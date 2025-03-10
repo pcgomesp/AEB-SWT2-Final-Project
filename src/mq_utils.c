@@ -1,5 +1,5 @@
-#include "mq_utils.h"
-#include "constants.h"
+#include "../inc/mq_utils.h"
+#include "../inc/constants.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -25,6 +25,9 @@ mqd_t create_mq(char *mq_name)
         perror("Error creating message queue");
         exit(1);
     }
+
+    printf("Queue created\n");
+
     return mqd;
 }
 

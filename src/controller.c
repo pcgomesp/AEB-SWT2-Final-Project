@@ -1,13 +1,16 @@
 #include <stdio.h>
-#include <pthread.h>
 #include <mqueue.h>
+#include <pthread.h>
 #include <unistd.h>
 #include <signal.h>
-#include "mq_utils.h"
-#include "constants.h"
+#include "../inc/mq_utils.h"
+#include "../inc/constants.h"
 
 int main()
 {
+
+    printf("Controller process PID: %d\n", getpid());
+
     int brake_pedal;
     int speed;
 
