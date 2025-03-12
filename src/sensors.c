@@ -6,7 +6,7 @@
 
 int main()
 {
-    mqd_t mq_sender = open_mq(MQ_NAME);
+    mqd_t mq_sender = open_mq(SENSORS_MQ);
     int speed = 0;
     while(1)
     {
