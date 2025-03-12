@@ -3,8 +3,9 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <signal.h>
-#include "../inc/mq_utils.h"
-#include "../inc/constants.h"
+#include <stdlib.h>
+#include "mq_utils.h"
+#include "constants.h"
 
 int main()
 {

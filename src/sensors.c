@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "../inc/constants.h"
-#include "../inc/mq_utils.h"
+#include "constants.h"
+#include "mq_utils.h"
 
 int main()
 {

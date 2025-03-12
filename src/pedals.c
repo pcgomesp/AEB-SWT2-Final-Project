@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "../inc/constants.h"
-#include "../inc/mq_utils.h"
-#include "../inc/leitura.h"
 #include <pthread.h>
+#include "constants.h"
+#include "mq_utils.h"
+#include "leitura.h"
 
 extern DadosMensagem dados; // Declaração da variável global
 

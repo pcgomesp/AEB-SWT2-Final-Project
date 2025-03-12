@@ -9,9 +9,9 @@ CFLAGS := -Wall -lpthread
 SRCFILES := $(wildcard $(SRCFOLDER)*.c)
 
 all: $(SRCFILES:src/%.c=obj/%.o)
-	$(CC) $(CFLAGS) obj/controller.o obj/mq_utils.o obj/leitura.o -o bin/controller_bin
-	$(CC) $(CFLAGS) obj/sensors.o obj/mq_utils.o obj/leitura.o -o bin/sensors_bin
-	$(CC) $(CFLAGS) obj/pedals.o obj/mq_utils.o obj/leitura.o -o bin/pedals_bin
+	$(CC) $(CFLAGS) obj/controller.o obj/mq_utils.o obj/leitura.o -o bin/controller_bin -I$(INCFOLDER)
+	$(CC) $(CFLAGS) obj/sensors.o obj/mq_utils.o obj/leitura.o -o bin/sensors_bin -I$(INCFOLDER)
+	$(CC) $(CFLAGS) obj/pedals.o obj/mq_utils.o obj/leitura.o -o bin/pedals_bin -I$(INCFOLDER)
 
 obj/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@ -I./inc
