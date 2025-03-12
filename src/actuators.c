@@ -10,7 +10,7 @@ int main()
     char buffer[MQ_MAX_MSG_SIZE];
     while (1)
     {
-        read_actuators_mq(mq_receiver, buffer);
+        read_mq(mq_receiver, buffer);
         printf("Received message: <%s>\n", buffer);
         sleep(1);
     }

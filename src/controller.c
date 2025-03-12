@@ -18,10 +18,24 @@ void terminate_execution(int sig)
     exit(0);
 }
 
+void update_values(char *mq_buffer, int *brake_pedal, int *speed)
+{
+    switch(mq_buffer[0])
+    {
+        case 'B':
+            sscanf(mq_buffer, "B: %d", brake_pedal);
+            break;
+        case 'S':
+            sscanf(mq_buffer, "S: %d", speed);
+            break;
+    }
+}
+
 int main()
 {
     printf("Controller process PID: %d\n", getpid());
 
+    char mq_buffer[MQ_MAX_MSG_SIZE];
     int brake_pedal;
     int speed;
 
@@ -32,13 +46,13 @@ int main()
 
     while (1)
     {
-        read_sensors_mq(sensors_mq, &brake_pedal, &speed);
+        read_mq(sensors_mq, mq_buffer);
+        update_values(mq_buffer, &brake_pedal, &speed);
         printf("Brake pedal: %d, Speed: %d\n", brake_pedal, speed);
 
-        char buffer[MQ_MAX_MSG_SIZE];
-        sprintf(buffer, "Freio: %d", rand() % 100 + 1);
-        printf("Sending message: %s\n", buffer);
-        write_mq(actuators_mq, buffer);
+        sprintf(mq_buffer, "Freio: %d", rand() % 100 + 1);
+        printf("Sending message: %s\n", mq_buffer);
+        write_mq(actuators_mq, mq_buffer);
 
         sleep(1);
     }

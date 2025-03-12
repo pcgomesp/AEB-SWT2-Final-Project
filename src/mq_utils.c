@@ -58,26 +58,7 @@ void close_mq(mqd_t mqd, char *mq_name)
     }
 }
 
-void read_sensors_mq(mqd_t mq_receiver, int *brake_pedal, int *speed)
-{
-    char mq_buffer[MQ_MAX_MSG_SIZE];
-    if (mq_receive(mq_receiver, mq_buffer, MQ_MAX_MSG_SIZE, NULL) != (mqd_t)-1)
-    {
-        switch (mq_buffer[0])
-        {
-        case 'B':
-            *brake_pedal = atoi(mq_buffer + 3);
-            break;
-        case 'S':
-            *speed = atoi(mq_buffer + 3);
-            break;
-        default:
-            break;
-        }
-    }
-}
-
-void read_actuators_mq(mqd_t mq_receiver, char* buffer)
+void read_mq(mqd_t mq_receiver, char* buffer)
 {
     if (mq_receive(mq_receiver, buffer, MQ_MAX_MSG_SIZE, NULL) == (mqd_t)-1)
     {
