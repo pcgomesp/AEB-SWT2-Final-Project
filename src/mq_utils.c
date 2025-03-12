@@ -71,7 +71,7 @@ void write_mq(mqd_t mq_sender, char *msg)
 {
     if (mq_send(mq_sender, msg, strlen(msg) + 1, 0) == -1)
     {
-        perror("Error sending message");
+        perror("Error sending message. Message queue is full");
         exit(1);
     }
 }
