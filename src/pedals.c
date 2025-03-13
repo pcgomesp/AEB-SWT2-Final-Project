@@ -13,7 +13,7 @@ int main()
     pthread_t t_leitura;
     pthread_create(&t_leitura, NULL, leitura_thread, NULL);
     
-    mqd_t mq_sender = open_mq(MQ_NAME);
+    mqd_t mq_sender = open_mq(SENSORS_MQ);
 
     int brake = 0;
     while (1)
