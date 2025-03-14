@@ -3,23 +3,28 @@
 #include "mq_utils.h"
 #include "constants.h"
 
-void setUp(void) {
+void setUp(void)
+{
     // set stuff up here
 }
 
-void tearDown(void) {
+void tearDown(void)
+{
     // clean stuff up here
 }
 
-void test_function_should_doBlahAndBlah(void) {
+void test_function_should_doBlahAndBlah(void)
+{
     TEST_ASSERT_EQUAL(0, 0);
 }
 
-void test_function_should_doAlsoDoBlah(void) {
+void test_function_should_doAlsoDoBlah(void)
+{
     TEST_ASSERT_EQUAL(0, 1);
 }
 
-void test_get_mq_attr(void) {
+void test_get_mq_attr(void)
+{
     struct mq_attr attr = get_mq_attr();
     TEST_ASSERT_EQUAL(O_NONBLOCK, attr.mq_flags);
     TEST_ASSERT_EQUAL(0, attr.mq_curmsgs);
@@ -27,7 +32,8 @@ void test_get_mq_attr(void) {
     TEST_ASSERT_EQUAL(MQ_MAX_MSG_SIZE, attr.mq_msgsize);
 }
 
-void test_create_and_close_mq(void) {
+void test_create_and_close_mq(void)
+{
     char *mq_name = "/test_mq";
     struct stat buffer;
 
@@ -45,7 +51,8 @@ void test_create_and_close_mq(void) {
     TEST_ASSERT_EQUAL(-1, exists);
 }
 
-int main(void) {
+int main(void)
+{
     UNITY_BEGIN();
     RUN_TEST(test_function_should_doBlahAndBlah);
     RUN_TEST(test_function_should_doAlsoDoBlah);
