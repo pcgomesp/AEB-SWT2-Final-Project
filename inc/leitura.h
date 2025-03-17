@@ -22,10 +22,4 @@ extern pthread_mutex_t dados_mutex;  // Declaração do mutex
 // Funções do módulo
 void* leitura_thread(void* arg);
 
-// Estrutura da mensagem estilo CAN a ser enviada para a fila
-typedef struct {
-    unsigned char identifier[8];
-    unsigned char dataFrame[8];
-} can_msg;
-
 #endif

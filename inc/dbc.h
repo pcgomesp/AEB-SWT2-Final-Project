@@ -13,4 +13,10 @@
 #define RES_SPEED_S     1/256
 #define RES_OBSTACLE_S  1/20
 
+// Estrutura da mensagem estilo CAN a ser enviada para a fila
+typedef struct {
+    unsigned char identifier[8];
+    unsigned char dataFrame[8];
+} can_msg;
+
 #endif
