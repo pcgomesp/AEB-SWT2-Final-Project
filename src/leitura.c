@@ -1,5 +1,5 @@
-#include "../inc/leitura.h"
-#include "../inc/mq_utils.h"
+#include "leitura.h"
+#include "mq_utils.h"
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
