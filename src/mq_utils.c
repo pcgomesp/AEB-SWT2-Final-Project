@@ -1,5 +1,5 @@
-#include "../inc/mq_utils.h"
-#include "../inc/constants.h"
+#include "mq_utils.h"
+#include "constants.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
