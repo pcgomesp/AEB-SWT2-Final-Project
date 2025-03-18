@@ -48,6 +48,8 @@ int main()
     printf("Main process PID: %d\n", getpid());
 
     //Initialize resources
+    sensors_mq = create_mq(SENSORS_MQ);
+    // create_shm();
 
     //Create auxiliary processes
     char *pedals_process = "../bin/pedals";
@@ -60,8 +62,11 @@ int main()
     cluster_pid = create_processes(cluster_process);
     obstacle_pid = create_processes(obstacle_process);
 
-
     // Read data from file
+    while(1)
+    {
+        
+    }
 
     signal(SIGINT, terminate_execution);
 
