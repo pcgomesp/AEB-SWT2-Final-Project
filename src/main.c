@@ -9,21 +9,7 @@
 #include "leitura.h"
 
 mqd_t sensors_mq;
-
-int main()
-{
-    printf("Main process PID: %d\n", getpid());
-
-    //Initialize resources
-
-    //Create processes
-
-    // Read data from file
-
-    signal(SIGINT, terminate_execution);
-
-    return EXIT_SUCCESS;
-}
+pid_t pedals_pid, speed_pid, cluster_pid, obstacle_pid;
 
 void terminate_execution(int sig)
 {
@@ -33,4 +19,51 @@ void terminate_execution(int sig)
     printf("Closing shared memory\n");
     //close_shm();
     exit(0);
+}
+
+pid_t create_processes(char *process_name)
+{
+    pid_t child_pid = fork();
+
+    if(child_pid < 0)
+    {
+        perror("Error creating auxiliary process \n");
+        exit(1);
+    }
+    else if(child_pid == 0)
+    {
+        if (execl(process_name, process_name, NULL) == -1) 
+        {
+            perror("Error executing the process");
+            exit(1);
+        }
+    }
+
+    return child_pid;
+
+}
+
+int main()
+{
+    printf("Main process PID: %d\n", getpid());
+
+    //Initialize resources
+
+    //Create auxiliary processes
+    char *pedals_process = "../bin/pedals";
+    char *speed_process = "../bin/speed";
+    char *cluster_process = "../bin/cluster";
+    char *obstacle_process = "../bin/obstacle";
+
+    pedals_pid = create_processes(pedals_process);
+    speed_pid = create_processes(speed_process);
+    cluster_pid = create_processes(cluster_process);
+    obstacle_pid = create_processes(obstacle_process);
+
+
+    // Read data from file
+
+    signal(SIGINT, terminate_execution);
+
+    return EXIT_SUCCESS;
 }
