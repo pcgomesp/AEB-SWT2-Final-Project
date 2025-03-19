@@ -3,6 +3,7 @@
 #include <mqueue.h>
 #include "mq_utils.h"
 #include "constants.h"
+#include "actuators.h"
 
 int main()
 {

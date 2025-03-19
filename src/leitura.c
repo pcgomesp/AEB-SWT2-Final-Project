@@ -1,5 +1,5 @@
-#include "../inc/leitura.h"
-#include "../inc/mq_utils.h"
+#include "leitura.h"
+#include "mq_utils.h"
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -10,7 +10,7 @@ DadosMensagem dados;  // Definição da variável global
 
 // Thread de leitura do arquivo
 void* leitura_thread(void* arg) {
-    FILE* arquivo = fopen("./cts/cenario.txt", "r");
+    FILE* arquivo = fopen("../cts/cenario.txt", "r");
     if (!arquivo) {
         perror("Erro ao abrir o arquivo cenario.txt");
         return NULL;
