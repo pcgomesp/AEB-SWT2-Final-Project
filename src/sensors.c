@@ -6,8 +6,13 @@
 #include "sensors_input.h"
 #include <pthread.h>
 #include <stdbool.h>
+#include "dbc.h"
 
 void* getSensorsData(void *arg);
+can_msg conv2CANCarClusterData(bool on_off_aeb_system);
+can_msg conv2CANVelocityData(double vehicle_velocity);
+can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance);
+can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal);
 
 pthread_t sensors_id;
 char *shm_ptr;
@@ -19,6 +24,8 @@ sensors_input_data sensorsData = {
     .accelerator_pedal = false, 
     .on_off_aeb_system = true
 };
+
+can_msg can_car_cluster, can_velocity_sensor, can_obstacle_sensor, can_pedals_sensor;
 
 int main(){
     int sensors_thr;
@@ -33,19 +40,7 @@ int main(){
     //     exit(51);
     // }
 
-    mqd_t mq_sender = open_mq(SENSORS_MQ);
-
-    // int speed = 0; // Apagar isso daqui
-    // while(1)
-    // {
-    //     speed += rand() % 20 - 10;
-    //     char buffer[MQ_MAX_MSG_SIZE];
-    //     sprintf(buffer, "S: %d", speed);
-    //     printf("%s\n",buffer);
-
-    //     write_mq(mq_sender, buffer);
-    //     sleep(1);
-    // }
+    //mqd_t mq_sender = open_mq(SENSORS_MQ);
 
     sensors_thr = pthread_create(&sensors_id, NULL, getSensorsData, NULL);
     if(sensors_thr != 0){
@@ -59,6 +54,8 @@ int main(){
 }
 
 void* getSensorsData(void *arg){
+    // Part 1: take data from shared memory
+
     // while(1){
     //     // MUST HAVE a Semaphore here
 
@@ -69,5 +66,30 @@ void* getSensorsData(void *arg){
     //     sleep(1);
     // }
 
+    // Part 2: Convert data to can_msg format
+    can_car_cluster     = conv2CANCarClusterData(sensorsData.on_off_aeb_system);
+    // can_velocity_sensor = conv2CANVelocityData();
+    // can_obstacle_sensor = conv2CANObstacleData();
+    // can_pedals_sensor   = conv2CANPedalsData();
+
+
+    // Part 3: Send all four frames to sensors_mq
+    
+    
+    
+    // Part 4: simple sleep timer here;
+
+    print_can_msg(&can_car_cluster);
+
     printf("Placeholder\n");
+    return NULL;
 }
+
+can_msg conv2CANCarClusterData(bool on_off_aeb_system){
+    can_msg aux = {.identifier = ID_CAR_C, .dataFrame = BASE_DATA_FRAME};
+
+    return aux;
+}
+// can_msg conv2CANVelocityData(double vehicle_velocity);
+// can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance);
+// can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal);
