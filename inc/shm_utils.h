@@ -2,13 +2,13 @@
 #define SHM_UTILS_H
 #include <semaphore.h>
 
-typedef struct
-{
-    int rpm;
+typedef struct {
     int speed;
-    int temp;
+    int time;
+    int obs_distance;
+    int obs_type;
+    int aeb_status;
 } sensors_info;
-
 typedef struct
 {
     char *shm;

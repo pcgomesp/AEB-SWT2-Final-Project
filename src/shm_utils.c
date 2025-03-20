@@ -65,14 +65,20 @@ void read_shm(char *shm_ptr, sem_t *sem, sensors_info *sinfo)
     sem_wait(sem);
     switch (shm_ptr[0])
     {
-    case 'R':
-        sinfo->rpm = atoi(shm_ptr + 3);
-        break;
     case 'S':
         sinfo->speed = atoi(shm_ptr + 3);
         break;
     case 'T':
-        sinfo->temp = atoi(shm_ptr + 3);
+        sinfo->time = atoi(shm_ptr + 3);
+        break;
+    case 'D':
+        sinfo->obs_distance = atoi(shm_ptr + 3);
+        break;
+    case 'O':
+        sinfo->obs_type = atoi(shm_ptr + 3);
+        break;
+    case 'A':
+        sinfo->aeb_status = atoi(shm_ptr + 3);
         break;
     default:
         fprintf(stderr, "Unknown sensor type: %c\n", shm_ptr[0]);
