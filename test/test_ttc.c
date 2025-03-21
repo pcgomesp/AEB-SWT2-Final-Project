@@ -12,17 +12,19 @@ float accel_calc(float spd) {
 
     clock_gettime(CLOCK_REALTIME, &current_time);
     printf("Current time: %ld.%09ld\n", current_time.tv_sec, current_time.tv_nsec);
-    elapsed_time = (double)(current_time.tv_sec - start_time.tv_sec) + (double)(current_time.tv_nsec - start_time.tv_nsec) / 1e9;
-    printf("Elapsed time: %f\n", elapsed_time);
-    start_time = current_time;
 
     if (prev_spd == 0.0) {
         prev_spd = spd;
+        start_time = current_time;
         return 0.0;
     }
 
     else {
+        elapsed_time = (double)(current_time.tv_sec - start_time.tv_sec) + (double)(current_time.tv_nsec - start_time.tv_nsec) / 1e9;
+        if (elapsed_time < 0.01) return 0.0; // To avoid division by zero
+        printf("Elapsed time: %f\n", elapsed_time);
         accel = ((spd - prev_spd) / 3.6) / elapsed_time; // acceleration in m/s^2
+        start_time = current_time;
         prev_spd = spd;
         return accel;
     } 
@@ -34,12 +36,16 @@ float ttc_calc(float dis_rel, float spd_rel) {
     float a = accel_calc(spd_rel);
     printf("Acceleration: %f\n", a);
     float b = spd_rel / 3.6;
+    printf("Speed: %f\n", spd_rel);
     float c = dis_rel;
+    printf("Distance: %f\n\n", dis_rel);
     float ttc, delta;
+
+    if (a == 0) return ttc = dis_rel / -spd_rel;
 
     // Calculating the discriminant
     delta = b * b - 2 * a * c;
-
+    printf("Delta: %f\n\n", delta);
     if (delta < 0) return -1.0; // No real roots
 
     else if (delta == 0) return -b / a;
@@ -87,7 +93,7 @@ void test_ttc_calc() {
         printf("Não há solução real para TTC com essas entradas\n");
     }
 
-    printf("\n");
+    printf("\n\n");
 }
 
 int main() {
