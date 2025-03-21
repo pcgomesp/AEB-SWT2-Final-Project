@@ -15,6 +15,7 @@ void updateInternalSpeedState(can_msg captured_frame);
 void updateInternalObstacleState(can_msg captured_frame);
 void updateInternalCarCState(can_msg captured_frame);
 
+mqd_t sensors_mq;
 pthread_t aeb_controller_id;
 sensors_input_data aeb_internal_state = {
     .vehicle_velocity = 0.0, 
@@ -27,12 +28,14 @@ sensors_input_data aeb_internal_state = {
 
 //can_msg captured_can_frame;
 can_msg captured_can_frame = {
-    .identifier = 0x0CFFB027,
-    .dataFrame  = {0x08, 0x07, 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
+    .identifier = 0x18FEF100,
+    .dataFrame  = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
 };
 
 int main(){
     int aeb_controller_thr;
+
+    sensors_mq = open_mq(SENSORS_MQ);
 
     aeb_controller_thr = pthread_create(&aeb_controller_id, NULL, mainWorkingLoop, NULL);
     if(aeb_controller_thr != 0){
@@ -47,14 +50,19 @@ int main(){
 void* mainWorkingLoop(void *arg){ // Main Loop function for our AEB Controller ECU
 
     // Step 01: Get CAN frames from the message queue
+    read_mq(sensors_mq, &captured_can_frame);
+    translateAndCallCanMsg(captured_can_frame); 
+    read_mq(sensors_mq, &captured_can_frame);
+    translateAndCallCanMsg(captured_can_frame); 
+    read_mq(sensors_mq, &captured_can_frame);
+    translateAndCallCanMsg(captured_can_frame); 
+    read_mq(sensors_mq, &captured_can_frame);
 
     // captured_can_frame = something something mq
 
     // Step 02: Translate the recieved CAN frame, according to its id
     // Step 03: Call the correct Function, based on the new data recieved
     translateAndCallCanMsg(captured_can_frame); 
-
-
 
     // Testing changes, exclude this on production code
     printf("vehicle_velocity: %lf\n", aeb_internal_state.vehicle_velocity);

@@ -14,15 +14,16 @@ can_msg conv2CANVelocityData(double vehicle_velocity);
 can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance);
 can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal);
 
+mqd_t sensors_mq;
 pthread_t sensors_id;
 //char *shm_ptr;
 sensors_input_data sensorsData = {
-    .vehicle_velocity = 50.0, 
-    .has_obstacle = false, 
-    .obstacle_distance = 90.0, 
-    .brake_pedal = false, 
-    .accelerator_pedal = false, 
-    .on_off_aeb_system = true
+    .vehicle_velocity = 20.0, 
+    .has_obstacle = true, 
+    .obstacle_distance = 100.0, 
+    .brake_pedal = true, 
+    .accelerator_pedal = true, 
+    .on_off_aeb_system = false
 };
 
 can_msg can_car_cluster, can_velocity_sensor, can_obstacle_sensor, can_pedals_sensor;
@@ -42,6 +43,8 @@ int main(){
 
     //mqd_t mq_sender = open_mq(SENSORS_MQ);
 
+    sensors_mq = create_mq(SENSORS_MQ);
+
     sensors_thr = pthread_create(&sensors_id, NULL, getSensorsData, NULL);
     if(sensors_thr != 0){
         perror("Sensors: it wasn't possible to create the associated thread\n");
@@ -50,21 +53,15 @@ int main(){
     sensors_thr = pthread_join(sensors_id, NULL);
     //close(shm_fd);
 
+    close_mq(sensors_mq, SENSORS_MQ);
+
     return 0;
 }
 
 void* getSensorsData(void *arg){
-    // Part 1: take data from shared memory
+    // Part 1: take data from txt or csv file
 
-    // while(1){
-    //     // MUST HAVE a Semaphore here
-
-    //     // Take data from the shared memory to sensorsData struct variable
-    //     // Convert to can_msg format
-    //     // Pass all the data, writing 4 different can_msg messages 
-        
-    //     sleep(1);
-    // }
+    
 
     // Part 2: Convert data to can_msg format
     can_car_cluster     = conv2CANCarClusterData(sensorsData.on_off_aeb_system);
@@ -73,11 +70,14 @@ void* getSensorsData(void *arg){
     can_pedals_sensor   = conv2CANPedalsData(sensorsData.brake_pedal, sensorsData.accelerator_pedal);
 
     // Part 3: Send all four frames to sensors_mq
-    
+    write_mq(sensors_mq, &can_car_cluster);
+    write_mq(sensors_mq, &can_velocity_sensor);
+    write_mq(sensors_mq, &can_obstacle_sensor);
+    write_mq(sensors_mq, &can_pedals_sensor);
     
     
     // Part 4: simple sleep timer here;
-
+    sleep(5);
 
     // PlaceHolder: just some simple prints to see if the data is being converted in the right way
     print_can_msg(&can_car_cluster);
