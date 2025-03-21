@@ -8,11 +8,17 @@
 #include <mqueue.h>
 #include <pthread.h>
 #include "constants.h"
+#include <stdbool.h>
 
 // Estrutura da mensagem a ser enviada pela fila
 typedef struct {
     int tempo;
-    int distancia;
+    double distancia;
+    bool obstacle;
+    double speed;
+    bool brake;
+    bool accelerator;
+    bool aeb_on_off;
 } DadosMensagem;
 
 // Variável global para armazenar os dados lidos

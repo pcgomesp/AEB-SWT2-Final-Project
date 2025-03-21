@@ -19,7 +19,8 @@ void* leitura_thread(void* arg) {
     char buffer[100];
     fgets(buffer, sizeof(buffer), arquivo); // Ignora o cabeçalho
 
-    while (fscanf(arquivo, "%d %d", &dados.tempo, &dados.distancia) == 2) {
+    while (fscanf(arquivo, "%d %f %d %f %d %d %d", &dados.tempo, &dados.distancia, &dados.obstacle, 
+    &dados.speed, &dados.brake, &dados.accelerator, &dados.aeb_on_off) == 7) {
         //printf("Lido: Tempo = %d, Distância = %d\n", dados.tempo, dados.distancia);
         usleep(dados.tempo * 1000);
     }
