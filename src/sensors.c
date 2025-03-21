@@ -15,7 +15,7 @@ can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance);
 can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal);
 
 pthread_t sensors_id;
-char *shm_ptr;
+//char *shm_ptr;
 sensors_input_data sensorsData = {
     .vehicle_velocity = 50.0, 
     .has_obstacle = false, 
@@ -77,7 +77,7 @@ void* getSensorsData(void *arg){
     
     
     // Part 4: simple sleep timer here;
-    
+
 
     // PlaceHolder: just some simple prints to see if the data is being converted in the right way
     print_can_msg(&can_car_cluster);

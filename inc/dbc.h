@@ -1,18 +1,20 @@
 #ifndef DBC_H
 #define DBC_H
 
-//#define ID_PEDALS       0x18FEF100
-//#define ID_SPEED_S      0x18FFFD64
-//#define ID_OBSTACLE_S   0x0CFFB027
-//#define ID_CAR_C        0x0CFFAF27
-//#define ID_AEB_S        0x18FFA027
+#include <stdint.h>
 
 // Identifiers, according to the dbc file in the requirements specification
-#define ID_PEDALS       {0x18, 0xFE, 0xF1, 0x00}
-#define ID_SPEED_S      {0x18, 0xFF, 0xFD, 0x64}
-#define ID_OBSTACLE_S   {0x0C, 0xFF, 0xB0, 0x27}
-#define ID_CAR_C        {0x0C, 0xFF, 0xAF, 0x27}
-#define ID_AEB_S        {0x18, 0xFF, 0xA0, 0x27}
+#define ID_PEDALS       0x18FEF100
+#define ID_SPEED_S      0x18FFFD64
+#define ID_OBSTACLE_S   0x0CFFB027
+#define ID_CAR_C        0x0CFFAF27
+#define ID_AEB_S        0x18FFA027
+
+// #define ID_PEDALS       {0x18, 0xFE, 0xF1, 0x00}
+// #define ID_SPEED_S      {0x18, 0xFF, 0xFD, 0x64}
+// #define ID_OBSTACLE_S   {0x0C, 0xFF, 0xB0, 0x27}
+// #define ID_CAR_C        {0x0C, 0xFF, 0xAF, 0x27}
+// #define ID_AEB_S        {0x18, 0xFF, 0xA0, 0x27}
 
 // left most: least significant // right most: most significant
 #define BASE_DATA_FRAME {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
@@ -26,7 +28,7 @@
 // Estrutura da mensagem estilo CAN a ser enviada para a fila
 typedef struct {
     //unsigned char identifier[8];
-    unsigned char identifier[4];
+    uint32_t identifier;
     unsigned char dataFrame[8];
 } can_msg;
 
