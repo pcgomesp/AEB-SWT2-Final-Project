@@ -7,6 +7,8 @@
 #include <pthread.h>
 #include <stdbool.h>
 #include "dbc.h"
+#include "ttc.h"
+#include "aeb_actions.h"
 
 void* mainWorkingLoop(void *arg);
 void translateAndCallCanMsg(can_msg captured_frame);
@@ -25,6 +27,7 @@ sensors_input_data aeb_internal_state = {
     .accelerator_pedal = false, 
     .on_off_aeb_system = true
 };
+double internal_ttc;
 
 //can_msg captured_can_frame;
 can_msg captured_can_frame = {
@@ -64,6 +67,14 @@ void* mainWorkingLoop(void *arg){ // Main Loop function for our AEB Controller E
     // Step 03: Call the correct Function, based on the new data recieved
     translateAndCallCanMsg(captured_can_frame); 
 
+    // Step 04: Reactions from the AEB System: based on the new data, what should the AEB controller do?
+    // Trace: SwR-1
+    internal_ttc = calculate_ttc_placeholder(aeb_internal_state.obstacle_distance, (aeb_internal_state.vehicle_velocity - 0.0));
+    printf("TTC = %.2lf\n", internal_ttc);
+
+    // Trace: SwR-2
+    issue_car_cluster_alert(internal_ttc);
+
     // Testing changes, exclude this on production code
     printf("vehicle_velocity: %lf\n", aeb_internal_state.vehicle_velocity);
     printf("has_obstacle: %s\n", aeb_internal_state.has_obstacle ? "true" : "false");
@@ -72,7 +83,7 @@ void* mainWorkingLoop(void *arg){ // Main Loop function for our AEB Controller E
     printf("accelerator_pedal: %s\n", aeb_internal_state.accelerator_pedal ? "true" : "false");
     printf("on_off_aeb_system: %s\n", aeb_internal_state.on_off_aeb_system ? "true" : "false");
 
-    // Step 04: Simple sleep timer? This will change when new functions to fulfill requirements are added
+    // Step 05: Simple sleep timer? This will change when new functions to fulfill requirements are added
 
     printf("Placeholder\n");
     return NULL;

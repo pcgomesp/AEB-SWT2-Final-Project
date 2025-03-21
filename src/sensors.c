@@ -18,9 +18,9 @@ mqd_t sensors_mq;
 pthread_t sensors_id;
 //char *shm_ptr;
 sensors_input_data sensorsData = {
-    .vehicle_velocity = 20.0, 
+    .vehicle_velocity = 50.0, 
     .has_obstacle = true, 
-    .obstacle_distance = 100.0, 
+    .obstacle_distance = 10.0, 
     .brake_pedal = true, 
     .accelerator_pedal = true, 
     .on_off_aeb_system = false
