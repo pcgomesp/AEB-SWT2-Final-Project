@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
+#include <unistd.h>
 
 // Function for calculate acceleration
 float accel_calc(float spd) {
@@ -20,31 +21,36 @@ float accel_calc(float spd) {
     }
 
     else {
-        elapsed_time = (double)(current_time.tv_sec - start_time.tv_sec) + (double)(current_time.tv_nsec - start_time.tv_nsec) / 1e9;
+        elapsed_time = (double)(current_time.tv_sec - start_time.tv_sec) 
+                        + (double)(current_time.tv_nsec - start_time.tv_nsec) / 1e9;
         if (elapsed_time < 0.01) return 0.0; // To avoid division by zero
         printf("Elapsed time: %f\n", elapsed_time);
+        
         accel = ((spd - prev_spd) / 3.6) / elapsed_time; // acceleration in m/s^2
         start_time = current_time;
         prev_spd = spd;
+        
         return accel;
     } 
 }
 
 // Function for calculating the time to collision (TTC)
 float ttc_calc(float dis_rel, float spd_rel) {
-    // Quadratic equation coefficients - basic cinematics
-    float a = accel_calc(spd_rel);
+    //static float prev_spd = 0.0; // scratch
+    // Quadratic equation coefficients - UVM (Uniformly Variable Motion)
+    float a, b, c, ttc, delta;
+    
+    a = accel_calc(spd_rel);
     printf("Acceleration: %f\n", a);
-    float b = spd_rel / 3.6;
+    b = spd_rel / 3.6;
     printf("Speed: %f\n", spd_rel);
-    float c = dis_rel;
+    c = dis_rel;
     printf("Distance: %f\n\n", dis_rel);
-    float ttc, delta;
 
-    if (a == 0) return ttc = dis_rel / -spd_rel;
+    if (a == 0) return ttc = dis_rel / spd_rel;
 
     // Calculating the discriminant
-    delta = b * b - 2 * a * c;
+    delta = b * b + 2 * a * c;
     printf("Delta: %f\n\n", delta);
     if (delta < 0) return -1.0; // No real roots
 
@@ -66,9 +72,11 @@ void test_accel_calc() {
 
     accel_calc(speed1);
     sleep(2);
-    printf("Aceleração entre %0.1f km/h e %0.1f km/h: %0.4f m/s^2\n", speed1, speed2, accel_calc(speed2));
+    printf("Aceleração entre %0.1f km/h e %0.1f km/h: %0.4f m/s^2\n", 
+            speed1, speed2, accel_calc(speed2));
     sleep(2);
-    printf("Aceleração entre %0.1f km/h e %0.1f km/h: %0.4f m/s^2\n", speed2, speed1, accel_calc(speed1));
+    printf("Aceleração entre %0.1f km/h e %0.1f km/h: %0.4f m/s^2\n", 
+            speed2, speed1, accel_calc(speed1));
     printf("\n");
 }
 
