@@ -2,7 +2,9 @@ name: Cppcheck MISRA
 
 on:
   push:
-    branches: [ "develop" ]
+    branches:
+      - develop
+      - feature/add_cppcheck_action
   pull_request:
     branches: [ "develop" ]
 
