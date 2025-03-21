@@ -11,9 +11,6 @@
 #include "../inc/mq_utils.h"
 #include "../inc/constants.h"
 
-// Definitions and constants
-#define QUEUE_NAME "/my_queue"
-#define MAX_SIZE 1024
 
 // Structure for storing sensor data
 typedef struct {
@@ -25,47 +22,6 @@ typedef struct {
 typedef struct {
     bool actv_break; // brake activation status
 } triggerData;
-
-// Function to create a message queue
-mqd_t create_mq(char *mq_name) {
-    mqd_t mq;
-    struct mq_attr attr;
-    attr.mq_flags = 0;
-    attr.mq_maxmsg = 10;
-    attr.mq_msgsize = MAX_SIZE;
-    attr.mq_curmsgs = 0;
-
-    mq = mq_open(mq_name, O_CREAT | O_RDWR, 0666, &attr);
-    if (mq == (mqd_t) -1) {
-        perror("mq_open");
-        exit(1);
-    }
-    return mq;
-}
-
-// Function to close a message queue
-void close_mq(mqd_t mq) {
-    if (mq_close(mq) == -1) {
-        perror("mq_close");
-        exit(1);
-    }
-}
-
-// Function to read from a message queue
-void read_mq(mqd_t mq_receiver, int *brake_pedal, int *speed) {
-    char buffer[MAX_SIZE];
-    ssize_t bytes_read;
-
-    bytes_read = mq_receive(mq_receiver, buffer, MAX_SIZE, NULL);
-    if (bytes_read >= 0) {
-        buffer[bytes_read] = '\0'; // Null terminate the string
-        // Parse brake_pedal and speed from buffer if required
-        // Example (assuming the data is passed as a string):
-        sscanf(buffer, "%d,%d", brake_pedal, speed);
-    } else {
-        perror("mq_receive");
-    }
-}
 
 // Function for calculate acceleration
 float accel_calc(float spd) {
