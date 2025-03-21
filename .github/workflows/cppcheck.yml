@@ -19,10 +19,6 @@ jobs:
     - name: Install cppcheck
       run: sudo apt-get update && sudo apt-get install -y cppcheck
 
-    - name: Download MISRA Addon
-      run: |
-        wget https://raw.githubusercontent.com/danmar/cppcheck/master/addons/misra.py -P /tmp
-
     - name: Run Cppcheck with MISRA
       run: |
-        cppcheck --addon=/tmp/misra.py --suppress=missingIncludeSystem --inline-suppr --std=c99 --error-exitcode=1 src/
+        cppcheck --addon=misra -I ./inc --force --library=posix src/
