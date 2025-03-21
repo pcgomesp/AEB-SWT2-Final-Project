@@ -28,7 +28,7 @@ clean:
 run:
 	bin/controller_bin
 
-test: test/test_mq_utils
+test: test/test_mq_utils test/test_mq_utils_read
 	./test/test_mq_utils
 	./test/test_mq_utils_read
 

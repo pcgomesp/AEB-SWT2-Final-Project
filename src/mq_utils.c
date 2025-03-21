@@ -58,19 +58,23 @@ void close_mq(mqd_t mqd, char *mq_name)
     }
 }
 
-int read_mq(mqd_t mq_receiver, char* buffer)
+int read_mq(mqd_t mq_receiver, can_msg *msg_read)
 {
+    char buffer[MQ_MAX_MSG_SIZE];
     if (mq_receive(mq_receiver, buffer, MQ_MAX_MSG_SIZE, NULL) == (mqd_t)-1)
     {
         perror("Error receiving message");
         return -1;
     }
+    memcpy(msg_read, buffer, MQ_MAX_MSG_SIZE);
     return 0;
 }
 
-int write_mq(mqd_t mq_sender, char *msg)
+int write_mq(mqd_t mq_sender, can_msg *msg)
 {
-    if (mq_send(mq_sender, msg, strlen(msg) + 1, 0) == -1)
+    char buffer[MQ_MAX_MSG_SIZE];
+    memcpy(buffer, msg, MQ_MAX_MSG_SIZE);
+    if (mq_send(mq_sender, buffer, MQ_MAX_MSG_SIZE, 0) == -1)
     {
         perror("Error sending message. Message queue is full");
         return -1;
