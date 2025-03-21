@@ -15,7 +15,11 @@ can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance);
 can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal);
 
 pthread_t sensors_id;
+
+sensors_input_data sensorsData;
+
 //char *shm_ptr;
+/*
 sensors_input_data sensorsData = {
     .vehicle_velocity = 50.0, 
     .has_obstacle = false, 
@@ -24,6 +28,7 @@ sensors_input_data sensorsData = {
     .accelerator_pedal = false, 
     .on_off_aeb_system = true
 };
+*/
 
 can_msg can_car_cluster, can_velocity_sensor, can_obstacle_sensor, can_pedals_sensor;
 
@@ -41,6 +46,8 @@ int main(){
     // }
 
     //mqd_t mq_sender = open_mq(SENSORS_MQ);
+
+    leitura_arquivo("cts/cenario.txt");  // Chama a função para ler os dados do arquivo
 
     sensors_thr = pthread_create(&sensors_id, NULL, getSensorsData, NULL);
     if(sensors_thr != 0){
@@ -67,6 +74,8 @@ void* getSensorsData(void *arg){
     // }
 
     // Part 2: Convert data to can_msg format
+
+    
     can_car_cluster     = conv2CANCarClusterData(sensorsData.on_off_aeb_system);
     can_velocity_sensor = conv2CANVelocityData(sensorsData.vehicle_velocity);
     can_obstacle_sensor = conv2CANObstacleData(sensorsData.has_obstacle, sensorsData.obstacle_distance);
