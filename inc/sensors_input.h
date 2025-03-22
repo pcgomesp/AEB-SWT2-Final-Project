@@ -4,12 +4,14 @@
 #include <stdbool.h>
 
 typedef struct {
-    double  vehicle_velocity;
-    bool    has_obstacle;
-    double  obstacle_distance;
-    bool    brake_pedal;
-    bool    accelerator_pedal;
-    bool    on_off_aeb_system;
+    double vehicle_velocity;
+    int has_obstacle;
+    double obstacle_distance;
+    int brake_pedal;
+    int accelerator_pedal;
+    int on_off_aeb_system;
 } sensors_input_data;
+
+
 
 #endif

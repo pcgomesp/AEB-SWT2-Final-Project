@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include <stdbool.h>
 #include "dbc.h"
+#include "file_reader.h"
 
 void* getSensorsData(void *arg);
 can_msg conv2CANCarClusterData(bool on_off_aeb_system);
@@ -15,15 +16,20 @@ can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance);
 can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal);
 
 pthread_t sensors_id;
+
+sensors_input_data sensorsData;
+
 //char *shm_ptr;
-sensors_input_data sensorsData = {
-    .vehicle_velocity = 50.0, 
-    .has_obstacle = false, 
-    .obstacle_distance = 90.0, 
-    .brake_pedal = false, 
-    .accelerator_pedal = false, 
-    .on_off_aeb_system = true
-};
+
+// sensors_input_data sensorsData = {
+//     .vehicle_velocity = 50.0, 
+//     .has_obstacle = false, 
+//     .obstacle_distance = 90.0, 
+//     .brake_pedal = false, 
+//     .accelerator_pedal = false, 
+//     .on_off_aeb_system = true
+// };
+
 
 can_msg can_car_cluster, can_velocity_sensor, can_obstacle_sensor, can_pedals_sensor;
 
@@ -42,7 +48,12 @@ int main(){
 
     //mqd_t mq_sender = open_mq(SENSORS_MQ);
 
-    sensors_thr = pthread_create(&sensors_id, NULL, getSensorsData, NULL);
+    //leitura_arquivo("cts/cenario.txt");  // Chama a função para ler os dados do arquivo
+
+    const char *filename = "cts/cenario.txt";
+    FILE *file = open_file(filename); // uses the modularized function to open the file
+
+    sensors_thr = pthread_create(&sensors_id, NULL, getSensorsData, file); //Changed the argument from null to file(the last argument)
     if(sensors_thr != 0){
         perror("Sensors: it wasn't possible to create the associated thread\n");
         exit(52);
@@ -67,10 +78,17 @@ void* getSensorsData(void *arg){
     // }
 
     // Part 2: Convert data to can_msg format
-    can_car_cluster     = conv2CANCarClusterData(sensorsData.on_off_aeb_system);
-    can_velocity_sensor = conv2CANVelocityData(sensorsData.vehicle_velocity);
-    can_obstacle_sensor = conv2CANObstacleData(sensorsData.has_obstacle, sensorsData.obstacle_distance);
-    can_pedals_sensor   = conv2CANPedalsData(sensorsData.brake_pedal, sensorsData.accelerator_pedal);
+
+    FILE *file = (FILE*)arg; // Recebe o arquivo como argumento
+
+    while (1) {
+        // Read a new line from the file
+        if (read_sensor_data(file, &sensorsData)) {
+
+        can_car_cluster     = conv2CANCarClusterData(sensorsData.on_off_aeb_system);
+        can_velocity_sensor = conv2CANVelocityData(sensorsData.vehicle_velocity);
+        can_obstacle_sensor = conv2CANObstacleData(sensorsData.has_obstacle, sensorsData.obstacle_distance);
+        can_pedals_sensor   = conv2CANPedalsData(sensorsData.brake_pedal, sensorsData.accelerator_pedal);
 
     // Part 3: Send all four frames to sensors_mq
     
@@ -79,13 +97,25 @@ void* getSensorsData(void *arg){
     // Part 4: simple sleep timer here;
 
 
-    // PlaceHolder: just some simple prints to see if the data is being converted in the right way
-    print_can_msg(&can_car_cluster);
-    print_can_msg(&can_velocity_sensor);
-    print_can_msg(&can_obstacle_sensor);
-    print_can_msg(&can_pedals_sensor);
+        // PlaceHolder: just some simple prints to see if the data is being converted in the right way
+        print_can_msg(&can_car_cluster);
+        print_can_msg(&can_velocity_sensor);
+        print_can_msg(&can_obstacle_sensor);
+        print_can_msg(&can_pedals_sensor);
+        
+        printf("New line.\n"); //This line is used for see the break of line
+    } else {
+        // If a new line can't be read, the end of the file was reached
+        printf("EOF reached.\n");
+        break;
+    }
 
-    printf("Placeholder\n");
+    sleep(1); // Wait for 1 second before reading the next line
+    }
+        
+
+    //printf("Placeholder\n");
+    fclose(file); // Closes the file at the end
     return NULL;
 }
 
