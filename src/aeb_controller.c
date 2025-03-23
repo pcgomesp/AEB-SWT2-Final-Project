@@ -48,13 +48,14 @@ void* mainWorkingLoop(void *arg){ // Main Loop function for our AEB Controller E
 
     // Step 01: Get CAN frames from the message queue
 
-    // captured_can_frame = something something mq
+    //read_mq(sensors_mq, &captured_can_frame);
 
     // Step 02: Translate the recieved CAN frame, according to its id
     // Step 03: Call the correct Function, based on the new data recieved
     translateAndCallCanMsg(captured_can_frame); 
 
 
+    // Step 04: Reactions from the AEB System: based on the new data, what should the AEB controller do?
 
     // Testing changes, exclude this on production code
     printf("vehicle_velocity: %lf\n", aeb_internal_state.vehicle_velocity);
@@ -64,7 +65,7 @@ void* mainWorkingLoop(void *arg){ // Main Loop function for our AEB Controller E
     printf("accelerator_pedal: %s\n", aeb_internal_state.accelerator_pedal ? "true" : "false");
     printf("on_off_aeb_system: %s\n", aeb_internal_state.on_off_aeb_system ? "true" : "false");
 
-    // Step 04: Simple sleep timer? This will change when new functions to fulfill requirements are added
+    // Step 05: Simple sleep timer? This will change when new functions to fulfill requirements are added
 
     printf("Placeholder\n");
     return NULL;

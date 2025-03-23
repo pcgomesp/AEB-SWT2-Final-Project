@@ -15,11 +15,9 @@ can_msg conv2CANVelocityData(double vehicle_velocity);
 can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance);
 can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal);
 
+mqd_t sensors_mq;
 pthread_t sensors_id;
-
 sensors_input_data sensorsData;
-
-//char *shm_ptr;
 
 // sensors_input_data sensorsData = {
 //     .vehicle_velocity = 50.0, 
@@ -30,23 +28,12 @@ sensors_input_data sensorsData;
 //     .on_off_aeb_system = true
 // };
 
-
 can_msg can_car_cluster, can_velocity_sensor, can_obstacle_sensor, can_pedals_sensor;
 
 int main(){
     int sensors_thr;
-    // Falta o SHM_LOCATION
-    // int shm_fd = shm_open(SHM_LOCATION, O_RDWR , 0666); // Acess to shared memory, not yet implemented
-    // shm_ptr = (char *)mmap(0, BUFFER_SIZE_SHM, PROT_WRITE, MAP_SHARED, shm_fd, 0); // Shared mem mapping to program internal mem
-    
-    // FALTA O SMPH_NAME
-    // smph = sem_open(SMPH_NAME, 0); // Acess to Posix Semaphore create on main.c
-    // if (smph == SEM_FAILED) {
-    //     perror("Sensors: it wasn't possible to acess the semaphore");
-    //     exit(51);
-    // }
 
-    //mqd_t mq_sender = open_mq(SENSORS_MQ);
+    sensors_mq = open_mq(SENSORS_MQ);
 
     //leitura_arquivo("cts/cenario.txt");  // Chama a função para ler os dados do arquivo
 
@@ -65,17 +52,8 @@ int main(){
 }
 
 void* getSensorsData(void *arg){
-    // Part 1: take data from shared memory
+    // Part 1: take data from txt/csv file
 
-    // while(1){
-    //     // MUST HAVE a Semaphore here
-
-    //     // Take data from the shared memory to sensorsData struct variable
-    //     // Convert to can_msg format
-    //     // Pass all the data, writing 4 different can_msg messages 
-        
-    //     sleep(1);
-    // }
 
     // Part 2: Convert data to can_msg format
 
@@ -84,36 +62,32 @@ void* getSensorsData(void *arg){
     while (1) {
         // Read a new line from the file
         if (read_sensor_data(file, &sensorsData)) {
+            can_car_cluster     = conv2CANCarClusterData(sensorsData.on_off_aeb_system);
+            can_velocity_sensor = conv2CANVelocityData(sensorsData.vehicle_velocity);
+            can_obstacle_sensor = conv2CANObstacleData(sensorsData.has_obstacle, sensorsData.obstacle_distance);
+            can_pedals_sensor   = conv2CANPedalsData(sensorsData.brake_pedal, sensorsData.accelerator_pedal);
 
-        can_car_cluster     = conv2CANCarClusterData(sensorsData.on_off_aeb_system);
-        can_velocity_sensor = conv2CANVelocityData(sensorsData.vehicle_velocity);
-        can_obstacle_sensor = conv2CANObstacleData(sensorsData.has_obstacle, sensorsData.obstacle_distance);
-        can_pedals_sensor   = conv2CANPedalsData(sensorsData.brake_pedal, sensorsData.accelerator_pedal);
-
-    // Part 3: Send all four frames to sensors_mq
+            // Part 3: Send all four frames to sensors_mq    
     
     
-    
-    // Part 4: simple sleep timer here;
+            // Part 4: simple sleep timer here;
 
-
-        // PlaceHolder: just some simple prints to see if the data is being converted in the right way
-        print_can_msg(&can_car_cluster);
-        print_can_msg(&can_velocity_sensor);
-        print_can_msg(&can_obstacle_sensor);
-        print_can_msg(&can_pedals_sensor);
+            // PlaceHolder: just some simple prints to see if the data is being converted in the right way
+            print_can_msg(&can_car_cluster);
+            print_can_msg(&can_velocity_sensor);
+            print_can_msg(&can_obstacle_sensor);
+            print_can_msg(&can_pedals_sensor);
         
-        printf("New line.\n"); //This line is used for see the break of line
-    } else {
+            printf("New line.\n"); //This line is used for see the break of line
+        } else {
         // If a new line can't be read, the end of the file was reached
         printf("EOF reached.\n");
         break;
     }
 
-    sleep(1); // Wait for 1 second before reading the next line
+        sleep(1); // Wait for 1 second before reading the next line
     }
         
-
     //printf("Placeholder\n");
     fclose(file); // Closes the file at the end
     return NULL;
