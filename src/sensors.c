@@ -19,29 +19,17 @@ pthread_t sensors_id;
 //char *shm_ptr;
 sensors_input_data sensorsData = {
     .vehicle_velocity = 50.0, 
-    .has_obstacle = true, 
+    .has_obstacle = false, 
     .obstacle_distance = 10.0, 
-    .brake_pedal = true, 
-    .accelerator_pedal = true, 
-    .on_off_aeb_system = false
+    .brake_pedal = false, 
+    .accelerator_pedal = false, 
+    .on_off_aeb_system = true
 };
 
 can_msg can_car_cluster, can_velocity_sensor, can_obstacle_sensor, can_pedals_sensor;
 
 int main(){
     int sensors_thr;
-    // Falta o SHM_LOCATION
-    // int shm_fd = shm_open(SHM_LOCATION, O_RDWR , 0666); // Acess to shared memory, not yet implemented
-    // shm_ptr = (char *)mmap(0, BUFFER_SIZE_SHM, PROT_WRITE, MAP_SHARED, shm_fd, 0); // Shared mem mapping to program internal mem
-    
-    // FALTA O SMPH_NAME
-    // smph = sem_open(SMPH_NAME, 0); // Acess to Posix Semaphore create on main.c
-    // if (smph == SEM_FAILED) {
-    //     perror("Sensors: it wasn't possible to acess the semaphore");
-    //     exit(51);
-    // }
-
-    //mqd_t mq_sender = open_mq(SENSORS_MQ);
 
     sensors_mq = create_mq(SENSORS_MQ);
 
@@ -51,7 +39,6 @@ int main(){
         exit(52);
     }
     sensors_thr = pthread_join(sensors_id, NULL);
-    //close(shm_fd);
 
     close_mq(sensors_mq, SENSORS_MQ);
 

@@ -29,7 +29,6 @@ sensors_input_data aeb_internal_state = {
 };
 double internal_ttc;
 
-//can_msg captured_can_frame;
 can_msg captured_can_frame = {
     .identifier = 0x18FEF100,
     .dataFrame  = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
