@@ -5,9 +5,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include "mq_utils.h"
-#include "shm_utils.h"
 #include "constants.h"
-#include "leitura.h"
 
 mqd_t sensors_mq;
 pid_t sensors_pid, controller_pid, actuators_pid;
