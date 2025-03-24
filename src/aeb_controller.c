@@ -7,6 +7,9 @@
 #include <pthread.h>
 #include <stdbool.h>
 #include "dbc.h"
+#include <time.h>
+
+#define LOOP_EMPTY_ITERATIONS_MAX 11
 
 void* mainWorkingLoop(void *arg);
 void translateAndCallCanMsg(can_msg captured_frame);
@@ -15,7 +18,9 @@ void updateInternalSpeedState(can_msg captured_frame);
 void updateInternalObstacleState(can_msg captured_frame);
 void updateInternalCarCState(can_msg captured_frame);
 
+mqd_t sensors_mq, actuators_mq;
 pthread_t aeb_controller_id;
+
 sensors_input_data aeb_internal_state = {
     .vehicle_velocity = 0.0, 
     .has_obstacle = false, 
@@ -24,15 +29,29 @@ sensors_input_data aeb_internal_state = {
     .accelerator_pedal = false, 
     .on_off_aeb_system = true
 };
+actuators_abstraction send_actuators_state = {
+    .belt_tightness = false,
+    .door_lock = true,
+    .should_activate_abs = false,
+    .alarm_led = true,
+    .alarm_buzzer = true
+};
 
-//can_msg captured_can_frame;
+
 can_msg captured_can_frame = {
     .identifier = 0x0CFFB027,
     .dataFrame  = {0x08, 0x07, 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
 };
+can_msg out_can_frame = {
+    .identifier = 0x18FFA027,
+    .dataFrame  = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
+};
 
 int main(){
     int aeb_controller_thr;
+
+    sensors_mq = open_mq(SENSORS_MQ);
+    actuators_mq = create_mq(ACTUATORS_MQ);
 
     aeb_controller_thr = pthread_create(&aeb_controller_id, NULL, mainWorkingLoop, NULL);
     if(aeb_controller_thr != 0){
@@ -41,31 +60,50 @@ int main(){
     }
     aeb_controller_thr = pthread_join(aeb_controller_id, NULL);
 
+    close_mq(actuators_mq, ACTUATORS_MQ);
+
     return 0;
 }
 
 void* mainWorkingLoop(void *arg){ // Main Loop function for our AEB Controller ECU
-
     // Step 01: Get CAN frames from the message queue
-
-    //read_mq(sensors_mq, &captured_can_frame);
-
     // Step 02: Translate the recieved CAN frame, according to its id
     // Step 03: Call the correct Function, based on the new data recieved
-    translateAndCallCanMsg(captured_can_frame); 
-
-
     // Step 04: Reactions from the AEB System: based on the new data, what should the AEB controller do?
-
-    // Testing changes, exclude this on production code
-    printf("vehicle_velocity: %lf\n", aeb_internal_state.vehicle_velocity);
-    printf("has_obstacle: %s\n", aeb_internal_state.has_obstacle ? "true" : "false");
-    printf("obstacle_distance: %lf\n", aeb_internal_state.obstacle_distance);
-    printf("brake_pedal: %s\n", aeb_internal_state.brake_pedal ? "true" : "false");
-    printf("accelerator_pedal: %s\n", aeb_internal_state.accelerator_pedal ? "true" : "false");
-    printf("on_off_aeb_system: %s\n", aeb_internal_state.on_off_aeb_system ? "true" : "false");
-
+        // 4.1 - Calculate new ttc
+        // 4.2 - Update send_actuators_state
+        // Should we separate more or can we let everything in this single thread?
+        // Will separating things make us need to worry more about synchronization?
     // Step 05: Simple sleep timer? This will change when new functions to fulfill requirements are added
+
+    int no_message_counter = 0;
+    int result;
+
+    // i don't know why yet, but this condition doesn't make it get out of the while/thread. Suggestions are accepted!
+    while(no_message_counter < LOOP_EMPTY_ITERATIONS_MAX){
+        result = read_mq(sensors_mq, &captured_can_frame);
+        if(result == 0){
+            translateAndCallCanMsg(captured_can_frame); 
+            no_message_counter = 0;
+        } else if (result == -1){
+            no_message_counter++;
+        } else {
+            perror("\n");
+            break;
+        }
+        
+        printf("Quantidade = %i\n", no_message_counter);
+
+        // Testing changes, exclude this on production code
+        printf("vehicle_velocity: %lf\n", aeb_internal_state.vehicle_velocity);
+        printf("has_obstacle: %s\n", aeb_internal_state.has_obstacle ? "true" : "false");
+        printf("obstacle_distance: %lf\n", aeb_internal_state.obstacle_distance);
+        printf("brake_pedal: %s\n", aeb_internal_state.brake_pedal ? "true" : "false");
+        printf("accelerator_pedal: %s\n", aeb_internal_state.accelerator_pedal ? "true" : "false");
+        printf("on_off_aeb_system: %s\n", aeb_internal_state.on_off_aeb_system ? "true" : "false");
+    
+        //nanosleep(&(struct timespec){.tv_sec = 0, .tv_nsec = 10000000000}, NULL); // 500ms sleep -> acho q n tá funfando
+    }
 
     printf("Placeholder\n");
     return NULL;

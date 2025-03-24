@@ -33,9 +33,8 @@ can_msg can_car_cluster, can_velocity_sensor, can_obstacle_sensor, can_pedals_se
 int main(){
     int sensors_thr;
 
-    sensors_mq = open_mq(SENSORS_MQ);
-
-    //leitura_arquivo("cts/cenario.txt");  // Chama a função para ler os dados do arquivo
+    sensors_mq = create_mq(SENSORS_MQ);
+    // sensors_mq = open_mq(SENSORS_MQ);
 
     const char *filename = "cts/cenario.txt";
     FILE *file = open_file(filename); // uses the modularized function to open the file
@@ -46,16 +45,17 @@ int main(){
         exit(52);
     }
     sensors_thr = pthread_join(sensors_id, NULL);
-    //close(shm_fd);
+    
+    close_mq(sensors_mq, SENSORS_MQ);
 
     return 0;
 }
 
 void* getSensorsData(void *arg){
     // Part 1: take data from txt/csv file
-
-
     // Part 2: Convert data to can_msg format
+    // Part 3: Send all four frames to sensors_mq    
+    // Part 4: simple sleep timer;
 
     FILE *file = (FILE*)arg; // Recebe o arquivo como argumento
 
@@ -67,10 +67,10 @@ void* getSensorsData(void *arg){
             can_obstacle_sensor = conv2CANObstacleData(sensorsData.has_obstacle, sensorsData.obstacle_distance);
             can_pedals_sensor   = conv2CANPedalsData(sensorsData.brake_pedal, sensorsData.accelerator_pedal);
 
-            // Part 3: Send all four frames to sensors_mq    
-    
-    
-            // Part 4: simple sleep timer here;
+            write_mq(sensors_mq, &can_car_cluster);
+            write_mq(sensors_mq, &can_velocity_sensor);
+            write_mq(sensors_mq, &can_obstacle_sensor);
+            write_mq(sensors_mq, &can_pedals_sensor);
 
             // PlaceHolder: just some simple prints to see if the data is being converted in the right way
             print_can_msg(&can_car_cluster);
@@ -80,10 +80,10 @@ void* getSensorsData(void *arg){
         
             printf("New line.\n"); //This line is used for see the break of line
         } else {
-        // If a new line can't be read, the end of the file was reached
-        printf("EOF reached.\n");
-        break;
-    }
+            // If a new line can't be read, the end of the file was reached
+            printf("EOF reached.\n");
+            break;
+        }
 
         sleep(1); // Wait for 1 second before reading the next line
     }
