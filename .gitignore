@@ -18,10 +18,12 @@ obj/*
 *.jar      # Java JAR files
 
 
-# Ignore common build directories (update if necessary)
+# Ignore common build directories
 /build/
 */build/
-bin/
-*/bin/
 out/
 */out/
+
+test/*
+!test/*.c
+!test/*.h
