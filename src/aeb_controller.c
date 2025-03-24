@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include <stdbool.h>
 #include "dbc.h"
+#include "actuators.h"
 #include <time.h>
 
 #define LOOP_EMPTY_ITERATIONS_MAX 11
@@ -17,6 +18,7 @@ void updateInternalPedalsState(can_msg captured_frame);
 void updateInternalSpeedState(can_msg captured_frame);
 void updateInternalObstacleState(can_msg captured_frame);
 void updateInternalCarCState(can_msg captured_frame);
+can_msg updateCanMsgOutput(double ref_ttc);
 
 mqd_t sensors_mq, actuators_mq;
 pthread_t aeb_controller_id;
@@ -29,13 +31,13 @@ sensors_input_data aeb_internal_state = {
     .accelerator_pedal = false, 
     .on_off_aeb_system = true
 };
-actuators_abstraction send_actuators_state = {
-    .belt_tightness = false,
-    .door_lock = true,
-    .should_activate_abs = false,
-    .alarm_led = true,
-    .alarm_buzzer = true
-};
+// actuators_abstraction send_actuators_state = {
+//     .belt_tightness = false,
+//     .door_lock = true,
+//     .should_activate_abs = false,
+//     .alarm_led = true,
+//     .alarm_buzzer = true
+// };
 
 
 can_msg captured_can_frame = {
@@ -92,7 +94,9 @@ void* mainWorkingLoop(void *arg){ // Main Loop function for our AEB Controller E
             break;
         }
         
-        printf("Quantidade = %i\n", no_message_counter);
+        // calculate ttc here?
+        out_can_frame = updateCanMsgOutput(2.1);
+        write_mq(actuators_mq, &out_can_frame);
 
         // Testing changes, exclude this on production code
         printf("vehicle_velocity: %lf\n", aeb_internal_state.vehicle_velocity);
@@ -102,7 +106,7 @@ void* mainWorkingLoop(void *arg){ // Main Loop function for our AEB Controller E
         printf("accelerator_pedal: %s\n", aeb_internal_state.accelerator_pedal ? "true" : "false");
         printf("on_off_aeb_system: %s\n", aeb_internal_state.on_off_aeb_system ? "true" : "false");
     
-        //nanosleep(&(struct timespec){.tv_sec = 0, .tv_nsec = 10000000000}, NULL); // 500ms sleep -> acho q n tá funfando
+        usleep(500000); // Deprected, change for function other later
     }
 
     printf("Placeholder\n");
@@ -110,7 +114,7 @@ void* mainWorkingLoop(void *arg){ // Main Loop function for our AEB Controller E
 }
 
 void translateAndCallCanMsg(can_msg captured_frame){
-    switch(captured_can_frame.identifier){
+    switch(captured_frame.identifier){
         case ID_PEDALS:
             updateInternalPedalsState(captured_frame);
             break;
@@ -195,4 +199,21 @@ void updateInternalCarCState(can_msg captured_frame){
     } else {
         ;
     }
+}
+
+can_msg updateCanMsgOutput(double ref_ttc){
+    can_msg aux = {.identifier = ID_AEB_S, .dataFrame = BASE_DATA_FRAME};
+
+    if(0 < ref_ttc && ref_ttc < 1){
+        aux.dataFrame[0] = 0x01;
+        aux.dataFrame[1] = 0x01;
+    } else if (0 < ref_ttc && ref_ttc < 2){
+        aux.dataFrame[0] = 0x01;
+        aux.dataFrame[1] = 0x00;
+    } else {
+        aux.dataFrame[0] = 0x00;
+        aux.dataFrame[1] = 0x00;
+    }
+
+    return aux;
 }
