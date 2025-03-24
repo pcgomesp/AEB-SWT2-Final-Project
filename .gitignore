@@ -2,3 +2,26 @@
 bin/*
 obj/*
 !.gitkeep
+
+# Ignore common binary files
+*.exe      # Executable files on Windows
+*.dll      # Libraries on Windows
+*.so       # Libraries on Linux
+*.dylib    # Libraries on macOS
+*.bin      # Generic binary files
+*.obj      # Object files (compilation artifacts)
+*.o        # Object files (compilation artifacts)
+*.a        # Static library files
+*.lib      # Static library files
+*.pdb      # Debugging files on Windows
+*.class    # Java bytecode files
+*.jar      # Java JAR files
+
+
+# Ignore common build directories (update if necessary)
+/build/
+*/build/
+bin/
+*/bin/
+out/
+*/out/
