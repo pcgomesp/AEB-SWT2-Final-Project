@@ -81,6 +81,48 @@ float ttc_calc(float dis_rel, float spd_rel) {
     }
 }
 
-// Fuction for decide to take action (to be implemented)
-
-
+/**
+ * @brief Decides whether to trigger the Autonomous Emergency Braking (AEB) system based on TTC.
+ *
+ * This function calculates the Time-to-Collision (TTC) using the relative distance and speed 
+ * between objects, and decides whether the AEB system should activate the alarm or apply the brakes.
+ * The decision is made based on predefined TTC thresholds:
+ * - If the TTC is below the `threshold_alarm` (e.g., 2 seconds), an alarm is triggered.
+ * - If the TTC is below the `threshold_braking` (e.g., 1 second), the braking system is activated.
+ * 
+ * The AEB system and the alarm are only triggered if the `enable_aeb` flag is set to true.
+ *
+ * @param enable_aeb Pointer to a flag indicating whether the AEB system is enabled [SwR-5]. If true, the system can take action.
+ * @param alarm_cluster Pointer to a flag that will be set to true if the alarm should be triggered [SwR-2]. It is set to false when no action is needed.
+ * @param enable_breaking Pointer to a flag that will be set to true if the braking system should be enabled [SwR-3]. It is set to false when no braking action is required.
+ * @param spd Pointer to the current vehicle speed (in km/h). This value is used to calculate the relative speed.
+ * @param dist Pointer to the relative distance to the object ahead (in meters). This value is used to calculate the TTC.
+ * 
+ * @note The function assumes that `spd` and `dist` are updated regularly, reflecting the current relative speed and distance to the object ahead.
+ */
+void aeb_control(bool *enable_aeb, bool *alarm_cluster, bool *enable_breaking, 
+                 float *spd, float *dist) {
+    float ttc;
+    
+    // Define the critical TTC thresholds (in seconds) below which AEB will be triggered
+    const float threshold_alarm = 2.0;  /// [SwR-2] < Threshold for triggering the alarm (TTC < 2.0 seconds)
+    const float threshold_braking = 1.0; /// [SwR-3] < Threshold for triggering the braking system (TTC < 1.0 second)
+    
+    // Calculate TTC using the relative distance and speed
+    ttc = ttc_calc(*dist, *spd);
+    
+    // If AEB is enabled and TTC is below the threshold, trigger the braking action
+    if (*enable_aeb && ttc > 0.0 && ttc < threshold_alarm) {
+        // Set the alarm flag to true if TTC is below the alarm threshold
+        *alarm_cluster = true;
+        
+        // Trigger the braking system if TTC is below the braking threshold
+        if (ttc < threshold_braking) {
+            *enable_breaking = true;
+        }       
+    } else {
+        // Reset the alarm and braking flags if TTC is above the threshold or AEB is disabled
+        *alarm_cluster = false;
+        *enable_breaking = false;
+    }
+}
