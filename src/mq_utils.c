@@ -63,7 +63,7 @@ int read_mq(mqd_t mq_receiver, can_msg *msg_read)
     char buffer[MQ_MAX_MSG_SIZE];
     if (mq_receive(mq_receiver, buffer, MQ_MAX_MSG_SIZE, NULL) == (mqd_t)-1)
     {
-        perror("Error receiving message");
+        // perror("Error receiving message");
         return -1;
     }
     memcpy(msg_read, buffer, MQ_MAX_MSG_SIZE);

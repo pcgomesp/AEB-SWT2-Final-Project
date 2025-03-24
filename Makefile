@@ -13,6 +13,8 @@ all: $(SRCFILES:src/%.c=obj/%.o)
 	$(CC) $(CFLAGS) obj/sensors.o obj/mq_utils.o obj/file_reader.o obj/dbc.o -o bin/sensors_bin -I$(INCFOLDER)
 	$(CC) $(CFLAGS) obj/actuators.o obj/mq_utils.o obj/file_reader.o obj/dbc.o -o bin/actuators_bin -I$(INCFOLDER)
 	$(CC) $(CFLAGS) obj/aeb_controller.o obj/mq_utils.o obj/file_reader.o obj/dbc.o -o bin/aeb_controller_bin -I$(INCFOLDER)
+	$(CC) $(CFLAGS) obj/main.o obj/mq_utils.o obj/file_reader.o obj/dbc.o -o bin/main_bin -I$(INCFOLDER)
+
 
 obj/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@ -I$(INCFOLDER)
@@ -23,6 +25,9 @@ clean:
 	rm -rf bin/*
 	rm -rf test/test_mq_utils
 	rm -rf test/test_mq_utils_read
+
+run:
+	./bin/main_bin
 
 test: build_test_executables
 	./test/test_mq_utils

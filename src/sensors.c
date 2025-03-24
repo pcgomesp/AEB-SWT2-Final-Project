@@ -47,7 +47,7 @@ int main(){
     }
     sensors_thr = pthread_join(sensors_id, NULL);
     
-    close_mq(sensors_mq, SENSORS_MQ);
+    // close_mq(sensors_mq, SENSORS_MQ);
 
     return 0;
 }

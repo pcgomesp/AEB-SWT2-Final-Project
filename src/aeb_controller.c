@@ -62,7 +62,7 @@ int main(){
     }
     aeb_controller_thr = pthread_join(aeb_controller_id, NULL);
 
-    close_mq(actuators_mq, ACTUATORS_MQ);
+    // close_mq(actuators_mq, ACTUATORS_MQ);
 
     return 0;
 }

@@ -19,7 +19,7 @@ void wait_terminate_execution()
 
     printf("Closing message queue\n");
     close_mq(sensors_mq, SENSORS_MQ);
-    close_mq(sensors_mq, ACTUATORS_MQ);
+    close_mq(actuators_mq, ACTUATORS_MQ);
 
     exit(0);
 
@@ -77,9 +77,9 @@ int main()
     sensors_mq = create_mq(ACTUATORS_MQ);
 
     //Create auxiliary processes
-    char *sensors_process = "../bin/sensors_bin";
-    char *controller_process = "../bin/aeb_controller_bin";
-    char *actuators_process = "../bin/actuators_bin";
+    char *sensors_process = "./bin/sensors_bin";
+    char *controller_process = "./bin/aeb_controller_bin";
+    char *actuators_process = "./bin/actuators_bin";
 
     sensors_pid = create_processes(sensors_process);
     controller_pid = create_processes(controller_process);
