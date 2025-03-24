@@ -17,6 +17,18 @@ void terminate_execution(int sig)
 
     printf("Closing shared memory\n");
     //close_shm();
+
+    printf("Closing child processes\n");
+    kill(sensors_pid, SIGTERM);
+    kill(controller_pid, SIGTERM);
+    kill(actuators_pid, SIGTERM);
+
+    waitpid(sensors_pid, NULL, 0);
+    waitpid(controller_pid, NULL, 0);
+    waitpid(actuators_pid, NULL, 0);
+
+    printf("Execution terminated\n");
+
     exit(0);
 }
 
@@ -52,18 +64,13 @@ int main()
 
     //Create auxiliary processes
     char *sensors_process = "../bin/sensors";
-    char *controller_process = "../bin/controller";
+    char *controller_process = "../bin/aeb_controller";
     char *actuators_process = "../bin/actuators";
 
     sensors_pid = create_processes(sensors_process);
     controller_pid = create_processes(controller_process);
     actuators_pid = create_processes(actuators_process);
 
-    // Read data from file
-    while(1)
-    {
-        
-    }
 
     signal(SIGINT, terminate_execution);
 
