@@ -69,9 +69,76 @@ void test_ttc_calc() {
     printf("\n\n");
 }
 
+/**
+ * @brief Test the behavior of the Autonomous Emergency Braking (AEB) control function.
+ *
+ * This function tests the `aeb_control` function with different values for vehicle speed (spd) and 
+ * relative distance (dist) to simulate various scenarios of time-to-collision (TTC) and check 
+ * whether the alarm and braking systems are triggered as expected. The function performs the 
+ * following tests:
+ * 
+ * - **Test 1**: TTC > 2.0 seconds (expected result: no alarm, no braking)
+ * - **Test 2**: 1.0 < TTC < 2.0 seconds (expected result: alarm triggered, no braking)
+ * - **Test 3**: TTC < 1.0 second (expected result: alarm triggered, braking enabled)
+ * - **Test 4**: AEB disabled, TTC < 1.0 second (expected result: no alarm, no braking)
+ * 
+ * Each test prints the expected result and the actual outcome for the alarm and braking flags.
+ */
+void test_aeb_control() {
+    // Variáveis de entrada para o teste
+    bool enable_aeb;
+    bool alarm_cluster;
+    bool enable_breaking;
+    float spd;
+    float dist;
+
+    // Teste 1: TTC > 2.0 (sem alarme ou frenagem)
+    enable_aeb = true;
+    spd = 30.0;  // 30 km/h
+    dist = 50.0; // 50 metros
+    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &spd, &dist);
+
+    // Verifique se o alarme e a frenagem não foram ativados
+    printf("Test 1 - TTC > 2.0\n");
+    printf("Expected: No alarm, no braking\n");
+    printf("Alarm: %s, Braking: %s\n", alarm_cluster ? "Triggered" : "Not triggered", enable_breaking ? "Enabled" : "Not enabled");
+
+    // Teste 2: TTC entre 1.0 e 2.0 (alarme acionado, mas não frenagem)
+    dist = 20.0; // 20 metros
+    spd = 30.0;  // 30 km/h
+    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &spd, &dist);
+
+    // Verifique se o alarme foi ativado, mas a frenagem não
+    printf("\nTest 2 - 1.0 < TTC < 2.0\n");
+    printf("Expected: Alarm triggered, no braking\n");
+    printf("Alarm: %s, Braking: %s\n", alarm_cluster ? "Triggered" : "Not triggered", enable_breaking ? "Enabled" : "Not enabled");
+
+    // Teste 3: TTC < 1.0 (alarme e frenagem acionados)
+    dist = 10.0; // 10 metros
+    spd = 30.0;  // 30 km/h
+    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &spd, &dist);
+
+    // Verifique se o alarme e a frenagem foram ativados
+    printf("\nTest 3 - TTC < 1.0\n");
+    printf("Expected: Alarm triggered, braking enabled\n");
+    printf("Alarm: %s, Braking: %s\n", alarm_cluster ? "Triggered" : "Not triggered", enable_breaking ? "Enabled" : "Not enabled");
+
+    // Teste 4: TTC < 1.0 com AEB desabilitado (sem alarme nem frenagem)
+    enable_aeb = false;
+    dist = 10.0; // 10 metros
+    spd = 30.0;  // 30 km/h
+    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &spd, &dist);
+
+    // Verifique se o alarme e a frenagem não foram ativados, já que o AEB está desativado
+    printf("\nTest 4 - AEB Disabled\n");
+    printf("Expected: No alarm, no braking\n");
+    printf("Alarm: %s, Braking: %s\n", alarm_cluster ? "Triggered" : "Not triggered", enable_breaking ? "Enabled" : "Not enabled");
+}
+
 int main() {
     test_accel_calc();
     test_ttc_calc();
+    test_aeb_control();
 
     return 0;
 }

@@ -1,5 +1,6 @@
 // Necessary libraries
 #include "../inc/ttc_control.h"
+#include "../inc/constants.h"
 
 /**
  * @brief Calculate acceleration based on speed and time difference.
@@ -87,8 +88,8 @@ float ttc_calc(float dis_rel, float spd_rel) {
  * This function calculates the Time-to-Collision (TTC) using the relative distance and speed 
  * between objects, and decides whether the AEB system should activate the alarm or apply the brakes.
  * The decision is made based on predefined TTC thresholds:
- * - If the TTC is below the `threshold_alarm` (e.g., 2 seconds), an alarm is triggered.
- * - If the TTC is below the `threshold_braking` (e.g., 1 second), the braking system is activated.
+ * - If the TTC is below the `THRESHOLD_ALARM` (e.g., 2 seconds), an alarm is triggered.
+ * - If the TTC is below the `THRESHOLD_BRAKING` (e.g., 1 second), the braking system is activated.
  * 
  * The AEB system and the alarm are only triggered if the `enable_aeb` flag is set to true.
  *
@@ -104,20 +105,16 @@ void aeb_control(bool *enable_aeb, bool *alarm_cluster, bool *enable_breaking,
                  float *spd, float *dist) {
     float ttc;
     
-    // Define the critical TTC thresholds (in seconds) below which AEB will be triggered
-    const float threshold_alarm = 2.0;  /// [SwR-2] < Threshold for triggering the alarm (TTC < 2.0 seconds)
-    const float threshold_braking = 1.0; /// [SwR-3] < Threshold for triggering the braking system (TTC < 1.0 second)
-    
     // Calculate TTC using the relative distance and speed
     ttc = ttc_calc(*dist, *spd);
     
-    // If AEB is enabled and TTC is below the threshold, trigger the braking action
-    if (*enable_aeb && ttc > 0.0 && ttc < threshold_alarm) {
+    // If AEB is enabled and TTC is below the threshold, trigger the AEB system
+    if (*enable_aeb && ttc > 0.0 && ttc < THRESHOLD_ALARM) {
         // Set the alarm flag to true if TTC is below the alarm threshold
         *alarm_cluster = true;
         
         // Trigger the braking system if TTC is below the braking threshold
-        if (ttc < threshold_braking) {
+        if (ttc < THRESHOLD_BRAKING) {
             *enable_breaking = true;
         }       
     } else {
