@@ -34,7 +34,7 @@ mqd_t create_mq(char *mq_name)
 mqd_t open_mq(char *mq_name)
 {
     struct mq_attr attr = get_mq_attr();
-    mqd_t mqd = mq_open(mq_name, O_RDWR, QUEUE_PERMISSIONS, &attr);
+    mqd_t mqd = mq_open(mq_name, O_RDWR | O_NONBLOCK, QUEUE_PERMISSIONS, &attr);
     if (mqd == (mqd_t)-1)
     {
         perror("Error opening message queue");

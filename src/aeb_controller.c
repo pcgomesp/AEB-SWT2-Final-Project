@@ -106,7 +106,7 @@ void* mainWorkingLoop(void *arg){ // Main Loop function for our AEB Controller E
         printf("accelerator_pedal: %s\n", aeb_internal_state.accelerator_pedal ? "true" : "false");
         printf("on_off_aeb_system: %s\n", aeb_internal_state.on_off_aeb_system ? "true" : "false");
     
-        usleep(500000); // Deprected, change for function other later
+        usleep(200000); // Deprected, change for function other later
     }
 
     printf("Placeholder\n");

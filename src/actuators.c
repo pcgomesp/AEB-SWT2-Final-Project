@@ -9,6 +9,8 @@
 #include "actuators.h"
 #include "dbc.h"
 
+#define LOOP_EMPTY_ITERATIONS_MAX 11
+
 void* actuatorsResponseLoop(void *arg);
 void actuatorsTranslateCanMsg(can_msg captured_frame);
 void updateInternalActuatorsState(can_msg captured_frame);
@@ -51,9 +53,21 @@ void* actuatorsResponseLoop(void *arg){
     // Step 04: sleep, waiting the next message -> loop
     // we must define a Stop criteria btw
 
-    while(1){
-        read_mq(actuators_mq, &captured_can_frame);
-        actuatorsTranslateCanMsg(captured_can_frame);
+    int no_message_counter = 0;
+    int result;
+
+    while(no_message_counter < LOOP_EMPTY_ITERATIONS_MAX){
+        result = read_mq(actuators_mq, &captured_can_frame);
+        if(result == 0){
+            actuatorsTranslateCanMsg(captured_can_frame); 
+            no_message_counter = 0;
+        } else if (result == -1){
+            no_message_counter++;
+        } else {
+            perror("\n");
+            break;
+        }
+        
 
         // write in file here
 
@@ -63,7 +77,7 @@ void* actuatorsResponseLoop(void *arg){
         printf("alarm_led: %s\n", actuators_state.alarm_led ? "true" : "false");
         printf("alarm_buzzer: %s\n", actuators_state.alarm_buzzer ? "true" : "false");
 
-        usleep(500000); // Deprected, change for function other later
+        usleep(200000); // Deprected, change for function other later
     }
 
     printf("Placeholder\n");
