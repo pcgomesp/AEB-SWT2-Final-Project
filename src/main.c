@@ -7,16 +7,30 @@
 #include "mq_utils.h"
 #include "constants.h"
 
-mqd_t sensors_mq;
+mqd_t sensors_mq, actuators_mq;
 pid_t sensors_pid, controller_pid, actuators_pid;
+
+void wait_terminate_execution()
+{
+
+    waitpid(sensors_pid, NULL, 0);
+    waitpid(controller_pid, NULL, 0);
+    waitpid(actuators_pid, NULL, 0);
+
+    printf("Closing message queue\n");
+    close_mq(sensors_mq, SENSORS_MQ);
+    close_mq(sensors_mq, ACTUATORS_MQ);
+
+    exit(0);
+
+}
 
 void terminate_execution(int sig)
 {
     printf("Closing message queue\n");
     close_mq(sensors_mq, SENSORS_MQ);
+    close_mq(sensors_mq, ACTUATORS_MQ);
 
-    printf("Closing shared memory\n");
-    //close_shm();
 
     printf("Closing child processes\n");
     kill(sensors_pid, SIGTERM);
@@ -60,7 +74,7 @@ int main()
 
     //Initialize resources
     sensors_mq = create_mq(SENSORS_MQ);
-    //create_shm();
+    sensors_mq = create_mq(ACTUATORS_MQ);
 
     //Create auxiliary processes
     char *sensors_process = "../bin/sensors";
@@ -71,8 +85,9 @@ int main()
     controller_pid = create_processes(controller_process);
     actuators_pid = create_processes(actuators_process);
 
-
     signal(SIGINT, terminate_execution);
+
+    wait_terminate_execution();
 
     return EXIT_SUCCESS;
 }
