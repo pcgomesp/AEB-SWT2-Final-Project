@@ -23,9 +23,6 @@ clean:
 	rm -rf test/test_mq_utils
 	rm -rf test/test_mq_utils_read
 
-run:
-	bin/controller_bin
-
 test: build_test_executables
 	./test/test_mq_utils
 	./test/test_mq_utils_read
