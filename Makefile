@@ -35,3 +35,6 @@ test/test_mq_utils: test/test_mq_utils.c src/mq_utils.c test/unity.c
 
 test/test_mq_utils_read: test/test_mq_utils_read.c src/mq_utils.c test/unity.c
 	$(CC) $(CFLAGS) test/test_mq_utils_read.c src/mq_utils.c test/unity.c -o test/test_mq_utils_read -I$(TESTFOLDER) -I$(INCFOLDER)
+
+cppcheck:
+	cppcheck --addon=misra -I ./inc --force --library=posix src/
