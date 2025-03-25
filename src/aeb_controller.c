@@ -208,15 +208,21 @@ void updateInternalCarCState(can_msg captured_frame){
 can_msg updateCanMsgOutput(double ref_ttc){
     can_msg aux = {.identifier = ID_AEB_S, .dataFrame = BASE_DATA_FRAME};
 
-    if(0 < ref_ttc && ref_ttc < 1){
-        aux.dataFrame[0] = 0x01;
-        aux.dataFrame[1] = 0x01;
+    if(0 < ref_ttc 
+        && ref_ttc < 1 
+        && aeb_internal_state.brake_pedal == false 
+        && aeb_internal_state.accelerator_pedal == false){ 
+        // Low TTC, No control by the Driver
+        aux.dataFrame[0] = 0x01; // activate warning system
+        aux.dataFrame[1] = 0x01; // activate braking system
     } else if (0 < ref_ttc && ref_ttc < 2){
-        aux.dataFrame[0] = 0x01;
-        aux.dataFrame[1] = 0x00;
+        // Low TTC and Driver Controlling Pedals or TTC not so low (1<TTC<2)
+        aux.dataFrame[0] = 0x01; // activate warning system
+        aux.dataFrame[1] = 0x00; // don't activate braking system
     } else {
-        aux.dataFrame[0] = 0x00;
-        aux.dataFrame[1] = 0x00;
+        // TTC not so Low
+        aux.dataFrame[0] = 0x00; // don't activate warning system
+        aux.dataFrame[1] = 0x00; // don't activate braking system
     }
 
     return aux;
