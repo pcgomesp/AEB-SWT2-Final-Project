@@ -65,7 +65,7 @@ float ttc_calc(float dis_rel, float spd_rel) {
     b = spd_rel / 3.6;
     c = dis_rel;
 
-    if (a == 0) return ttc = dis_rel / spd_rel;
+    if (a == 0) return ttc = c / b;
 
     // Calculating the discriminant
     delta = b * b + 2 * a * c;
