@@ -27,7 +27,8 @@ void updateInternalPedalsState(can_msg captured_frame);
 void updateInternalSpeedState(can_msg captured_frame);
 void updateInternalObstacleState(can_msg captured_frame);
 void updateInternalCarCState(can_msg captured_frame);
-can_msg updateCanMsgOutput(double ref_ttc);
+can_msg updateCanMsgOutput(aeb_controller_state state);
+aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, int ttc);
 
 mqd_t sensors_mq, actuators_mq;
 pthread_t aeb_controller_id;
@@ -88,8 +89,12 @@ void *mainWorkingLoop(void *arg)
 
             translateAndCallCanMsg(captured_can_frame);
 
-            // calculate ttc here?
-            out_can_frame = updateCanMsgOutput(2.1);
+            int ttc = 1; // TODO: Calculate TTC here
+
+            state = getAEBState(aeb_internal_state, ttc);
+
+            out_can_frame = updateCanMsgOutput(state);
+            
             write_mq(actuators_mq, &out_can_frame);
 
             // Testing changes, exclude this on production code
@@ -100,7 +105,8 @@ void *mainWorkingLoop(void *arg)
 
         usleep(200000); // Deprecated, change for other function later
     }
-    printf("Placeholder\n");
+
+    printf("AEB Controller: Empty MQ counter reached the limit, exiting\n");
 }
 
 void print_info()
@@ -234,28 +240,49 @@ void updateInternalCarCState(can_msg captured_frame)
     }
 }
 
-can_msg updateCanMsgOutput(double ref_ttc)
+can_msg updateCanMsgOutput(aeb_controller_state state)
 {
     can_msg aux = {.identifier = ID_AEB_S, .dataFrame = BASE_DATA_FRAME};
 
-    if (0 < ref_ttc && ref_ttc < 1 && aeb_internal_state.brake_pedal == false && aeb_internal_state.accelerator_pedal == false)
+    switch (state)
     {
-        // Low TTC, No control by the Driver
-        aux.dataFrame[0] = 0x01; // activate warning system
-        aux.dataFrame[1] = 0x01; // activate braking system
-    }
-    else if (0 < ref_ttc && ref_ttc < 2)
-    {
-        // Low TTC and Driver Controlling Pedals or TTC not so low (1<TTC<2)
-        aux.dataFrame[0] = 0x01; // activate warning system
-        aux.dataFrame[1] = 0x00; // don't activate braking system
-    }
-    else
-    {
-        // TTC not so Low
-        aux.dataFrame[0] = 0x00; // don't activate warning system
-        aux.dataFrame[1] = 0x00; // don't activate braking system
+        case AEB_STATE_BRAKE:
+            aux.dataFrame[0] = 0x01; // activate warning system
+            aux.dataFrame[1] = 0x01; // activate braking system
+            break;
+        case AEB_STATE_ALARM:
+            aux.dataFrame[0] = 0x01; // activate warning system
+            aux.dataFrame[1] = 0x00; // don't activate braking system
+            break;
+        case AEB_STATE_ACTIVE:
+            aux.dataFrame[0] = 0x00; // don't activate warning system
+            aux.dataFrame[1] = 0x00; // don't activate braking system
+            break;
+        case AEB_STATE_STANDBY:
+            aux.dataFrame[0] = 0x00; // don't activate warning system
+            aux.dataFrame[1] = 0x00; // don't activate braking system
+            break;
+        default:
+            break;
     }
 
     return aux;
+}
+
+aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, int ttc)
+{
+    if (aeb_internal_state.on_off_aeb_system == false)
+        return AEB_STATE_STANDBY;
+    if(aeb_internal_state.vehicle_velocity < MIN_SPD_ENABLED)
+        return AEB_STATE_STANDBY;
+    if (aeb_internal_state.vehicle_velocity > MAX_SPD_ENABLED)
+        return AEB_STATE_STANDBY;
+    if (aeb_internal_state.brake_pedal == false && aeb_internal_state.accelerator_pedal == false)
+    {
+        if (ttc < THRESHOLD_BRAKING)
+            return AEB_STATE_BRAKE;
+        if (ttc < THRESHOLD_ALARM)
+            return AEB_STATE_ALARM;
+    }
+    return AEB_STATE_ACTIVE;
 }
