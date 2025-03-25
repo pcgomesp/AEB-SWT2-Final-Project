@@ -142,7 +142,7 @@ void updateInternalPedalsState(can_msg captured_frame){
 
 void updateInternalSpeedState(can_msg captured_frame){
     unsigned int data_speed; // used for can frame conversion
-    double new_internal_speed;
+    double new_internal_speed = 0.0;
 
     if(captured_frame.dataFrame[0] == 0xFE && captured_frame.dataFrame[1] == 0xFF){ // DBC: Clear Data
         new_internal_speed = 0.0;
@@ -165,7 +165,7 @@ void updateInternalSpeedState(can_msg captured_frame){
 
 void updateInternalObstacleState(can_msg captured_frame){
     unsigned int data_distance; // used for can frame conversion
-    double new_internal_distance;
+    double new_internal_distance = 0.0;
 
     if(captured_frame.dataFrame[2] == 0x00){
         aeb_internal_state.has_obstacle = false;
