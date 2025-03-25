@@ -31,14 +31,6 @@ sensors_input_data aeb_internal_state = {
     .accelerator_pedal = false, 
     .on_off_aeb_system = true
 };
-// actuators_abstraction send_actuators_state = {
-//     .belt_tightness = false,
-//     .door_lock = true,
-//     .should_activate_abs = false,
-//     .alarm_led = true,
-//     .alarm_buzzer = true
-// };
-
 
 can_msg captured_can_frame = {
     .identifier = 0x0CFFB027,
@@ -62,8 +54,6 @@ int main(){
     }
     aeb_controller_thr = pthread_join(aeb_controller_id, NULL);
 
-    // close_mq(actuators_mq, ACTUATORS_MQ);
-
     return 0;
 }
 
@@ -78,16 +68,15 @@ void* mainWorkingLoop(void *arg){ // Main Loop function for our AEB Controller E
         // Will separating things make us need to worry more about synchronization?
     // Step 05: Simple sleep timer? This will change when new functions to fulfill requirements are added
 
-    int no_message_counter = 0;
-    int result;
+    int no_message_counter = 0; // Empty MQ counter -> used for sync and ending the main thread loop
+    int no_packet_in_mq_counter;
 
-    // i don't know why yet, but this condition doesn't make it get out of the while/thread. Suggestions are accepted!
     while(no_message_counter < LOOP_EMPTY_ITERATIONS_MAX){
-        result = read_mq(sensors_mq, &captured_can_frame);
-        if(result == 0){
+        no_packet_in_mq_counter = read_mq(sensors_mq, &captured_can_frame);
+        if(no_packet_in_mq_counter == 0){
             translateAndCallCanMsg(captured_can_frame); 
             no_message_counter = 0;
-        } else if (result == -1){
+        } else if (no_packet_in_mq_counter == -1){
             no_message_counter++;
         } else {
             perror("\n");
@@ -113,7 +102,7 @@ void* mainWorkingLoop(void *arg){ // Main Loop function for our AEB Controller E
     return NULL;
 }
 
-void translateAndCallCanMsg(can_msg captured_frame){
+void translateAndCallCanMsg(can_msg captured_frame){ // Call aproppriate function to deal with the can_msg
     switch(captured_frame.identifier){
         case ID_PEDALS:
             updateInternalPedalsState(captured_frame);
@@ -152,25 +141,31 @@ void updateInternalPedalsState(can_msg captured_frame){
 }
 
 void updateInternalSpeedState(can_msg captured_frame){
-    unsigned int data_speed;
-    double new_internal_speed;
-    
-    // THIS FUNCTION LACKS SPECIAL CONDITIONS AND MAXIMUM SPEED CHECKS
+    unsigned int data_speed; // used for can frame conversion
+    double new_internal_speed = 0.0;
 
-    // SPECIAL CONDITIONS GO HERE
-
-    // Conversion from CAN data frame, according to dbc in the requirement file
-    data_speed = captured_frame.dataFrame[0] + (captured_frame.dataFrame[1] << 8);
-    new_internal_speed = data_speed * RES_SPEED_S;
+    if(captured_frame.dataFrame[0] == 0xFE && captured_frame.dataFrame[1] == 0xFF){ // DBC: Clear Data
+        new_internal_speed = 0.0;
+    } else if (captured_frame.dataFrame[0] == 0xFF && captured_frame.dataFrame[1] == 0xFF){ // DBC: Do nothing
+        ;
+    } else {
+        // Conversion from CAN data frame, according to dbc in the requirement file
+        data_speed = captured_frame.dataFrame[0] + (captured_frame.dataFrame[1] << 8);
+        new_internal_speed = data_speed * RES_SPEED_S;
+    }
     
-    // MAXIMUM SPEED CHECKS GO HERE
+    if(new_internal_speed > 251.0){ // DBC: Max value constraint
+        new_internal_speed = 251.0;
+    } else {
+        ;
+    }
 
     aeb_internal_state.vehicle_velocity = new_internal_speed;
 }
 
 void updateInternalObstacleState(can_msg captured_frame){
-    unsigned int data_distance;
-    double new_internal_distance;
+    unsigned int data_distance; // used for can frame conversion
+    double new_internal_distance = 0.0;
 
     if(captured_frame.dataFrame[2] == 0x00){
         aeb_internal_state.has_obstacle = false;
@@ -179,14 +174,23 @@ void updateInternalObstacleState(can_msg captured_frame){
     } else {
         ;
     }
-    
-    // THIS FUNCTION ALSO LACKS SPECIAL CONDITIONS AND MAXIMUM DISTANCE CHECKS
-    // BOTH SHOULD BE BEFORE THE CONVERSION BELOW
 
-    // Conversion from CAN data frame, according to dbc in the requirement file
-    data_distance = captured_frame.dataFrame[0] + (captured_frame.dataFrame[1] << 8);
-    new_internal_distance = data_distance * RES_OBSTACLE_S;
+    if(captured_frame.dataFrame[1] == 0xFF && captured_frame.dataFrame[0] == 0xFE){ // DBC: Clear Data
+        // Defined to max distance, to avoid problems with TTC calculation
+        new_internal_distance = 300.0;
+    } else if(captured_frame.dataFrame[1] == 0xFF && captured_frame.dataFrame[0] == 0xFF){ // DBC: Do nothing
+        ;
+    } else {
+        // Conversion from CAN data frame, according to dbc in the requirement file
+        data_distance = captured_frame.dataFrame[0] + (captured_frame.dataFrame[1] << 8);
+        new_internal_distance = data_distance * RES_OBSTACLE_S;
+    }
 
+    if(new_internal_distance > 300.0){ // DBC: Max value constraint
+        new_internal_distance = 300.0; 
+    } else {
+        ;
+    }
 
     aeb_internal_state.obstacle_distance = new_internal_distance;
 }
@@ -204,15 +208,21 @@ void updateInternalCarCState(can_msg captured_frame){
 can_msg updateCanMsgOutput(double ref_ttc){
     can_msg aux = {.identifier = ID_AEB_S, .dataFrame = BASE_DATA_FRAME};
 
-    if(0 < ref_ttc && ref_ttc < 1){
-        aux.dataFrame[0] = 0x01;
-        aux.dataFrame[1] = 0x01;
+    if(0 < ref_ttc 
+        && ref_ttc < 1 
+        && aeb_internal_state.brake_pedal == false 
+        && aeb_internal_state.accelerator_pedal == false){ 
+        // Low TTC, No control by the Driver
+        aux.dataFrame[0] = 0x01; // activate warning system
+        aux.dataFrame[1] = 0x01; // activate braking system
     } else if (0 < ref_ttc && ref_ttc < 2){
-        aux.dataFrame[0] = 0x01;
-        aux.dataFrame[1] = 0x00;
+        // Low TTC and Driver Controlling Pedals or TTC not so low (1<TTC<2)
+        aux.dataFrame[0] = 0x01; // activate warning system
+        aux.dataFrame[1] = 0x00; // don't activate braking system
     } else {
-        aux.dataFrame[0] = 0x00;
-        aux.dataFrame[1] = 0x00;
+        // TTC not so Low
+        aux.dataFrame[0] = 0x00; // don't activate warning system
+        aux.dataFrame[1] = 0x00; // don't activate braking system
     }
 
     return aux;
