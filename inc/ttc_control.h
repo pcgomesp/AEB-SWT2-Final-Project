@@ -9,7 +9,7 @@
 // Function prototypes
 float accel_calc(float spd);
 float ttc_calc(float dist, float spd);
-void aeb_control(bool *enable_aeb, bool *alarm_cluster, bool *enable_breaking, 
-                 float *spd, float *dist);
+void aeb_control(bool *enable_aeb, bool *alarm_cluster, bool *enable_breaking,
+                 bool *lk_seatbelt, bool *lk_doors, float *spd, float *dist);
 
 #endif
