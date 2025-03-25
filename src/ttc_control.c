@@ -122,7 +122,8 @@ void aeb_control(bool *enable_aeb, bool *alarm_cluster, bool *enable_breaking,
         
         // Trigger the braking system if TTC is below the braking threshold
         // and the driver is not already braking, and the speed is within the allowed limit
-        if ((ttc < THRESHOLD_BRAKING) && (!*enable_breaking) && (*spd < MAX_SPD_ENABLED)) {
+        if ((ttc < THRESHOLD_BRAKING) && (!*enable_breaking) && (*spd < MAX_SPD_ENABLED)
+            && (*spd > MIN_SPD_ENABLED)) {
             *enable_breaking = true;
             if (ttc < (THRESHOLD_BRAKING / 2.0)) {
                 // If TTC is less than half of the braking threshold, prepare for a collision
