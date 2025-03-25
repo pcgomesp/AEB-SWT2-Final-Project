@@ -34,33 +34,33 @@ sensors_input_data aeb_internal_state = {
 can_msg captured_can_frame = {
     .identifier = 0x0CFFB027,
     .dataFrame = {0x08, 0x07, 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
+
 can_msg out_can_frame = {
     .identifier = 0x18FFA027,
     .dataFrame = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
 
 int main()
 {
-    int aeb_controller_thr;
-
     sensors_mq = open_mq(SENSORS_MQ);
-    actuators_mq = create_mq(ACTUATORS_MQ);
+    actuators_mq = open_mq(ACTUATORS_MQ);
 
-    aeb_controller_thr = pthread_create(&aeb_controller_id, NULL, mainWorkingLoop, NULL);
-    if (aeb_controller_thr != 0)
+    int controller_thread = pthread_create(&aeb_controller_id, NULL, mainWorkingLoop, NULL);
+    if (controller_thread != 0)
     {
-        perror("AEB Controller: it wasn't possible to create the associated thread\n");
+        perror("AEB Controller: It wasn't possible to create the associated thread\n");
         exit(53);
     }
-    aeb_controller_thr = pthread_join(aeb_controller_id, NULL);
+    controller_thread = pthread_join(aeb_controller_id, NULL);
 
     return 0;
 }
 
 void *mainWorkingLoop(void *arg)
-{ // Main Loop function for our AEB Controller ECU
-    // Step 01: Get CAN frames from the message queue
+{
+    // Main Loop function for our AEB Controller ECU
+    // Step 01: Get CAN frames from the sensors message queue
     // Step 02: Translate the recieved CAN frame, according to its id
-    // Step 03: Call the correct Function, based on the new data recieved
+    // Step 03: Call the correct Function, based on the new data recieved (o que eh new data recieved? acho que eh a mensagem nova)
     // Step 04: Reactions from the AEB System: based on the new data, what should the AEB controller do?
     // 4.1 - Calculate new ttc
     // 4.2 - Update send_actuators_state
@@ -68,25 +68,19 @@ void *mainWorkingLoop(void *arg)
     // Will separating things make us need to worry more about synchronization?
     // Step 05: Simple sleep timer? This will change when new functions to fulfill requirements are added
 
-    int no_message_counter = 0; // Empty MQ counter -> used for sync and ending the main thread loop
-    int no_packet_in_mq_counter;
-
-    while (no_message_counter < LOOP_EMPTY_ITERATIONS_MAX)
+    int msg_read;
+    int empty_mq_counter = 0;
+    while (empty_mq_counter < LOOP_EMPTY_ITERATIONS_MAX)
     {
-        no_packet_in_mq_counter = read_mq(sensors_mq, &captured_can_frame);
-        if (no_packet_in_mq_counter == 0)
+        msg_read = read_mq(sensors_mq, &captured_can_frame);
+        if (msg_read == 0)
         {
             translateAndCallCanMsg(captured_can_frame);
-            no_message_counter = 0;
-        }
-        else if (no_packet_in_mq_counter == -1)
-        {
-            no_message_counter++;
+            empty_mq_counter = 0;
         }
         else
         {
-            perror("\n");
-            break;
+            empty_mq_counter++;
         }
 
         // calculate ttc here?
@@ -101,7 +95,7 @@ void *mainWorkingLoop(void *arg)
         printf("accelerator_pedal: %s\n", aeb_internal_state.accelerator_pedal ? "true" : "false");
         printf("on_off_aeb_system: %s\n", aeb_internal_state.on_off_aeb_system ? "true" : "false");
 
-        usleep(200000); // Deprected, change for function other later
+        usleep(200000); // Deprecated, change for other function later
     }
 
     printf("Placeholder\n");
