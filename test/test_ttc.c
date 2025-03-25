@@ -85,51 +85,58 @@ void test_ttc_calc() {
  * Each test prints the expected result and the actual outcome for the alarm and braking flags.
  */
 void test_aeb_control() {
-    // Variáveis de entrada para o teste
+    // Input variables for the test
     bool enable_aeb;
     bool alarm_cluster;
     bool enable_breaking;
+    bool lk_seatbelt;
+    bool lk_doors;
     float spd;
     float dist;
+    float delta_spd;
 
-    // Teste 1: TTC > 2.0 (sem alarme ou frenagem)
+    // Test 1: TTC > 2.0 (no alarm, no braking)
     enable_aeb = true;
     spd = 30.0;  // 30 km/h
-    dist = 50.0; // 50 metros
-    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &spd, &dist);
-
-    // Verifique se o alarme e a frenagem não foram ativados
+    dist = 50.0; // 50 meters
+    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &lk_seatbelt, &lk_doors, &spd, &dist);
+    delta_spd = 0.001;
+    spd -= delta_spd;
+    printf("Velocidade: %.6f km/h\n", spd);
+    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &lk_seatbelt, &lk_doors, &spd, &dist);
+    
+    // Check if the alarm and braking are not triggered
     printf("Test 1 - TTC > 2.0\n");
     printf("Expected: No alarm, no braking\n");
     printf("Alarm: %s, Braking: %s\n", alarm_cluster ? "Triggered" : "Not triggered", enable_breaking ? "Enabled" : "Not enabled");
 
-    // Teste 2: TTC entre 1.0 e 2.0 (alarme acionado, mas não frenagem)
-    dist = 20.0; // 20 metros
-    spd = 30.0;  // 30 km/h
-    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &spd, &dist);
+    // Test 2: 1.0 < TTC < 2.0 (alarm triggered, no braking)
+    dist = 12.5; // 12.5 meters
+    spd += delta_spd; // 30.0 km/h
+    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &lk_seatbelt, &lk_doors, &spd, &dist);
 
-    // Verifique se o alarme foi ativado, mas a frenagem não
+    // Check if the alarm was triggered, but braking was not
     printf("\nTest 2 - 1.0 < TTC < 2.0\n");
     printf("Expected: Alarm triggered, no braking\n");
     printf("Alarm: %s, Braking: %s\n", alarm_cluster ? "Triggered" : "Not triggered", enable_breaking ? "Enabled" : "Not enabled");
 
-    // Teste 3: TTC < 1.0 (alarme e frenagem acionados)
-    dist = 10.0; // 10 metros
-    spd = 30.0;  // 30 km/h
-    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &spd, &dist);
+    // Test 3: TTC < 1.0 (alarm and braking triggered)
+    dist = 5.0; // 5 meters
+    spd += (5*delta_spd); // 30.002 km/h
+    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &lk_seatbelt, &lk_doors, &spd, &dist);
 
-    // Verifique se o alarme e a frenagem foram ativados
+    // Check if the alarm and braking were both triggered
     printf("\nTest 3 - TTC < 1.0\n");
     printf("Expected: Alarm triggered, braking enabled\n");
     printf("Alarm: %s, Braking: %s\n", alarm_cluster ? "Triggered" : "Not triggered", enable_breaking ? "Enabled" : "Not enabled");
 
-    // Teste 4: TTC < 1.0 com AEB desabilitado (sem alarme nem frenagem)
+    // Test 4: TTC < 1.0 with AEB disabled (no alarm, no braking)
     enable_aeb = false;
-    dist = 10.0; // 10 metros
+    dist = 10.0; // 10 meters
     spd = 30.0;  // 30 km/h
-    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &spd, &dist);
+    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &lk_seatbelt, &lk_doors, &spd, &dist);
 
-    // Verifique se o alarme e a frenagem não foram ativados, já que o AEB está desativado
+    // Check if the alarm and braking were not triggered because AEB is disabled
     printf("\nTest 4 - AEB Disabled\n");
     printf("Expected: No alarm, no braking\n");
     printf("Alarm: %s, Braking: %s\n", alarm_cluster ? "Triggered" : "Not triggered", enable_breaking ? "Enabled" : "Not enabled");
