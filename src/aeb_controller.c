@@ -1,18 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <pthread.h>
+#include <stdbool.h>
+#include <time.h>
 #include "constants.h"
 #include "mq_utils.h"
 #include "sensors_input.h"
-#include <pthread.h>
-#include <stdbool.h>
 #include "dbc.h"
 #include "actuators.h"
-#include <time.h>
 
 #define LOOP_EMPTY_ITERATIONS_MAX 11
 
+typedef enum
+{
+    AEB_STATE_ACTIVE,
+    AEB_STATE_ALARM,
+    AEB_STATE_BRAKE,
+    AEB_STATE_STANDBY
+} aeb_controller_state;
+
 void *mainWorkingLoop(void *arg);
+void print_info();
 void translateAndCallCanMsg(can_msg captured_frame);
 void updateInternalPedalsState(can_msg captured_frame);
 void updateInternalSpeedState(can_msg captured_frame);
@@ -68,38 +77,40 @@ void *mainWorkingLoop(void *arg)
     // Will separating things make us need to worry more about synchronization?
     // Step 05: Simple sleep timer? This will change when new functions to fulfill requirements are added
 
-    int msg_read;
+    aeb_controller_state state = AEB_STATE_STANDBY;
+
     int empty_mq_counter = 0;
     while (empty_mq_counter < LOOP_EMPTY_ITERATIONS_MAX)
     {
-        msg_read = read_mq(sensors_mq, &captured_can_frame);
-        if (msg_read == 0)
+        if (read_mq(sensors_mq, &captured_can_frame) != -1)
         {
+            empty_mq_counter = 0; // reset counter
+
             translateAndCallCanMsg(captured_can_frame);
-            empty_mq_counter = 0;
+
+            // calculate ttc here?
+            out_can_frame = updateCanMsgOutput(2.1);
+            write_mq(actuators_mq, &out_can_frame);
+
+            // Testing changes, exclude this on production code
+            print_info();
         }
         else
-        {
             empty_mq_counter++;
-        }
-
-        // calculate ttc here?
-        out_can_frame = updateCanMsgOutput(2.1);
-        write_mq(actuators_mq, &out_can_frame);
-
-        // Testing changes, exclude this on production code
-        printf("vehicle_velocity: %lf\n", aeb_internal_state.vehicle_velocity);
-        printf("has_obstacle: %s\n", aeb_internal_state.has_obstacle ? "true" : "false");
-        printf("obstacle_distance: %lf\n", aeb_internal_state.obstacle_distance);
-        printf("brake_pedal: %s\n", aeb_internal_state.brake_pedal ? "true" : "false");
-        printf("accelerator_pedal: %s\n", aeb_internal_state.accelerator_pedal ? "true" : "false");
-        printf("on_off_aeb_system: %s\n", aeb_internal_state.on_off_aeb_system ? "true" : "false");
 
         usleep(200000); // Deprecated, change for other function later
     }
-
     printf("Placeholder\n");
-    return NULL;
+}
+
+void print_info()
+{
+    printf("vehicle_velocity: %lf\n", aeb_internal_state.vehicle_velocity);
+    printf("has_obstacle: %s\n", aeb_internal_state.has_obstacle ? "true" : "false");
+    printf("obstacle_distance: %lf\n", aeb_internal_state.obstacle_distance);
+    printf("brake_pedal: %s\n", aeb_internal_state.brake_pedal ? "true" : "false");
+    printf("accelerator_pedal: %s\n", aeb_internal_state.accelerator_pedal ? "true" : "false");
+    printf("on_off_aeb_system: %s\n", aeb_internal_state.on_off_aeb_system ? "true" : "false");
 }
 
 void translateAndCallCanMsg(can_msg captured_frame)
@@ -134,10 +145,6 @@ void updateInternalPedalsState(can_msg captured_frame)
     {
         aeb_internal_state.accelerator_pedal = true;
     }
-    else
-    {
-        ;
-    }
 
     if (captured_frame.dataFrame[1] == 0x00)
     {
@@ -146,10 +153,6 @@ void updateInternalPedalsState(can_msg captured_frame)
     else if (captured_frame.dataFrame[1] == 0x01)
     {
         aeb_internal_state.brake_pedal = true;
-    }
-    else
-    {
-        ;
     }
 }
 
@@ -177,10 +180,6 @@ void updateInternalSpeedState(can_msg captured_frame)
     { // DBC: Max value constraint
         new_internal_speed = 251.0;
     }
-    else
-    {
-        ;
-    }
 
     aeb_internal_state.vehicle_velocity = new_internal_speed;
 }
@@ -197,10 +196,6 @@ void updateInternalObstacleState(can_msg captured_frame)
     else if (captured_frame.dataFrame[2] == 0x01)
     {
         aeb_internal_state.has_obstacle = true;
-    }
-    else
-    {
-        ;
     }
 
     if (captured_frame.dataFrame[1] == 0xFF && captured_frame.dataFrame[0] == 0xFE)
@@ -223,10 +218,6 @@ void updateInternalObstacleState(can_msg captured_frame)
     { // DBC: Max value constraint
         new_internal_distance = 300.0;
     }
-    else
-    {
-        ;
-    }
 
     aeb_internal_state.obstacle_distance = new_internal_distance;
 }
@@ -240,10 +231,6 @@ void updateInternalCarCState(can_msg captured_frame)
     else if (captured_frame.dataFrame[0] == 0x01)
     {
         aeb_internal_state.on_off_aeb_system = true;
-    }
-    else
-    {
-        ;
     }
 }
 
