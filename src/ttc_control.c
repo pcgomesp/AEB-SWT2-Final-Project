@@ -106,7 +106,7 @@ float ttc_calc(float dis_rel, float spd_rel) {
  * @param dist A pointer to the current distance to the obstacle (in meters).
  * 
  * @note The function complies with the requirements (SwR-2, SwR-3, SwR-5,
- *       SwR-14, SwR-15, Sys-F-8, Sys-F-9, Sys-F-14).
+ *       SwR-11, SwR-14, SwR-15, Sys-F-8, Sys-F-9, Sys-F-14).
  */
 void aeb_control(bool *enable_aeb, bool *alarm_cluster, bool *enable_breaking,
                  bool *lk_seatbelt, bool *lk_doors, float *spd, float *dist) {
