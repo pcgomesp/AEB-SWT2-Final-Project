@@ -8,6 +8,7 @@
 #include "constants.h"
 #include "actuators.h"
 #include "dbc.h"
+#include "log_utils.h" 
 
 #define LOOP_EMPTY_ITERATIONS_MAX 11
 
@@ -22,7 +23,7 @@ actuators_abstraction actuators_state = {
     .door_lock = true,
     .should_activate_abs = false,
     .alarm_led = false,
-    .alarm_buzzer = false
+    .alarm_buzzer = true
 };
 
 can_msg captured_can_frame = {
@@ -68,8 +69,14 @@ void* actuatorsResponseLoop(void *arg){
             break;
         }
         
+        uint32_t event_id = 0x63A5D2E1;  // A simple event_id for testing purposes
+
 
         // write in file here
+        //The condition below is for test porpuse, should be changed to a ttc value
+            log_event("AEB1", event_id, actuators_state);
+        
+
 
         printf("belt_tightness: %s\n", actuators_state.belt_tightness ? "true" : "false");
         printf("door_lock: %s\n", actuators_state.door_lock ? "true" : "false");
