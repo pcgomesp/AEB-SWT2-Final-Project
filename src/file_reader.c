@@ -1,6 +1,14 @@
 #include "../inc/file_reader.h"
 #include <stdlib.h>
 
+/**
+ * @brief Opens a file for reading and skips the first line (header).
+ * 
+ * @param filename Name of the file to be opened.
+ * @return FILE* Pointer to the opened file.
+ * @note If the file cannot be opened, the program exits with an error.
+ */
+
 FILE* open_file(const char* filename) {
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
@@ -8,13 +16,24 @@ FILE* open_file(const char* filename) {
         exit(EXIT_FAILURE);
     }
 
-    // Pula o cabeçalho do arquivo
+    // Skip header
     char header[100];
     fgets(header, sizeof(header), file);
 
     return file;
 }
 
+
+/**
+ * @brief Reads a line from the file and fills the sensor data structure.
+ * 
+ * @param file Pointer to the opened file.
+ * @param sensor_data Pointer to the structure where the data will be stored.
+ * @return int Returns 1 if the reading is successful, 0 otherwise.
+ * 
+ * @note The expected file format will follow this label formact:
+            Distance(m) Obstacle Speed(m/s) Brake Accelerator AEB_on_off Reverse
+ */
 int read_sensor_data(FILE *file, sensors_input_data *sensor_data) {
     return fscanf(file, "%lf %d %lf %d %d %d %d", 
                   &sensor_data->obstacle_distance, 
