@@ -18,6 +18,7 @@ void updateInternalActuatorsState(can_msg captured_frame);
 
 mqd_t actuators_mq;
 pthread_t actuators_id;
+
 actuators_abstraction actuators_state = {
     .belt_tightness = false,
     .door_lock = true,
@@ -31,17 +32,16 @@ can_msg captured_can_frame = {
 
 int main()
 {
-    int actuators_thr;
-
     actuators_mq = open_mq(ACTUATORS_MQ);
 
-    actuators_thr = pthread_create(&actuators_id, NULL, actuatorsResponseLoop, NULL);
-    if (actuators_thr != 0)
+    int actuators_thread;
+    actuators_thread = pthread_create(&actuators_id, NULL, actuatorsResponseLoop, NULL);
+    if (actuators_thread != 0)
     {
         perror("Actuators: it wasn't possible to create the associated thread\n");
         exit(54);
     }
-    actuators_thr = pthread_join(actuators_id, NULL);
+    actuators_thread = pthread_join(actuators_id, NULL);
 
     return 0;
 }
@@ -55,25 +55,17 @@ void *actuatorsResponseLoop(void *arg)
     // Step 04: sleep, waiting the next message -> loop
     // we must define a Stop criteria btw
 
-    int no_message_counter = 0;
-    int result;
-
-    while (no_message_counter < LOOP_EMPTY_ITERATIONS_MAX)
+    int empty_mq_counter = 0;
+    while (empty_mq_counter < LOOP_EMPTY_ITERATIONS_MAX)
     {
-        result = read_mq(actuators_mq, &captured_can_frame);
-        if (result == 0)
+        if (read_mq(actuators_mq, &captured_can_frame) != -1)
         {
+            empty_mq_counter = 0;
             actuatorsTranslateCanMsg(captured_can_frame);
-            no_message_counter = 0;
-        }
-        else if (result == -1)
-        {
-            no_message_counter++;
         }
         else
         {
-            perror("\n");
-            break;
+            empty_mq_counter++;
         }
 
         uint32_t event_id = 0x63A5D2E1; // A simple event_id for testing purposes
@@ -91,8 +83,7 @@ void *actuatorsResponseLoop(void *arg)
         usleep(200000); // Deprected, change for function other later
     }
 
-    printf("Placeholder\n");
-    return NULL;
+    printf("Actuators: empty_mq_counter reached the limit, exiting\n");
 }
 
 void actuatorsTranslateCanMsg(can_msg captured_frame)
