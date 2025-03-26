@@ -75,7 +75,6 @@ void* actuatorsResponseLoop(void *arg){
         // write in file here
         //The condition below is for test porpuse, should be changed to a ttc value
         if (actuators_state.should_activate_abs || actuators_state.alarm_led || actuators_state.alarm_buzzer) {
-            //log_event("Frenagem e alarme ativados");
             log_event("AEB1", event_id, actuators_state);
         }
 

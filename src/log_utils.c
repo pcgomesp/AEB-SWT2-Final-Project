@@ -6,7 +6,7 @@
 void log_event(const char *id_aeb, uint32_t event_id, actuators_abstraction actuators) {
     FILE *log_file = fopen("log/log.txt", "a");
     if (log_file == NULL) {
-        perror("Erro ao abrir o arquivo de log");
+        perror("Error opening log file");
         return;
     }
 
@@ -15,11 +15,11 @@ void log_event(const char *id_aeb, uint32_t event_id, actuators_abstraction actu
     clock_gettime(CLOCK_REALTIME, &ts);
     long timestamp_ms = ts.tv_sec * 1000 + ts.tv_nsec / 1000000;
 
-    // Converter event_id para hexadecimal
+    // Convert id to hexadecimal string
     char event_id_str[9]; // 8 caracteres + '\0'
     snprintf(event_id_str, sizeof(event_id_str), "%08X", event_id);
 
-    // Escrever no arquivo no formato desejado
+    // Write in file in desired format
     fprintf(log_file, "[%s][%s][T:%07ld] WARNING | %d | %d | %d | %d | %d\n",
             id_aeb,
             event_id_str,

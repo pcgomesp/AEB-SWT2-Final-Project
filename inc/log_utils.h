@@ -5,7 +5,7 @@
 #include <actuators.h>
 #include <stdint.h>
 
-// Função para registrar eventos no log
+// Function to register log events in a file
 void log_event(const char *id_aeb, uint32_t event_id, actuators_abstraction actuators);
 
 #endif

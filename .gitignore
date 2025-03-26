@@ -24,6 +24,10 @@ obj/*
 out/
 */out/
 
+#Ignora log files
+log.txt
+
+
 test/*
 !test/*.c
 !test/*.h
