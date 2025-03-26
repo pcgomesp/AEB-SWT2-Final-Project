@@ -32,9 +32,9 @@ float accel_calc(float spd) {
     else {
         elapsed_time = (double)(current_time.tv_sec - start_time.tv_sec) 
                         + (double)(current_time.tv_nsec - start_time.tv_nsec) / 1e9;
-        if (elapsed_time < 0.01) return 0.0; // To avoid division by zero
+        if (elapsed_time < 0.01) return 0.0;
         
-        accel = ((spd - prev_spd) / 3.6) / elapsed_time; // acceleration in m/s^2
+        accel = ((spd - prev_spd) / 3.6) / elapsed_time;
         start_time = current_time;
         prev_spd = spd;
         
