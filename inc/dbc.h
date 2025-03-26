@@ -9,6 +9,7 @@
 #define ID_OBSTACLE_S 0x0CFFB027
 #define ID_CAR_C 0x0CFFAF27
 #define ID_AEB_S 0x18FFA027
+#define ID_EMPTY 0x00000000
 
 // left most: least significant // right most: most significant
 #define BASE_DATA_FRAME {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}

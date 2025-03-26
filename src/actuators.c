@@ -93,6 +93,9 @@ void actuatorsTranslateCanMsg(can_msg captured_frame)
     case ID_AEB_S:
         updateInternalActuatorsState(captured_frame);
         break;
+    case ID_EMPTY:
+        printf("Actuators: Empty message received\n");
+        break;
     default:
         printf("Actuators: CAN Identifier unknown\n");
         break;
