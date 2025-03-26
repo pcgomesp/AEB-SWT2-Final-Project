@@ -25,7 +25,7 @@ out/
 */out/
 
 #Ignora log files
-log.txt
+log/log.txt
 
 
 test/*
