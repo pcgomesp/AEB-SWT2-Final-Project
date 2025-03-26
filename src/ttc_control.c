@@ -58,7 +58,6 @@ float accel_calc(float spd) {
  *         as distance divided by speed.
  */
 float ttc_calc(float dis_rel, float spd_rel) {
-    // Quadratic equation coefficients - UVM (Uniformly Variable Motion)
     float a, b, c, ttc, delta;
     
     a = accel_calc(spd_rel);
@@ -67,17 +66,14 @@ float ttc_calc(float dis_rel, float spd_rel) {
 
     if (a == 0) return ttc = c / b;
 
-    // Calculating the discriminant
     delta = b * b + 2 * a * c;
-    if (delta < 0) return -1.0; // No real roots
+    
+    if (delta < 0) return -1.0;
 
     else if (delta == 0) return -b / a;
 
     else {
-        // calculating the root
         ttc = (-b + sqrt(delta)) / a;
-
-        // returning the positive root
         return ttc;
     }
 }
@@ -112,27 +108,20 @@ void aeb_control(bool *enable_aeb, bool *alarm_cluster, bool *enable_breaking,
                  bool *lk_seatbelt, bool *lk_doors, float *spd, float *dist) {
     float ttc;
     
-    // Calculate the Time to Collision (TTC) using the relative distance and speed
     ttc = ttc_calc(*dist, *spd);
     
-    // If AEB is enabled and the TTC is below the threshold, trigger the AEB system
     if ((*enable_aeb) && (ttc > 0.0) && (ttc < THRESHOLD_ALARM)) {
-        // Set the alarm flag to true if TTC is below the alarm threshold
         *alarm_cluster = true;
         
-        // Trigger the braking system if TTC is below the braking threshold
-        // and the driver is not already braking, and the speed is within the allowed limit
         if ((ttc < THRESHOLD_BRAKING) && (!*enable_breaking) && (*spd < MAX_SPD_ENABLED)
             && (*spd > MIN_SPD_ENABLED)) {
             *enable_breaking = true;
             if (ttc < (THRESHOLD_BRAKING / 2.0)) {
-                // If TTC is less than half of the braking threshold, prepare for a collision
-                *lk_seatbelt = true;  // Lock the seatbelt
-                *lk_doors = false;    // Unlock the doors (preparing for emergency evacuation)
+                *lk_seatbelt = true;  
+                *lk_doors = false;    
             }
         }       
-    } else { // If the TTC is above the threshold or AEB is disabled
-        // Reset the alarm and braking flags to their default states
+    } else {
         *alarm_cluster = false;
         *enable_breaking = false;
     }
