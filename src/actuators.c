@@ -74,7 +74,7 @@ void* actuatorsResponseLoop(void *arg){
 
         // write in file here
         //The condition below is for test porpuse, should be changed to a ttc value
-            log_event("AEB1", event_id, actuators_state);
+        log_event("AEB1", event_id, actuators_state);
         
 
 
@@ -93,11 +93,11 @@ void* actuatorsResponseLoop(void *arg){
 
 void actuatorsTranslateCanMsg(can_msg captured_frame){
     switch(captured_frame.identifier){
-        case ID_PEDALS:
+        case ID_AEB_S:
             updateInternalActuatorsState(captured_frame);
             break;
         default:
-            printf("CAN Identifier unkown\n");
+            printf("Actuators: CAN Identifier unknown\n");
             break;
     }
 }
