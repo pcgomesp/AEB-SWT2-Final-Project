@@ -10,10 +10,10 @@ CFLAGS := -Wall -lpthread -I$(INCFOLDER)
 SRCFILES := $(wildcard $(SRCFOLDER)*.c)
 
 all: $(SRCFILES:src/%.c=obj/%.o)
-	$(CC) $(CFLAGS) obj/sensors.o obj/mq_utils.o obj/file_reader.o obj/dbc.o -o bin/sensors_bin
-	$(CC) $(CFLAGS) obj/actuators.o obj/mq_utils.o obj/file_reader.o obj/dbc.o -o bin/actuators_bin
-	$(CC) $(CFLAGS) obj/aeb_controller.o obj/mq_utils.o obj/file_reader.o obj/dbc.o -o bin/aeb_controller_bin
-	$(CC) $(CFLAGS) obj/main.o obj/mq_utils.o obj/file_reader.o obj/dbc.o -o bin/main_bin
+	$(CC) $(CFLAGS) obj/sensors.o obj/mq_utils.o obj/file_reader.o obj/log_utils.o obj/dbc.o -o bin/sensors_bin
+	$(CC) $(CFLAGS) obj/actuators.o obj/mq_utils.o obj/file_reader.o obj/log_utils.o obj/dbc.o -o bin/actuators_bin
+	$(CC) $(CFLAGS) obj/aeb_controller.o obj/mq_utils.o obj/file_reader.o obj/log_utils.o obj/dbc.o -o bin/aeb_controller_bin
+	$(CC) $(CFLAGS) obj/main.o obj/mq_utils.o obj/file_reader.o obj/log_utils.o obj/dbc.o -o bin/main_bin
 
 
 obj/%.o: src/%.c
