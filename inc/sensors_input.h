@@ -10,6 +10,7 @@ typedef struct {
     int brake_pedal;
     int accelerator_pedal;
     int on_off_aeb_system;
+    int reverseEnabled;
 } sensors_input_data;
 
 
