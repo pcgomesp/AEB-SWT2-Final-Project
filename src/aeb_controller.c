@@ -39,14 +39,15 @@ sensors_input_data aeb_internal_state = {
     .obstacle_distance = 0.0,
     .brake_pedal = false,
     .accelerator_pedal = false,
-    .on_off_aeb_system = true};
+    .on_off_aeb_system = true,
+    .reverseEnabled = false};
 
 can_msg captured_can_frame = {
-    .identifier = 0x0CFFB027,
-    .dataFrame = {0x08, 0x07, 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
+    .identifier = ID_CAR_C,
+    .dataFrame = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
 
 can_msg out_can_frame = {
-    .identifier = 0x18FFA027,
+    .identifier = ID_AEB_S,
     .dataFrame = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
 
 int main()
@@ -92,6 +93,7 @@ void *mainWorkingLoop(void *arg)
             int ttc = 1; // TODO: Calculate TTC here
 
             state = getAEBState(aeb_internal_state, ttc);
+            printf("Meu state eh: %d\n", state);
 
             out_can_frame = updateCanMsgOutput(state);
             
@@ -107,6 +109,7 @@ void *mainWorkingLoop(void *arg)
     }
 
     printf("AEB Controller: Empty MQ counter reached the limit, exiting\n");
+    return NULL;
 }
 
 void print_info()
@@ -117,6 +120,7 @@ void print_info()
     printf("brake_pedal: %s\n", aeb_internal_state.brake_pedal ? "true" : "false");
     printf("accelerator_pedal: %s\n", aeb_internal_state.accelerator_pedal ? "true" : "false");
     printf("on_off_aeb_system: %s\n", aeb_internal_state.on_off_aeb_system ? "true" : "false");
+    printf("Is vehicle in reverse: %s\n", aeb_internal_state.reverseEnabled ? "true" : "false");
 }
 
 void translateAndCallCanMsg(can_msg captured_frame)
@@ -167,6 +171,7 @@ void updateInternalSpeedState(can_msg captured_frame)
     unsigned int data_speed; // used for can frame conversion
     double new_internal_speed = 0.0;
 
+    // update internal data according to the relative velocity detected by the sensor
     if (captured_frame.dataFrame[0] == 0xFE && captured_frame.dataFrame[1] == 0xFF)
     { // DBC: Clear Data
         new_internal_speed = 0.0;
@@ -188,6 +193,16 @@ void updateInternalSpeedState(can_msg captured_frame)
     }
 
     aeb_internal_state.vehicle_velocity = new_internal_speed;
+
+    // update internal data according to the movement direction reported by the sensor
+    if (captured_frame.dataFrame[2] == 0x00)
+    {
+        aeb_internal_state.reverseEnabled = false;
+    }
+    else if (captured_frame.dataFrame[2] == 0x01)
+    {
+        aeb_internal_state.reverseEnabled = true;
+    }
 }
 
 void updateInternalObstacleState(can_msg captured_frame)
@@ -273,9 +288,9 @@ aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, int ttc)
 {
     if (aeb_internal_state.on_off_aeb_system == false)
         return AEB_STATE_STANDBY;
-    if(aeb_internal_state.vehicle_velocity < MIN_SPD_ENABLED)
+    if(aeb_internal_state.vehicle_velocity < MIN_SPD_ENABLED && aeb_internal_state.reverseEnabled == false)
         return AEB_STATE_STANDBY;
-    if (aeb_internal_state.vehicle_velocity > MAX_SPD_ENABLED)
+    if (aeb_internal_state.vehicle_velocity > MAX_SPD_ENABLED && aeb_internal_state.reverseEnabled == false)
         return AEB_STATE_STANDBY;
     if (aeb_internal_state.brake_pedal == false && aeb_internal_state.accelerator_pedal == false)
     {

@@ -12,22 +12,13 @@
 
 void* getSensorsData(void *arg);
 can_msg conv2CANCarClusterData(bool on_off_aeb_system);
-can_msg conv2CANVelocityData(double vehicle_velocity);
+can_msg conv2CANVelocityData(bool vehicle_direction, double vehicle_velocity);
 can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance);
 can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal);
 
 mqd_t sensors_mq;
 pthread_t sensors_id;
 sensors_input_data sensorsData;
-
-// sensors_input_data sensorsData = {
-//     .vehicle_velocity = 50.0, 
-//     .has_obstacle = false, 
-//     .obstacle_distance = 90.0, 
-//     .brake_pedal = false, 
-//     .accelerator_pedal = false, 
-//     .on_off_aeb_system = true
-// };
 
 can_msg can_car_cluster, can_velocity_sensor, can_obstacle_sensor, can_pedals_sensor;
 
@@ -64,7 +55,7 @@ void* getSensorsData(void *arg){
         // Read a new line from the file
         if (read_sensor_data(file, &sensorsData)) {
             can_car_cluster     = conv2CANCarClusterData(sensorsData.on_off_aeb_system);
-            can_velocity_sensor = conv2CANVelocityData(sensorsData.vehicle_velocity);
+            can_velocity_sensor = conv2CANVelocityData(sensorsData.reverseEnabled, sensorsData.vehicle_velocity);
             can_obstacle_sensor = conv2CANObstacleData(sensorsData.has_obstacle, sensorsData.obstacle_distance);
             can_pedals_sensor   = conv2CANPedalsData(sensorsData.brake_pedal, sensorsData.accelerator_pedal);
 
@@ -74,10 +65,10 @@ void* getSensorsData(void *arg){
             write_mq(sensors_mq, &can_pedals_sensor);
 
             // PlaceHolder: just some simple prints to see if the data is being converted in the right way
-            print_can_msg(&can_car_cluster);
-            print_can_msg(&can_velocity_sensor);
-            print_can_msg(&can_obstacle_sensor);
-            print_can_msg(&can_pedals_sensor);
+            //print_can_msg(&can_car_cluster);
+            //print_can_msg(&can_velocity_sensor);
+            //print_can_msg(&can_obstacle_sensor);
+            //print_can_msg(&can_pedals_sensor);
         
             printf("New line.\n"); //This line is used for see the break of line
         } else {
@@ -100,6 +91,7 @@ void* getSensorsData(void *arg){
 can_msg conv2CANCarClusterData(bool on_off_aeb_system){
     can_msg aux = {.identifier = ID_CAR_C, .dataFrame = BASE_DATA_FRAME};
 
+    // Enable or disable AEB data encapsulation
     if(on_off_aeb_system){
         aux.dataFrame[0] = 0x01;
     }
@@ -110,10 +102,17 @@ can_msg conv2CANCarClusterData(bool on_off_aeb_system){
     return aux;
 }
 
-can_msg conv2CANVelocityData(double vehicle_velocity){
+can_msg conv2CANVelocityData(bool vehicle_direction, double vehicle_velocity){
     can_msg aux = {.identifier = ID_SPEED_S, .dataFrame = BASE_DATA_FRAME};
 
-    // Speed data ​​encapsulation: Data_speed = speed/res - offset => speed * 256
+    // Vehicle direction (forward or reverse) data encapsulation
+    if(vehicle_direction){
+        aux.dataFrame[2] = 0x01;
+    } else {
+        aux.dataFrame[2] = 0x00;
+    }
+
+    // Speed data ​​encapsulation
     unsigned int data_speed = vehicle_velocity / RES_SPEED_S;
     unsigned char ms_speed, ls_speed;
     ls_speed = data_speed;
@@ -129,13 +128,14 @@ can_msg conv2CANVelocityData(double vehicle_velocity){
 can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance){
     can_msg aux = {.identifier = ID_OBSTACLE_S, .dataFrame = BASE_DATA_FRAME};
 
+    // Obstacle detection data encapsulation
     if(has_obstacle){
         aux.dataFrame[2] = 0x01;
     } else {
         aux.dataFrame[2] = 0x00;
     }
 
-    // Obstacle distance data ​​encapsulation: Data_speed = speed/res - offset => speed * 256
+    // Obstacle distance data ​​encapsulation
     unsigned int data_distance = obstacle_distance / RES_OBSTACLE_S;
     unsigned char ms_distance, ls_distance;
     ls_distance = data_distance;
@@ -151,12 +151,14 @@ can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance){
 can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal){
     can_msg aux = {.identifier = ID_PEDALS, .dataFrame = BASE_DATA_FRAME};
 
+    // Brake pedal activation data encapsulation
     if(brake_pedal){
         aux.dataFrame[1] = 0x01;
     } else {
         aux.dataFrame[1] = 0x00;
     }
 
+    // Accelerator pedal activation data encapsulation
     if(accelerator_pedal){
         aux.dataFrame[0] = 0x01;
     } else {
