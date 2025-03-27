@@ -15,7 +15,7 @@
 #define QUEUE_PERMISSIONS 0660
 
 /**
- * @brief Get the default attributes for a message queue.
+ * @brief Gets the default attributes for a message queue.
  *
  * @return A mq_attr structure configured with default values.
  */
@@ -30,7 +30,7 @@ struct mq_attr get_mq_attr()
 }
 
 /**
- * @brief Create a POSIX message queue.
+ * @brief Creates a POSIX message queue.
  *
  * @param mq_name Name of the message queue to be created.
  * @return Message queue identifier (mqd_t).
@@ -50,14 +50,8 @@ mqd_t create_mq(char *mq_name)
     return mqd;
 }
 
-/**
- * @brief Abre uma fila de mensagens POSIX existente.
- *
- * @param mq_name Nome da fila de mensagens a ser aberta.
- * @return Identificador da fila de mensagens (mqd_t).
- */
  /**
- * @brief Open a POSIX message queue.
+ * @brief Opens a POSIX message queue.
  *
  * @param mq_name Name of the message queue to be opened.
  * @return Message queue identifier (mqd_t).
@@ -75,7 +69,7 @@ mqd_t open_mq(char *mq_name)
 }
 
 /**
- * @brief Close and unlink the specified POSIX message queue.
+ * @brief Closes and unlinks the specified POSIX message queue.
  *
  * @param mqd Message queue identifier.
  * @param mq_name Name of the message queue to be closed.
@@ -96,7 +90,7 @@ void close_mq(mqd_t mqd, char *mq_name)
 }
 
 /**
- * @brief Read a message from a POSIX message queue.
+ * @brief Reads a message from a POSIX message queue.
  *
  * @param mq_receiver Identifier of the message queue from which the message will be read.
  * @param msg_read Pointer to the structure where the read message will be stored, in can_msg struct type.
@@ -115,7 +109,7 @@ int read_mq(mqd_t mq_receiver, can_msg *msg_read)
 }
 
 /**
- * @brief Write a message from a POSIX message queue.
+ * @brief Writes a message from a POSIX message queue.
  *
  * @param mq_receiver Identifier of the message queue from which the message will be read.
  * @param msg_read Pointer to the can_msg struct type used to write a message in the MQ POSIX format.

@@ -1,8 +1,25 @@
+/**
+ * @file log_utils.c
+ * @brief Utilitary file for event tracking in actuators abstraction.
+ *
+ * This file provides functionality to log events with timestamps 
+ * and relevant actuator states.
+ */
 #include <stdio.h>
 #include <time.h>
 #include <stdint.h>
 #include "log_utils.h"
 
+/**
+ * @brief Logs an event with a timestamp and actuator states.
+ *
+ * This function writes event information into a log file, including 
+ * a timestamp, event identifier, and actuator states.
+ *
+ * @param id_aeb A string representing the system identifier, regarding AEB.
+ * @param event_id A 32-bit unsigned integer representing the event ID.
+ * @param actuators The abstract structure that represents all the possible actuator and their states.
+ */
 void log_event(const char *id_aeb, uint32_t event_id, actuators_abstraction actuators) {
     FILE *log_file = fopen("log/log.txt", "a");
     if (log_file == NULL) {
