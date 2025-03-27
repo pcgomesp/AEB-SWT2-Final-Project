@@ -1,0 +1,114 @@
+\hypertarget{file__reader_8h}{}\doxysection{inc/file\+\_\+reader.h File Reference}
+\label{file__reader_8h}\index{inc/file\_reader.h@{inc/file\_reader.h}}
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}sensors\+\_\+input.\+h\char`\"{}}\newline
+Include dependency graph for file\+\_\+reader.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=242pt]{file__reader_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{file__reader_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+FILE $\ast$ \mbox{\hyperlink{file__reader_8h_a385ee1464ad17f916d05e6eac823751e}{open\+\_\+file}} (const char $\ast$filename)
+\begin{DoxyCompactList}\small\item\em Opens a file for reading and skips the first line (header). \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{file__reader_8h_a06e72747213ae08275b8a3f9ed2c7ba0}{read\+\_\+sensor\+\_\+data}} (FILE $\ast$file, \mbox{\hyperlink{structsensors__input__data}{sensors\+\_\+input\+\_\+data}} $\ast$sensor\+\_\+data)
+\begin{DoxyCompactList}\small\item\em Reads a line from the file and fills the sensor data structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{file__reader_8h_a385ee1464ad17f916d05e6eac823751e}\label{file__reader_8h_a385ee1464ad17f916d05e6eac823751e}} 
+\index{file\_reader.h@{file\_reader.h}!open\_file@{open\_file}}
+\index{open\_file@{open\_file}!file\_reader.h@{file\_reader.h}}
+\doxysubsubsection{\texorpdfstring{open\_file()}{open\_file()}}
+{\footnotesize\ttfamily FILE$\ast$ open\+\_\+file (\begin{DoxyParamCaption}\item[{const char $\ast$}]{filename }\end{DoxyParamCaption})}
+
+
+
+Opens a file for reading and skips the first line (header). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & Name of the file to be opened. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+FILE$\ast$ Pointer to the opened file. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+If the file cannot be opened, the program exits with an error. 
+\end{DoxyNote}
+
+
+Definition at line 12 of file file\+\_\+reader.\+c.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{12                                       \{}
+\DoxyCodeLine{13     FILE *file = fopen(filename, \textcolor{stringliteral}{"{}r"{}});}
+\DoxyCodeLine{14     \textcolor{keywordflow}{if} (file == NULL) \{}
+\DoxyCodeLine{15         perror(\textcolor{stringliteral}{"{}Erro ao abrir o arquivo"{}});}
+\DoxyCodeLine{16         exit(EXIT\_FAILURE);}
+\DoxyCodeLine{17     \}}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19     \textcolor{comment}{// Skip header}}
+\DoxyCodeLine{20     \textcolor{keywordtype}{char} header[100];}
+\DoxyCodeLine{21     fgets(header, \textcolor{keyword}{sizeof}(header), file);}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23     \textcolor{keywordflow}{return} file;}
+\DoxyCodeLine{24 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{file__reader_8h_a06e72747213ae08275b8a3f9ed2c7ba0}\label{file__reader_8h_a06e72747213ae08275b8a3f9ed2c7ba0}} 
+\index{file\_reader.h@{file\_reader.h}!read\_sensor\_data@{read\_sensor\_data}}
+\index{read\_sensor\_data@{read\_sensor\_data}!file\_reader.h@{file\_reader.h}}
+\doxysubsubsection{\texorpdfstring{read\_sensor\_data()}{read\_sensor\_data()}}
+{\footnotesize\ttfamily int read\+\_\+sensor\+\_\+data (\begin{DoxyParamCaption}\item[{FILE $\ast$}]{file,  }\item[{\mbox{\hyperlink{structsensors__input__data}{sensors\+\_\+input\+\_\+data}} $\ast$}]{sensor\+\_\+data }\end{DoxyParamCaption})}
+
+
+
+Reads a line from the file and fills the sensor data structure. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file} & Pointer to the opened file. \\
+\hline
+{\em sensor\+\_\+data} & Pointer to the structure where the data will be stored. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+int Returns 1 if the reading is successful, 0 otherwise.
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+The expected file format will follow this label formact\+: Distance(m) Obstacle Speed(m/s) Brake Accelerator AEB\+\_\+on\+\_\+off Reverse 
+\end{DoxyNote}
+
+
+Definition at line 37 of file file\+\_\+reader.\+c.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{37                                                                   \{}
+\DoxyCodeLine{38     \textcolor{keywordflow}{return} fscanf(file, \textcolor{stringliteral}{"{}\%lf \%d \%lf \%d \%d \%d \%d"{}}, }
+\DoxyCodeLine{39                   \&sensor\_data-\/>\mbox{\hyperlink{structsensors__input__data_a01371737abb4472988490f1d011be0c9}{obstacle\_distance}}, }
+\DoxyCodeLine{40                   \&sensor\_data-\/>\mbox{\hyperlink{structsensors__input__data_a3782de9b1037f3ce0036f685de31f165}{has\_obstacle}}, }
+\DoxyCodeLine{41                   \&sensor\_data-\/>\mbox{\hyperlink{structsensors__input__data_a093ccd15507b18e4a407ae811d01e3ab}{vehicle\_velocity}}, }
+\DoxyCodeLine{42                   \&sensor\_data-\/>\mbox{\hyperlink{structsensors__input__data_a8cc0d9e6c44c3b22ba0ad4e2e3f7d055}{brake\_pedal}}, }
+\DoxyCodeLine{43                   \&sensor\_data-\/>\mbox{\hyperlink{structsensors__input__data_a605d64229c3a536712761f44feb45251}{accelerator\_pedal}}, }
+\DoxyCodeLine{44                   \&sensor\_data-\/>\mbox{\hyperlink{structsensors__input__data_a7d3eb4bf1acbb1c912830e8808f72168}{on\_off\_aeb\_system}},}
+\DoxyCodeLine{45                   \&sensor\_data-\/>\mbox{\hyperlink{structsensors__input__data_a0f676ac6033e205e2603c48fecf461ef}{reverseEnabled}}}
+\DoxyCodeLine{46                 ) == 7;}
+\DoxyCodeLine{47 \}}
+
+\end{DoxyCode}

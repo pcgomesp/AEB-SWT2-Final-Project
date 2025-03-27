@@ -44,3 +44,13 @@ test/test_mq_utils_read: test/test_mq_utils_read.c src/mq_utils.c test/unity.c
 
 cppcheck:
 	cppcheck --addon=misra -I ./inc --force --library=posix $(SRCFOLDER) $(INCFOLDER)
+
+.PHONY: docs
+docs:
+	doxygen Doxyfile
+
+.PHONY: clean-docs
+clean-docs:
+	rm -rf docs/html
+	rm -rf docs/latex
+	rm -rf docs/rtf

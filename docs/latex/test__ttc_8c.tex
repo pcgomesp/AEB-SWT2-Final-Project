@@ -1,0 +1,225 @@
+\hypertarget{test__ttc_8c}{}\doxysection{test/test\+\_\+ttc.c File Reference}
+\label{test__ttc_8c}\index{test/test\_ttc.c@{test/test\_ttc.c}}
+{\ttfamily \#include \char`\"{}../inc/ttc\+\_\+control.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+Include dependency graph for test\+\_\+ttc.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__ttc_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{test__ttc_8c_aaa271620731b1adc6009951500b9a45e}{test\+\_\+accel\+\_\+calc}} ()
+\begin{DoxyCompactList}\small\item\em Test the accel\+\_\+calc function. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{test__ttc_8c_a3e542e9dad49d304203017dd31307e4d}{test\+\_\+ttc\+\_\+calc}} ()
+\begin{DoxyCompactList}\small\item\em Test the ttc\+\_\+calc function. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{test__ttc_8c_afd99c079a2d5d38ff53825437a709283}{test\+\_\+aeb\+\_\+control}} ()
+\begin{DoxyCompactList}\small\item\em Test the behavior of the Autonomous Emergency Braking (AEB) control function. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{test__ttc_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{test__ttc_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}\label{test__ttc_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}} 
+\index{test\_ttc.c@{test\_ttc.c}!main@{main}}
+\index{main@{main}!test\_ttc.c@{test\_ttc.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 145 of file test\+\_\+ttc.\+c.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{145            \{}
+\DoxyCodeLine{146     \mbox{\hyperlink{test__ttc_8c_aaa271620731b1adc6009951500b9a45e}{test\_accel\_calc}}();}
+\DoxyCodeLine{147     \mbox{\hyperlink{test__ttc_8c_a3e542e9dad49d304203017dd31307e4d}{test\_ttc\_calc}}();}
+\DoxyCodeLine{148     \mbox{\hyperlink{test__ttc_8c_afd99c079a2d5d38ff53825437a709283}{test\_aeb\_control}}();}
+\DoxyCodeLine{149 }
+\DoxyCodeLine{150     \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{151 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{test__ttc_8c_aaa271620731b1adc6009951500b9a45e}\label{test__ttc_8c_aaa271620731b1adc6009951500b9a45e}} 
+\index{test\_ttc.c@{test\_ttc.c}!test\_accel\_calc@{test\_accel\_calc}}
+\index{test\_accel\_calc@{test\_accel\_calc}!test\_ttc.c@{test\_ttc.c}}
+\doxysubsubsection{\texorpdfstring{test\_accel\_calc()}{test\_accel\_calc()}}
+{\footnotesize\ttfamily void test\+\_\+accel\+\_\+calc (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Test the accel\+\_\+calc function. 
+
+This function tests the {\ttfamily accel\+\_\+calc} function by simulating different speeds and calculating the acceleration between them. It prints the calculated acceleration in m/s² for various speed values at different time intervals.
+
+It performs the following steps\+:
+\begin{DoxyItemize}
+\item Tests the acceleration calculation between two speeds (10 km/h and 20 km/h).
+\item Calls the {\ttfamily accel\+\_\+calc} function with different speeds and prints the results.
+\item Waits 2 seconds between calls to simulate time intervals. 
+\end{DoxyItemize}
+
+Definition at line 18 of file test\+\_\+ttc.\+c.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{18                        \{}
+\DoxyCodeLine{19     printf(\textcolor{stringliteral}{"{}Testando função accel\_calc\(\backslash\)n"{}});}
+\DoxyCodeLine{20     \textcolor{keywordtype}{float} speed1 = 10.0;  \textcolor{comment}{// 10 km/h}}
+\DoxyCodeLine{21     \textcolor{keywordtype}{float} speed2 = 20.0;  \textcolor{comment}{// 20 km/h}}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23     \mbox{\hyperlink{ttc__control_8c_a48b709ab38f0019afe1d01374488b9dc}{accel\_calc}}(speed1);}
+\DoxyCodeLine{24     sleep(2);}
+\DoxyCodeLine{25     printf(\textcolor{stringliteral}{"{}Aceleração entre \%0.1f km/h e \%0.1f km/h: \%0.4f m/s\string^2\(\backslash\)n"{}}, }
+\DoxyCodeLine{26             speed1, speed2, \mbox{\hyperlink{ttc__control_8c_a48b709ab38f0019afe1d01374488b9dc}{accel\_calc}}(speed2));}
+\DoxyCodeLine{27     sleep(2);}
+\DoxyCodeLine{28     printf(\textcolor{stringliteral}{"{}Aceleração entre \%0.1f km/h e \%0.1f km/h: \%0.4f m/s\string^2\(\backslash\)n"{}}, }
+\DoxyCodeLine{29             speed2, speed1, \mbox{\hyperlink{ttc__control_8c_a48b709ab38f0019afe1d01374488b9dc}{accel\_calc}}(speed1));}
+\DoxyCodeLine{30     printf(\textcolor{stringliteral}{"{}\(\backslash\)n"{}});}
+\DoxyCodeLine{31 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{test__ttc_8c_afd99c079a2d5d38ff53825437a709283}\label{test__ttc_8c_afd99c079a2d5d38ff53825437a709283}} 
+\index{test\_ttc.c@{test\_ttc.c}!test\_aeb\_control@{test\_aeb\_control}}
+\index{test\_aeb\_control@{test\_aeb\_control}!test\_ttc.c@{test\_ttc.c}}
+\doxysubsubsection{\texorpdfstring{test\_aeb\_control()}{test\_aeb\_control()}}
+{\footnotesize\ttfamily void test\+\_\+aeb\+\_\+control (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Test the behavior of the Autonomous Emergency Braking (AEB) control function. 
+
+This function tests the {\ttfamily aeb\+\_\+control} function with different values for vehicle speed (spd) and relative distance (dist) to simulate various scenarios of time-\/to-\/collision (TTC) and check whether the alarm and braking systems are triggered as expected. The function performs the following tests\+:
+
+
+\begin{DoxyItemize}
+\item {\bfseries{Test 1}}\+: TTC $>$ 2.\+0 seconds (expected result\+: no alarm, no braking)
+\item {\bfseries{Test 2}}\+: 1.\+0 $<$ TTC $<$ 2.\+0 seconds (expected result\+: alarm triggered, no braking)
+\item {\bfseries{Test 3}}\+: TTC $<$ 1.\+0 second (expected result\+: alarm triggered, braking enabled)
+\item {\bfseries{Test 4}}\+: AEB disabled, TTC $<$ 1.\+0 second (expected result\+: no alarm, no braking)
+\end{DoxyItemize}
+
+Each test prints the expected result and the actual outcome for the alarm and braking flags. 
+
+Definition at line 87 of file test\+\_\+ttc.\+c.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{87                         \{}
+\DoxyCodeLine{88     \textcolor{comment}{// Input variables for the test}}
+\DoxyCodeLine{89     \textcolor{keywordtype}{bool} enable\_aeb;}
+\DoxyCodeLine{90     \textcolor{keywordtype}{bool} alarm\_cluster;}
+\DoxyCodeLine{91     \textcolor{keywordtype}{bool} enable\_breaking;}
+\DoxyCodeLine{92     \textcolor{keywordtype}{bool} lk\_seatbelt;}
+\DoxyCodeLine{93     \textcolor{keywordtype}{bool} lk\_doors;}
+\DoxyCodeLine{94     \textcolor{keywordtype}{float} spd;}
+\DoxyCodeLine{95     \textcolor{keywordtype}{float} dist;}
+\DoxyCodeLine{96     \textcolor{keywordtype}{float} delta\_spd;}
+\DoxyCodeLine{97 }
+\DoxyCodeLine{98     \textcolor{comment}{// Test 1: TTC > 2.0 (no alarm, no braking)}}
+\DoxyCodeLine{99     enable\_aeb = \textcolor{keyword}{true};}
+\DoxyCodeLine{100     spd = 30.0;  \textcolor{comment}{// 30 km/h}}
+\DoxyCodeLine{101     dist = 50.0; \textcolor{comment}{// 50 meters}}
+\DoxyCodeLine{102     \mbox{\hyperlink{ttc__control_8c_ad9680218967729532a9eb469cfdb3ae4}{aeb\_control}}(\&enable\_aeb, \&alarm\_cluster, \&enable\_breaking, \&lk\_seatbelt, \&lk\_doors, \&spd, \&dist);}
+\DoxyCodeLine{103     delta\_spd = 0.001;}
+\DoxyCodeLine{104     spd -\/= delta\_spd;}
+\DoxyCodeLine{105     printf(\textcolor{stringliteral}{"{}Velocidade: \%.6f km/h\(\backslash\)n"{}}, spd);}
+\DoxyCodeLine{106     \mbox{\hyperlink{ttc__control_8c_ad9680218967729532a9eb469cfdb3ae4}{aeb\_control}}(\&enable\_aeb, \&alarm\_cluster, \&enable\_breaking, \&lk\_seatbelt, \&lk\_doors, \&spd, \&dist);}
+\DoxyCodeLine{107     }
+\DoxyCodeLine{108     \textcolor{comment}{// Check if the alarm and braking are not triggered}}
+\DoxyCodeLine{109     printf(\textcolor{stringliteral}{"{}Test 1 -\/ TTC > 2.0\(\backslash\)n"{}});}
+\DoxyCodeLine{110     printf(\textcolor{stringliteral}{"{}Expected: No alarm, no braking\(\backslash\)n"{}});}
+\DoxyCodeLine{111     printf(\textcolor{stringliteral}{"{}Alarm: \%s, Braking: \%s\(\backslash\)n"{}}, alarm\_cluster ? \textcolor{stringliteral}{"{}Triggered"{}} : \textcolor{stringliteral}{"{}Not triggered"{}}, enable\_breaking ? \textcolor{stringliteral}{"{}Enabled"{}} : \textcolor{stringliteral}{"{}Not enabled"{}});}
+\DoxyCodeLine{112 }
+\DoxyCodeLine{113     \textcolor{comment}{// Test 2: 1.0 < TTC < 2.0 (alarm triggered, no braking)}}
+\DoxyCodeLine{114     dist = 12.5; \textcolor{comment}{// 12.5 meters}}
+\DoxyCodeLine{115     spd += delta\_spd; \textcolor{comment}{// 30.0 km/h}}
+\DoxyCodeLine{116     \mbox{\hyperlink{ttc__control_8c_ad9680218967729532a9eb469cfdb3ae4}{aeb\_control}}(\&enable\_aeb, \&alarm\_cluster, \&enable\_breaking, \&lk\_seatbelt, \&lk\_doors, \&spd, \&dist);}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{118     \textcolor{comment}{// Check if the alarm was triggered, but braking was not}}
+\DoxyCodeLine{119     printf(\textcolor{stringliteral}{"{}\(\backslash\)nTest 2 -\/ 1.0 < TTC < 2.0\(\backslash\)n"{}});}
+\DoxyCodeLine{120     printf(\textcolor{stringliteral}{"{}Expected: Alarm triggered, no braking\(\backslash\)n"{}});}
+\DoxyCodeLine{121     printf(\textcolor{stringliteral}{"{}Alarm: \%s, Braking: \%s\(\backslash\)n"{}}, alarm\_cluster ? \textcolor{stringliteral}{"{}Triggered"{}} : \textcolor{stringliteral}{"{}Not triggered"{}}, enable\_breaking ? \textcolor{stringliteral}{"{}Enabled"{}} : \textcolor{stringliteral}{"{}Not enabled"{}});}
+\DoxyCodeLine{122 }
+\DoxyCodeLine{123     \textcolor{comment}{// Test 3: TTC < 1.0 (alarm and braking triggered)}}
+\DoxyCodeLine{124     dist = 5.0; \textcolor{comment}{// 5 meters}}
+\DoxyCodeLine{125     spd += (5*delta\_spd); \textcolor{comment}{// 30.002 km/h}}
+\DoxyCodeLine{126     \mbox{\hyperlink{ttc__control_8c_ad9680218967729532a9eb469cfdb3ae4}{aeb\_control}}(\&enable\_aeb, \&alarm\_cluster, \&enable\_breaking, \&lk\_seatbelt, \&lk\_doors, \&spd, \&dist);}
+\DoxyCodeLine{127 }
+\DoxyCodeLine{128     \textcolor{comment}{// Check if the alarm and braking were both triggered}}
+\DoxyCodeLine{129     printf(\textcolor{stringliteral}{"{}\(\backslash\)nTest 3 -\/ TTC < 1.0\(\backslash\)n"{}});}
+\DoxyCodeLine{130     printf(\textcolor{stringliteral}{"{}Expected: Alarm triggered, braking enabled\(\backslash\)n"{}});}
+\DoxyCodeLine{131     printf(\textcolor{stringliteral}{"{}Alarm: \%s, Braking: \%s\(\backslash\)n"{}}, alarm\_cluster ? \textcolor{stringliteral}{"{}Triggered"{}} : \textcolor{stringliteral}{"{}Not triggered"{}}, enable\_breaking ? \textcolor{stringliteral}{"{}Enabled"{}} : \textcolor{stringliteral}{"{}Not enabled"{}});}
+\DoxyCodeLine{132 }
+\DoxyCodeLine{133     \textcolor{comment}{// Test 4: TTC < 1.0 with AEB disabled (no alarm, no braking)}}
+\DoxyCodeLine{134     enable\_aeb = \textcolor{keyword}{false};}
+\DoxyCodeLine{135     dist = 10.0; \textcolor{comment}{// 10 meters}}
+\DoxyCodeLine{136     spd = 30.0;  \textcolor{comment}{// 30 km/h}}
+\DoxyCodeLine{137     \mbox{\hyperlink{ttc__control_8c_ad9680218967729532a9eb469cfdb3ae4}{aeb\_control}}(\&enable\_aeb, \&alarm\_cluster, \&enable\_breaking, \&lk\_seatbelt, \&lk\_doors, \&spd, \&dist);}
+\DoxyCodeLine{138 }
+\DoxyCodeLine{139     \textcolor{comment}{// Check if the alarm and braking were not triggered because AEB is disabled}}
+\DoxyCodeLine{140     printf(\textcolor{stringliteral}{"{}\(\backslash\)nTest 4 -\/ AEB Disabled\(\backslash\)n"{}});}
+\DoxyCodeLine{141     printf(\textcolor{stringliteral}{"{}Expected: No alarm, no braking\(\backslash\)n"{}});}
+\DoxyCodeLine{142     printf(\textcolor{stringliteral}{"{}Alarm: \%s, Braking: \%s\(\backslash\)n"{}}, alarm\_cluster ? \textcolor{stringliteral}{"{}Triggered"{}} : \textcolor{stringliteral}{"{}Not triggered"{}}, enable\_breaking ? \textcolor{stringliteral}{"{}Enabled"{}} : \textcolor{stringliteral}{"{}Not enabled"{}});}
+\DoxyCodeLine{143 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{test__ttc_8c_a3e542e9dad49d304203017dd31307e4d}\label{test__ttc_8c_a3e542e9dad49d304203017dd31307e4d}} 
+\index{test\_ttc.c@{test\_ttc.c}!test\_ttc\_calc@{test\_ttc\_calc}}
+\index{test\_ttc\_calc@{test\_ttc\_calc}!test\_ttc.c@{test\_ttc.c}}
+\doxysubsubsection{\texorpdfstring{test\_ttc\_calc()}{test\_ttc\_calc()}}
+{\footnotesize\ttfamily void test\+\_\+ttc\+\_\+calc (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Test the ttc\+\_\+calc function. 
+
+This function tests the {\ttfamily ttc\+\_\+calc} function by simulating different distances and speeds, and then calculates the time to collision (TTC). The function prints the calculated TTC values for different input parameters.
+
+It performs the following steps\+:
+\begin{DoxyItemize}
+\item Tests the TTC with a 100-\/meter distance and a 20 km/h speed.
+\item Tests TTC with different speeds (adding 30 km/h).
+\item Tests TTC with a 50-\/meter distance and a 10 km/h speed, and checks for negative results.
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+If the calculated TTC is negative, it indicates that there is no real solution for the given inputs (i.\+e., no real roots in the quadratic equation). 
+\end{DoxyNote}
+
+
+Definition at line 48 of file test\+\_\+ttc.\+c.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{48                      \{}
+\DoxyCodeLine{49     printf(\textcolor{stringliteral}{"{}Testando função ttc\_calc\(\backslash\)n"{}});}
+\DoxyCodeLine{50 }
+\DoxyCodeLine{51     \textcolor{comment}{// Testes com distância e velocidade}}
+\DoxyCodeLine{52     \textcolor{keywordtype}{float} dist = 100.0;  \textcolor{comment}{// 100 metros}}
+\DoxyCodeLine{53     \textcolor{keywordtype}{float} speed = 20.0;  \textcolor{comment}{// 20 km/h}}
+\DoxyCodeLine{54     \textcolor{keywordtype}{float} ttc = \mbox{\hyperlink{ttc__control_8c_a0cc178c96e646a5361f34b3e9835e676}{ttc\_calc}}(dist, speed);}
+\DoxyCodeLine{55     sleep(2);}
+\DoxyCodeLine{56     ttc = \mbox{\hyperlink{ttc__control_8c_a0cc178c96e646a5361f34b3e9835e676}{ttc\_calc}}(dist, speed + 30.0);}
+\DoxyCodeLine{57     printf(\textcolor{stringliteral}{"{}Tempo para colisão com distância de \%.1f metros e velocidade de \%.1f km/h: \%0.2f segundos\(\backslash\)n"{}}, dist, speed, ttc);}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59     \textcolor{comment}{// Teste com outra velocidade}}
+\DoxyCodeLine{60     dist = 50.0;  \textcolor{comment}{// 50 metros}}
+\DoxyCodeLine{61     speed = 10.0; \textcolor{comment}{// 10 km/h}}
+\DoxyCodeLine{62     ttc = \mbox{\hyperlink{ttc__control_8c_a0cc178c96e646a5361f34b3e9835e676}{ttc\_calc}}(dist, speed);}
+\DoxyCodeLine{63     \textcolor{keywordflow}{if} (ttc >= 0) \{}
+\DoxyCodeLine{64         printf(\textcolor{stringliteral}{"{}Tempo para colisão com distância de \%.1f metros e velocidade de \%.1f km/h: \%0.2f segundos\(\backslash\)n"{}}, dist, speed, ttc);}
+\DoxyCodeLine{65     \} \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{66         printf(\textcolor{stringliteral}{"{}Não há solução real para TTC com essas entradas\(\backslash\)n"{}});}
+\DoxyCodeLine{67     \}}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69     printf(\textcolor{stringliteral}{"{}\(\backslash\)n\(\backslash\)n"{}});}
+\DoxyCodeLine{70 \}}
+
+\end{DoxyCode}

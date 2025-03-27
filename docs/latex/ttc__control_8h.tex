@@ -1,0 +1,208 @@
+\hypertarget{ttc__control_8h}{}\doxysection{inc/ttc\+\_\+control.h File Reference}
+\label{ttc__control_8h}\index{inc/ttc\_control.h@{inc/ttc\_control.h}}
+{\ttfamily \#include $<$math.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+Include dependency graph for ttc\+\_\+control.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=278pt]{ttc__control_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=276pt]{ttc__control_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+float \mbox{\hyperlink{ttc__control_8h_a48b709ab38f0019afe1d01374488b9dc}{accel\+\_\+calc}} (float spd)
+\begin{DoxyCompactList}\small\item\em Calculate acceleration based on speed and time difference. \end{DoxyCompactList}\item 
+float \mbox{\hyperlink{ttc__control_8h_a3d764fb657999d51ee365fbaa4214d06}{ttc\+\_\+calc}} (float dist, float spd)
+\begin{DoxyCompactList}\small\item\em Calculate the time to collision (TTC) based on relative distance and speed. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{ttc__control_8h_ad9680218967729532a9eb469cfdb3ae4}{aeb\+\_\+control}} (bool $\ast$enable\+\_\+aeb, bool $\ast$alarm\+\_\+cluster, bool $\ast$enable\+\_\+breaking, bool $\ast$lk\+\_\+seatbelt, bool $\ast$lk\+\_\+doors, float $\ast$spd, float $\ast$dist)
+\begin{DoxyCompactList}\small\item\em Controls the Autonomous Emergency Braking (AEB) system. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{ttc__control_8h_a48b709ab38f0019afe1d01374488b9dc}\label{ttc__control_8h_a48b709ab38f0019afe1d01374488b9dc}} 
+\index{ttc\_control.h@{ttc\_control.h}!accel\_calc@{accel\_calc}}
+\index{accel\_calc@{accel\_calc}!ttc\_control.h@{ttc\_control.h}}
+\doxysubsubsection{\texorpdfstring{accel\_calc()}{accel\_calc()}}
+{\footnotesize\ttfamily float accel\+\_\+calc (\begin{DoxyParamCaption}\item[{float}]{spd }\end{DoxyParamCaption})}
+
+
+
+Calculate acceleration based on speed and time difference. 
+
+This function calculates the acceleration in m/s² based on the difference in speed and time. It uses the {\ttfamily clock\+\_\+gettime} function to measure the time difference between consecutive calls and calculates acceleration as the change in speed divided by the elapsed time \mbox{[}Sw\+R-\/11\mbox{]}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em spd} & Current speed in km/h.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The acceleration in m/s². If the function is called for the first time or there is insufficient time difference between calls, it returns 0.\+0. 
+\end{DoxyReturn}
+
+
+Definition at line 17 of file ttc\+\_\+control.\+c.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{17                             \{}
+\DoxyCodeLine{18     \textcolor{keyword}{static} \textcolor{keywordtype}{float} prev\_spd = 0.0;}
+\DoxyCodeLine{19     \textcolor{keyword}{static} \textcolor{keyword}{struct }timespec start\_time = \{0, 0\};}
+\DoxyCodeLine{20     \textcolor{keyword}{struct }timespec current\_time;}
+\DoxyCodeLine{21     \textcolor{keywordtype}{double} elapsed\_time;}
+\DoxyCodeLine{22     \textcolor{keywordtype}{float} accel = 0.0;}
+\DoxyCodeLine{23 }
+\DoxyCodeLine{24     clock\_gettime(CLOCK\_REALTIME, \&current\_time);}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{26     \textcolor{keywordflow}{if} (prev\_spd == 0.0) \{}
+\DoxyCodeLine{27         prev\_spd = spd;}
+\DoxyCodeLine{28         start\_time = current\_time;}
+\DoxyCodeLine{29         \textcolor{keywordflow}{return} 0.0;}
+\DoxyCodeLine{30     \}}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32     \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{33         elapsed\_time = (double)(current\_time.tv\_sec -\/ start\_time.tv\_sec) }
+\DoxyCodeLine{34                         + (double)(current\_time.tv\_nsec -\/ start\_time.tv\_nsec) / 1e9;}
+\DoxyCodeLine{35         \textcolor{keywordflow}{if} (elapsed\_time < 0.01) \textcolor{keywordflow}{return} 0.0;}
+\DoxyCodeLine{36         }
+\DoxyCodeLine{37         accel = ((spd -\/ prev\_spd) / 3.6) / elapsed\_time;}
+\DoxyCodeLine{38         start\_time = current\_time;}
+\DoxyCodeLine{39         prev\_spd = spd;}
+\DoxyCodeLine{40         }
+\DoxyCodeLine{41         \textcolor{keywordflow}{return} accel;}
+\DoxyCodeLine{42     \} }
+\DoxyCodeLine{43 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{ttc__control_8h_ad9680218967729532a9eb469cfdb3ae4}\label{ttc__control_8h_ad9680218967729532a9eb469cfdb3ae4}} 
+\index{ttc\_control.h@{ttc\_control.h}!aeb\_control@{aeb\_control}}
+\index{aeb\_control@{aeb\_control}!ttc\_control.h@{ttc\_control.h}}
+\doxysubsubsection{\texorpdfstring{aeb\_control()}{aeb\_control()}}
+{\footnotesize\ttfamily void aeb\+\_\+control (\begin{DoxyParamCaption}\item[{bool $\ast$}]{enable\+\_\+aeb,  }\item[{bool $\ast$}]{alarm\+\_\+cluster,  }\item[{bool $\ast$}]{enable\+\_\+breaking,  }\item[{bool $\ast$}]{lk\+\_\+seatbelt,  }\item[{bool $\ast$}]{lk\+\_\+doors,  }\item[{float $\ast$}]{spd,  }\item[{float $\ast$}]{dist }\end{DoxyParamCaption})}
+
+
+
+Controls the Autonomous Emergency Braking (AEB) system. 
+
+This function calculates the Time to Collision (TTC) based on the relative distance and speed of the vehicle. If the TTC is below a certain threshold, the AEB system triggers the alarm and may engage the braking system. It also prepares other safety features like seatbelt locking and door unlocking in critical conditions.
+
+The decision is made based on predefined TTC thresholds\+:
+\begin{DoxyItemize}
+\item If the TTC is below the {\ttfamily THRESHOLD\+\_\+\+ALARM} (e.\+g., 2 seconds), an alarm is triggered.
+\item If the TTC is below the {\ttfamily THRESHOLD\+\_\+\+BRAKING} (e.\+g., 1 second), the braking system is activated.
+\item If the TTC is less than half of the braking threshold, the braking system is prepared for a collision.
+\end{DoxyItemize}
+
+The AEB system and the alarm are only triggered if the {\ttfamily enable\+\_\+aeb} flag is set to true.
+
+
+\begin{DoxyParams}{Parameters}
+{\em enable\+\_\+aeb} & A pointer to a boolean flag that enables or disables the AEB system. \mbox{[}Sw\+R-\/5\mbox{]} \\
+\hline
+{\em alarm\+\_\+cluster} & A pointer to a boolean flag that triggers the alarm in the cluster. \mbox{[}Sw\+R-\/2\mbox{]} \\
+\hline
+{\em enable\+\_\+breaking} & A pointer to a boolean flag that enables or disables the braking system. \mbox{[}Sw\+R-\/3\mbox{]} \\
+\hline
+{\em lk\+\_\+seatbelt} & A pointer to a boolean flag that locks the seatbelt in case of emergency. \mbox{[}Sys-\/\+F-\/14\mbox{]} \\
+\hline
+{\em lk\+\_\+doors} & A pointer to a boolean flag that locks or unlocks the doors in an emergency. \mbox{[}Sys-\/\+F-\/14\mbox{]} \\
+\hline
+{\em spd} & A pointer to the current speed of the vehicle (in km/h). \\
+\hline
+{\em dist} & A pointer to the current distance to the obstacle (in meters).\\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+The function complies with the requirements (Sw\+R-\/2, Sw\+R-\/3, Sw\+R-\/5, Sw\+R-\/11, Sw\+R-\/14, Sw\+R-\/15, Sys-\/\+F-\/8, Sys-\/\+F-\/9, Sys-\/\+F-\/14). 
+\end{DoxyNote}
+
+
+Definition at line 107 of file ttc\+\_\+control.\+c.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{108                                                                              \{}
+\DoxyCodeLine{109     \textcolor{keywordtype}{float} ttc;}
+\DoxyCodeLine{110     }
+\DoxyCodeLine{111     ttc = \mbox{\hyperlink{ttc__control_8c_a0cc178c96e646a5361f34b3e9835e676}{ttc\_calc}}(*dist, *spd);}
+\DoxyCodeLine{112     }
+\DoxyCodeLine{113     \textcolor{keywordflow}{if} ((*enable\_aeb) \&\& (ttc > 0.0) \&\& (ttc < \mbox{\hyperlink{constants_8h_af914e188aab1d10dc995ba2938e0b691}{THRESHOLD\_ALARM}})) \{}
+\DoxyCodeLine{114         *alarm\_cluster = \textcolor{keyword}{true};}
+\DoxyCodeLine{115         }
+\DoxyCodeLine{116         \textcolor{keywordflow}{if} ((ttc < \mbox{\hyperlink{constants_8h_a54bb76eeda8e1910c30bab2500d91325}{THRESHOLD\_BRAKING}}) \&\& (!*enable\_breaking) \&\& (*spd < \mbox{\hyperlink{constants_8h_ad6212b1ad0c34c6212ec01d5aa81005b}{MAX\_SPD\_ENABLED}})}
+\DoxyCodeLine{117             \&\& (*spd > \mbox{\hyperlink{constants_8h_a3f02e1e1a9f7e4eeba4cac6cfe6e18b1}{MIN\_SPD\_ENABLED}})) \{}
+\DoxyCodeLine{118             *enable\_breaking = \textcolor{keyword}{true};}
+\DoxyCodeLine{119             \textcolor{keywordflow}{if} (ttc < (\mbox{\hyperlink{constants_8h_a54bb76eeda8e1910c30bab2500d91325}{THRESHOLD\_BRAKING}} / 2.0)) \{}
+\DoxyCodeLine{120                 *lk\_seatbelt = \textcolor{keyword}{true};  }
+\DoxyCodeLine{121                 *lk\_doors = \textcolor{keyword}{false};    }
+\DoxyCodeLine{122             \}}
+\DoxyCodeLine{123         \}       }
+\DoxyCodeLine{124     \} \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{125         *alarm\_cluster = \textcolor{keyword}{false};}
+\DoxyCodeLine{126         *enable\_breaking = \textcolor{keyword}{false};}
+\DoxyCodeLine{127     \}}
+\DoxyCodeLine{128 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{ttc__control_8h_a3d764fb657999d51ee365fbaa4214d06}\label{ttc__control_8h_a3d764fb657999d51ee365fbaa4214d06}} 
+\index{ttc\_control.h@{ttc\_control.h}!ttc\_calc@{ttc\_calc}}
+\index{ttc\_calc@{ttc\_calc}!ttc\_control.h@{ttc\_control.h}}
+\doxysubsubsection{\texorpdfstring{ttc\_calc()}{ttc\_calc()}}
+{\footnotesize\ttfamily float ttc\+\_\+calc (\begin{DoxyParamCaption}\item[{float}]{dis\+\_\+rel,  }\item[{float}]{spd\+\_\+rel }\end{DoxyParamCaption})}
+
+
+
+Calculate the time to collision (TTC) based on relative distance and speed. 
+
+This function calculates the time to collision using the Uniformly Variable Motion (UVM) model. It uses a quadratic equation to calculate the time to collision (TTC) between two objects based on their relative distance and speed. If the relative acceleration is zero, the function simply calculates the time by dividing the relative distance by the relative speed \mbox{[}Sw\+R-\/1\mbox{]}, \mbox{[}Sw\+R-\/10\mbox{]}, \mbox{[}Sw\+R-\/11\mbox{]}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em dis\+\_\+rel} & The relative distance between the objects in meters. \\
+\hline
+{\em spd\+\_\+rel} & The relative speed between the objects in km/h.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The time to collision in seconds. If no real solution is found (i.\+e., negative discriminant), the function returns -\/1.\+0. If there is no relative acceleration, the time to collision is calculated as distance divided by speed. 
+\end{DoxyReturn}
+
+
+Definition at line 60 of file ttc\+\_\+control.\+c.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{60                                              \{}
+\DoxyCodeLine{61     \textcolor{keywordtype}{float} a, b, c, ttc, delta;}
+\DoxyCodeLine{62     }
+\DoxyCodeLine{63     a = \mbox{\hyperlink{ttc__control_8c_a48b709ab38f0019afe1d01374488b9dc}{accel\_calc}}(spd\_rel);}
+\DoxyCodeLine{64     b = spd\_rel / 3.6;}
+\DoxyCodeLine{65     c = dis\_rel;}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{67     \textcolor{keywordflow}{if} (a == 0) \textcolor{keywordflow}{return} ttc = c / b;}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69     delta = b * b + 2 * a * c;}
+\DoxyCodeLine{70     }
+\DoxyCodeLine{71     \textcolor{keywordflow}{if} (delta < 0) \textcolor{keywordflow}{return} -\/1.0;}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (delta == 0) \textcolor{keywordflow}{return} -\/b / a;}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{75     \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{76         ttc = (-\/b + sqrt(delta)) / a;}
+\DoxyCodeLine{77         \textcolor{keywordflow}{return} ttc;}
+\DoxyCodeLine{78     \}}
+\DoxyCodeLine{79 \}}
+
+\end{DoxyCode}
