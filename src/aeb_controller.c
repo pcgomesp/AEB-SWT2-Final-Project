@@ -9,6 +9,7 @@
 #include "sensors_input.h"
 #include "dbc.h"
 #include "actuators.h"
+#include "ttc_control.h"
 
 #define LOOP_EMPTY_ITERATIONS_MAX 11
 
@@ -94,7 +95,7 @@ void *mainWorkingLoop(void *arg)
 
             translateAndCallCanMsg(captured_can_frame);
 
-            int ttc = 1; // TODO: Calculate TTC here // [SwR-1]
+            int ttc = ttc_calc(aeb_internal_state.obstacle_distance, aeb_internal_state.relative_velocity);
 
             state = getAEBState(aeb_internal_state, ttc);
             printf("Meu state eh: %d\n", state);

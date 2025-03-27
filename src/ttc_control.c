@@ -1,6 +1,5 @@
-// Necessary libraries
-#include "../inc/ttc_control.h"
-#include "../inc/constants.h"
+#include "ttc_control.h"
+#include "constants.h"
 
 /**
  * @brief Calculate acceleration based on speed and time difference.
