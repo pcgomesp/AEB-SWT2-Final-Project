@@ -116,6 +116,7 @@ void *mainWorkingLoop(void *arg)
     }
 
     printf("AEB Controller: empty_mq_counter reached the limit, exiting\n");
+    return NULL;
 }
 
 void print_info()

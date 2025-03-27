@@ -84,6 +84,7 @@ void *actuatorsResponseLoop(void *arg)
     }
 
     printf("Actuators: empty_mq_counter reached the limit, exiting\n");
+    return NULL;
 }
 
 void actuatorsTranslateCanMsg(can_msg captured_frame)
