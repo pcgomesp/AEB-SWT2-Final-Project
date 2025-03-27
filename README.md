@@ -19,6 +19,22 @@ This project is part of the final course in Automotive Propulsion Engineering, a
 - **Programming Language**: C, leveraging POSIX-compatible libraries and system calls to ensure portability and efficiency.
 - **POSIX-Compatible Operating Systems**: Development is focused on systems adhering to POSIX standards, ensuring greater code compatibility and portability.
 
+## How It Works
+
+1. **Sensors Module**:
+   - Continuously monitors the environment and sends data to the AEB controller via message queues.
+
+2. **AEB Controller**:
+   - Processes sensor data to calculate the Time to Collision (TTC).
+   - Decides whether to trigger alarms or activate the braking system based on predefined thresholds.
+
+3. **Actuators Module**:
+   - Receives commands from the AEB controller and performs actions such as locking seatbelts, activating alarms, or engaging brakes.
+
+4. **Logging**:
+   - Logs events such as alarms and braking activations for diagnostics and debugging purposes.
+   - Logs are stored in the `log/` directory in a structured format.
+
 ## Project Structure
 
 The project's directory structure is organized as follows:
