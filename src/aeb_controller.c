@@ -12,7 +12,7 @@
 
 #define LOOP_EMPTY_ITERATIONS_MAX 11
 
-typedef enum
+typedef enum // Abstraction according to [SwR-12]
 {
     AEB_STATE_ACTIVE,
     AEB_STATE_ALARM,
@@ -34,7 +34,7 @@ mqd_t sensors_mq, actuators_mq;
 pthread_t aeb_controller_id;
 
 sensors_input_data aeb_internal_state = {
-    .vehicle_velocity = 0.0,
+    .relative_velocity = 0.0,
     .has_obstacle = false,
     .obstacle_distance = 0.0,
     .brake_pedal = false,
@@ -73,7 +73,7 @@ int main()
 void *mainWorkingLoop(void *arg)
 {
     // Main Loop function for our AEB Controller ECU
-    // Step 01: Get CAN frames from the sensors message queue
+    // Step 01: Get CAN frames from the sensors message queue [SwR-9]
     // Step 02: Translate the recieved CAN frame, according to its id
     // Step 03: Call the correct Function, based on the new data recieved (o que eh new data recieved? acho que eh a mensagem nova)
     // Step 04: Reactions from the AEB System: based on the new data, what should the AEB controller do?
@@ -88,7 +88,7 @@ void *mainWorkingLoop(void *arg)
     int empty_mq_counter = 0;
     while (empty_mq_counter < LOOP_EMPTY_ITERATIONS_MAX)
     {
-        if (read_mq(sensors_mq, &captured_can_frame) != -1)
+        if (read_mq(sensors_mq, &captured_can_frame) != -1) // Reads message from sensors [SwR-9]
         {
             empty_mq_counter = 0; // reset counter
 
@@ -120,7 +120,7 @@ void *mainWorkingLoop(void *arg)
 
 void print_info()
 {
-    printf("vehicle_velocity: %lf\n", aeb_internal_state.vehicle_velocity);
+    printf("relative_velocity: %lf\n", aeb_internal_state.relative_velocity);
     printf("has_obstacle: %s\n", aeb_internal_state.has_obstacle ? "true" : "false");
     printf("obstacle_distance: %lf\n", aeb_internal_state.obstacle_distance);
     printf("brake_pedal: %s\n", aeb_internal_state.brake_pedal ? "true" : "false");
@@ -198,7 +198,7 @@ void updateInternalSpeedState(can_msg captured_frame)
         new_internal_speed = 251.0;
     }
 
-    aeb_internal_state.vehicle_velocity = new_internal_speed;
+    aeb_internal_state.relative_velocity = new_internal_speed;
 
     // update internal data according to the movement direction reported by the sensor
     if (captured_frame.dataFrame[2] == 0x00)
@@ -290,13 +290,13 @@ can_msg updateCanMsgOutput(aeb_controller_state state)
     return aux;
 }
 
-aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, int ttc)
+aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, int ttc) // Abstraction according to [SwR-12]
 {
     if (aeb_internal_state.on_off_aeb_system == false)
         return AEB_STATE_STANDBY;
-    if(aeb_internal_state.vehicle_velocity < MIN_SPD_ENABLED && aeb_internal_state.reverseEnabled == false)
+    if(aeb_internal_state.relative_velocity < MIN_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-16]
         return AEB_STATE_STANDBY;
-    if (aeb_internal_state.vehicle_velocity > MAX_SPD_ENABLED && aeb_internal_state.reverseEnabled == false)
+    if (aeb_internal_state.relative_velocity > MAX_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-16]
         return AEB_STATE_STANDBY;
     if (aeb_internal_state.brake_pedal == false && aeb_internal_state.accelerator_pedal == false)
     {

@@ -12,7 +12,7 @@
 
 void* getSensorsData(void *arg);
 can_msg conv2CANCarClusterData(bool on_off_aeb_system);
-can_msg conv2CANVelocityData(bool vehicle_direction, double vehicle_velocity);
+can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity);
 can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance);
 can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal);
 
@@ -52,10 +52,10 @@ void* getSensorsData(void *arg){
     FILE *file = (FILE*)arg; // Recebe o arquivo como argumento
 
     while (1) {
-        // Read a new line from the file
+        // Read a new line from the file [SwR-9]
         if (read_sensor_data(file, &sensorsData)) {
             can_car_cluster     = conv2CANCarClusterData(sensorsData.on_off_aeb_system);
-            can_velocity_sensor = conv2CANVelocityData(sensorsData.reverseEnabled, sensorsData.vehicle_velocity);
+            can_velocity_sensor = conv2CANVelocityData(sensorsData.reverseEnabled, sensorsData.relative_velocity); // [SwR-10]
             can_obstacle_sensor = conv2CANObstacleData(sensorsData.has_obstacle, sensorsData.obstacle_distance);
             can_pedals_sensor   = conv2CANPedalsData(sensorsData.brake_pedal, sensorsData.accelerator_pedal);
 
@@ -102,7 +102,7 @@ can_msg conv2CANCarClusterData(bool on_off_aeb_system){
     return aux;
 }
 
-can_msg conv2CANVelocityData(bool vehicle_direction, double vehicle_velocity){
+can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity){
     can_msg aux = {.identifier = ID_SPEED_S, .dataFrame = BASE_DATA_FRAME};
 
     // Vehicle direction (forward or reverse) data encapsulation
@@ -113,7 +113,7 @@ can_msg conv2CANVelocityData(bool vehicle_direction, double vehicle_velocity){
     }
 
     // Speed data ​​encapsulation
-    unsigned int data_speed = vehicle_velocity / RES_SPEED_S;
+    unsigned int data_speed = relative_velocity / RES_SPEED_S;
     unsigned char ms_speed, ls_speed;
     ls_speed = data_speed;
     ms_speed = data_speed >> 8;
