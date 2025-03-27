@@ -1,19 +1,20 @@
 /**
  * @file can_utils.c
- * @brief Utilitários para manipulação de mensagens CAN, conforme especificação do DBC especificado.
+ * @brief Utilities for handling CAN messages, according to the DBC specification.
  *
- * Este arquivo contém uma função para exibição de mensagens CAN, para ajudar no debugging do código em desenvolvimento.
+ * This file contains a function for displaying CAN messages, 
+ * to help with debugging the code under development.
  */
 
 #include <stdio.h>
 #include "dbc.h"
 
 /**
- * @brief Imprime o identificador e data frame de uma mensagem CAN, seguindo a abstração de DBC.h.
+ * @brief Prints the identifier and data frame of a CAN message, following the DBC.h abstraction.
  *
- * Exibe o identificador da mensagem CAN e os dados contidos formato hexadecimal.
+ * Displays the CAN message identifier and the data contained in hexadecimal format.
  *
- * @param msg Ponteiro para a estrutura da mensagem CAN a ser impressa.
+ * @param msg Pointer to the structure of the CAN message to be printed.
  */
 void print_can_msg(const can_msg *msg) {
     printf("Identifier: %08X\n", msg->identifier);
