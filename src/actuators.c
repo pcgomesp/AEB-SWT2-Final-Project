@@ -8,75 +8,71 @@
 #include "constants.h"
 #include "actuators.h"
 #include "dbc.h"
-#include "log_utils.h" 
+#include "log_utils.h"
 
 #define LOOP_EMPTY_ITERATIONS_MAX 11
 
-void* actuatorsResponseLoop(void *arg);
+void *actuatorsResponseLoop(void *arg);
 void actuatorsTranslateCanMsg(can_msg captured_frame);
 void updateInternalActuatorsState(can_msg captured_frame);
 
 mqd_t actuators_mq;
 pthread_t actuators_id;
+
 actuators_abstraction actuators_state = {
     .belt_tightness = false,
     .door_lock = true,
     .should_activate_abs = false,
     .alarm_led = false,
-    .alarm_buzzer = true
-};
+    .alarm_buzzer = true};
 
 can_msg captured_can_frame = {
     .identifier = 0x0CFFB027,
-    .dataFrame  = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
-};
+    .dataFrame = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
 
-int main(){   
-    int actuators_thr;
-
+int main()
+{
     actuators_mq = open_mq(ACTUATORS_MQ);
 
-    actuators_thr = pthread_create(&actuators_id, NULL, actuatorsResponseLoop, NULL);
-    if(actuators_thr != 0){
+    int actuators_thread;
+    actuators_thread = pthread_create(&actuators_id, NULL, actuatorsResponseLoop, NULL);
+    if (actuators_thread != 0)
+    {
         perror("Actuators: it wasn't possible to create the associated thread\n");
         exit(54);
     }
-    actuators_thr = pthread_join(actuators_id, NULL);
+    actuators_thread = pthread_join(actuators_id, NULL);
 
     return 0;
 }
 
-void* actuatorsResponseLoop(void *arg){
+void *actuatorsResponseLoop(void *arg)
+{
     // Step 01: Recieve message from Message Queue, with new data sent by AEB
     // Step 02: Convert data from the AEB can_msg to actuators_state memory
-    // Step 03: Do the right activation from the actuator -> 
+    // Step 03: Do the right activation from the actuator ->
     // i.e., in our project, writing the correct expected output in a txt ou csv, since this is an abstraction
     // Step 04: sleep, waiting the next message -> loop
     // we must define a Stop criteria btw
 
-    int no_message_counter = 0;
-    int result;
-
-    while(no_message_counter < LOOP_EMPTY_ITERATIONS_MAX){
-        result = read_mq(actuators_mq, &captured_can_frame);
-        if(result == 0){
-            actuatorsTranslateCanMsg(captured_can_frame); 
-            no_message_counter = 0;
-        } else if (result == -1){
-            no_message_counter++;
-        } else {
-            perror("\n");
-            break;
+    int empty_mq_counter = 0;
+    while (empty_mq_counter < LOOP_EMPTY_ITERATIONS_MAX)
+    {
+        if (read_mq(actuators_mq, &captured_can_frame) != -1)
+        {
+            empty_mq_counter = 0;
+            actuatorsTranslateCanMsg(captured_can_frame);
         }
-        
-        uint32_t event_id = 0x63A5D2E1;  // A simple event_id for testing purposes
+        else
+        {
+            empty_mq_counter++;
+        }
 
+        uint32_t event_id = 0x63A5D2E1; // A simple event_id for testing purposes
 
         // write in file here
-        //The condition below is for test porpuse, should be changed to a ttc value
+        // The condition below is for test porpuse, should be changed to a ttc value
         log_event("AEB1", event_id, actuators_state);
-        
-
 
         printf("belt_tightness: %s\n", actuators_state.belt_tightness ? "true" : "false");
         printf("door_lock: %s\n", actuators_state.door_lock ? "true" : "false");
@@ -87,39 +83,49 @@ void* actuatorsResponseLoop(void *arg){
         usleep(200000); // Deprected, change for function other later
     }
 
-    printf("Placeholder\n");
-    return NULL;
+    printf("Actuators: empty_mq_counter reached the limit, exiting\n");
 }
 
-void actuatorsTranslateCanMsg(can_msg captured_frame){
-    switch(captured_frame.identifier){
-        case ID_AEB_S:
-            updateInternalActuatorsState(captured_frame);
-            break;
-        default:
-            printf("Actuators: CAN Identifier unknown\n");
-            break;
+void actuatorsTranslateCanMsg(can_msg captured_frame)
+{
+    switch (captured_frame.identifier)
+    {
+    case ID_AEB_S:
+        updateInternalActuatorsState(captured_frame);
+        break;
+    case ID_EMPTY:
+        printf("Actuators: Empty message received\n");
+        break;
+    default:
+        printf("Actuators: CAN Identifier unknown\n");
+        break;
     }
 }
 
-void updateInternalActuatorsState(can_msg captured_frame){
-    if(captured_frame.dataFrame[1] == 0x01){
+void updateInternalActuatorsState(can_msg captured_frame)
+{
+    if (captured_frame.dataFrame[1] == 0x01)
+    {
         actuators_state.belt_tightness = true;
         actuators_state.door_lock = false;
         actuators_state.should_activate_abs = true;
         actuators_state.alarm_led = true;
         actuators_state.alarm_buzzer = true;
-    } else if (captured_frame.dataFrame[0] == 0x01){
+    }
+    else if (captured_frame.dataFrame[0] == 0x01)
+    {
         actuators_state.belt_tightness = false;
         actuators_state.door_lock = true;
         actuators_state.should_activate_abs = false;
         actuators_state.alarm_led = true;
         actuators_state.alarm_buzzer = true;
-    } else {
+    }
+    else
+    {
         actuators_state.belt_tightness = false;
         actuators_state.door_lock = true;
         actuators_state.should_activate_abs = false;
         actuators_state.alarm_led = false;
-        actuators_state.alarm_buzzer = false;        
+        actuators_state.alarm_buzzer = false;
     }
 }

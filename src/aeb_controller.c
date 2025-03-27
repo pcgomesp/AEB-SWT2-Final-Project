@@ -50,6 +50,10 @@ can_msg out_can_frame = {
     .identifier = ID_AEB_S,
     .dataFrame = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
 
+can_msg empty_msg = {
+    .identifier = ID_EMPTY,
+    .dataFrame = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
+
 int main()
 {
     sensors_mq = open_mq(SENSORS_MQ);
@@ -97,7 +101,10 @@ void *mainWorkingLoop(void *arg)
 
             out_can_frame = updateCanMsgOutput(state);
             
-            write_mq(actuators_mq, &out_can_frame);
+            if (state == AEB_STATE_STANDBY)
+                write_mq(actuators_mq, &empty_msg);
+            else
+                write_mq(actuators_mq, &out_can_frame);
 
             // Testing changes, exclude this on production code
             print_info();
@@ -108,8 +115,7 @@ void *mainWorkingLoop(void *arg)
         usleep(200000); // Deprecated, change for other function later
     }
 
-    printf("AEB Controller: Empty MQ counter reached the limit, exiting\n");
-    return NULL;
+    printf("AEB Controller: empty_mq_counter reached the limit, exiting\n");
 }
 
 void print_info()
