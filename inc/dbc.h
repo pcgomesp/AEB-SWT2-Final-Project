@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+// Calibration values [SwR-13]
 // Identifiers, according to the dbc file in the requirements specification
 #define ID_PEDALS 0x18FEF100
 #define ID_SPEED_S 0x18FFFD64

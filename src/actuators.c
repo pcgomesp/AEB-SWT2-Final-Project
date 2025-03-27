@@ -72,7 +72,7 @@ void *actuatorsResponseLoop(void *arg)
 
         // write in file here
         // The condition below is for test porpuse, should be changed to a ttc value
-        log_event("AEB1", event_id, actuators_state);
+        log_event("AEB1", event_id, actuators_state); // [SwR-4]
 
         printf("belt_tightness: %s\n", actuators_state.belt_tightness ? "true" : "false");
         printf("door_lock: %s\n", actuators_state.door_lock ? "true" : "false");

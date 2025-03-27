@@ -50,7 +50,7 @@ can_msg out_can_frame = {
     .identifier = ID_AEB_S,
     .dataFrame = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
 
-can_msg empty_msg = {
+can_msg empty_msg = { // [SwR-5]
     .identifier = ID_EMPTY,
     .dataFrame = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
 
@@ -94,17 +94,17 @@ void *mainWorkingLoop(void *arg)
 
             translateAndCallCanMsg(captured_can_frame);
 
-            int ttc = 1; // TODO: Calculate TTC here
+            int ttc = 1; // TODO: Calculate TTC here // [SwR-1]
 
             state = getAEBState(aeb_internal_state, ttc);
             printf("Meu state eh: %d\n", state);
 
             out_can_frame = updateCanMsgOutput(state);
             
-            if (state == AEB_STATE_STANDBY)
+            if (state == AEB_STATE_STANDBY) // [SwR-5]
                 write_mq(actuators_mq, &empty_msg);
             else
-                write_mq(actuators_mq, &out_can_frame);
+                write_mq(actuators_mq, &out_can_frame); // [SwR-2][SwR-3][SwR-4][SwR-6][SwR-14][SwR-15]
 
             // Testing changes, exclude this on production code
             print_info();
@@ -188,7 +188,8 @@ void updateInternalSpeedState(can_msg captured_frame)
     }
     else
     {
-        // Conversion from CAN data frame, according to dbc in the requirement file
+        // Conversion from CAN data frame, according to dbc in the requirement file  
+        // [SwR-10]
         data_speed = captured_frame.dataFrame[0] + (captured_frame.dataFrame[1] << 8);
         new_internal_speed = data_speed * RES_SPEED_S;
     }
@@ -294,9 +295,9 @@ aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, int ttc)
 {
     if (aeb_internal_state.on_off_aeb_system == false)
         return AEB_STATE_STANDBY;
-    if(aeb_internal_state.relative_velocity < MIN_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-16]
+    if(aeb_internal_state.relative_velocity < MIN_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-7][SwR-16]
         return AEB_STATE_STANDBY;
-    if (aeb_internal_state.relative_velocity > MAX_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-16]
+    if (aeb_internal_state.relative_velocity > MAX_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-7][SwR-16]
         return AEB_STATE_STANDBY;
     if (aeb_internal_state.brake_pedal == false && aeb_internal_state.accelerator_pedal == false)
     {
@@ -305,5 +306,5 @@ aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, int ttc)
         if (ttc < THRESHOLD_ALARM)
             return AEB_STATE_ALARM;
     }
-    return AEB_STATE_ACTIVE;
+    return AEB_STATE_ACTIVE; // [SwR-8]
 }
