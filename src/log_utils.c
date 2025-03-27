@@ -3,6 +3,18 @@
 #include <stdint.h>
 #include "log_utils.h"
 
+
+/**
+ * @brief Logs an event to a file with a timestamp and actuator data.
+ *
+ * This function logs an event by appending it to a log file. It records the event ID, 
+ * the timestamp (in milliseconds), and actuator states in a structured format.
+ *
+ * @param id_aeb Identifier for the AEB system.
+ * @param event_id The unique event identifier (formatted as a hexadecimal string).
+ * @param actuators Structure containing actuator state information.
+ */
+
 void log_event(const char *id_aeb, uint32_t event_id, actuators_abstraction actuators) {
     FILE *log_file = fopen("log/log.txt", "a");
     if (log_file == NULL) {
