@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <sys/wait.h>
 #include "mq_utils.h"
 #include "constants.h"
 
@@ -12,7 +13,6 @@ pid_t sensors_pid, controller_pid, actuators_pid;
 
 void wait_terminate_execution()
 {
-
     waitpid(sensors_pid, NULL, 0);
     waitpid(controller_pid, NULL, 0);
     waitpid(actuators_pid, NULL, 0);
@@ -22,7 +22,6 @@ void wait_terminate_execution()
     close_mq(actuators_mq, ACTUATORS_MQ);
 
     exit(0);
-
 }
 
 void terminate_execution(int sig)
@@ -30,7 +29,6 @@ void terminate_execution(int sig)
     printf("Closing message queue\n");
     close_mq(sensors_mq, SENSORS_MQ);
     close_mq(sensors_mq, ACTUATORS_MQ);
-
 
     printf("Closing child processes\n");
     kill(sensors_pid, SIGTERM);
@@ -50,14 +48,14 @@ pid_t create_processes(char *process_name)
 {
     pid_t child_pid = fork();
 
-    if(child_pid < 0)
+    if (child_pid < 0)
     {
         perror("Error creating auxiliary process \n");
         exit(1);
     }
-    else if(child_pid == 0)
+    else if (child_pid == 0)
     {
-        if (execl(process_name, process_name, NULL) == -1) 
+        if (execl(process_name, process_name, NULL) == -1)
         {
             perror("Error executing the process");
             exit(1);
@@ -65,18 +63,17 @@ pid_t create_processes(char *process_name)
     }
 
     return child_pid;
-
 }
 
 int main()
 {
     printf("Main process PID: %d\n", getpid());
 
-    //Initialize resources
+    // Initialize resources
     sensors_mq = create_mq(SENSORS_MQ);
     sensors_mq = create_mq(ACTUATORS_MQ);
 
-    //Create auxiliary processes
+    // Create auxiliary processes
     char *sensors_process = "./bin/sensors_bin";
     char *controller_process = "./bin/aeb_controller_bin";
     char *actuators_process = "./bin/actuators_bin";
