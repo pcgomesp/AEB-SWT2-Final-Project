@@ -1,3 +1,10 @@
+/**
+ * @file log_utils.c
+ * @brief Utilitary file for event tracking in actuators abstraction.
+ *
+ * This file provides functionality to log events with timestamps 
+ * and relevant actuator states.
+ */
 #include <stdio.h>
 #include <time.h>
 #include <stdint.h>

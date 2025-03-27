@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 typedef struct {
-    double vehicle_velocity;
+    double relative_velocity;
     int has_obstacle;
     double obstacle_distance;
     int brake_pedal;
