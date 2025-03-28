@@ -1,6 +1,5 @@
-// Necessary libraries
-#include "../inc/ttc_control.h"
-#include "../inc/constants.h"
+#include "ttc_control.h"
+#include "constants.h"
 
 /**
  * @brief Calculate acceleration based on speed and time difference.
@@ -14,12 +13,12 @@
  * @return The acceleration in m/s². If the function is called for the first time or there is
  *         insufficient time difference between calls, it returns 0.0.
  */
-float accel_calc(float spd) {
-    static float prev_spd = 0.0;
+double accel_calc(double spd) {
+    static double prev_spd = 0.0;
     static struct timespec start_time = {0, 0};
     struct timespec current_time;
     double elapsed_time;
-    float accel = 0.0;
+    double accel = 0.0;
 
     clock_gettime(CLOCK_REALTIME, &current_time);
 
@@ -57,8 +56,8 @@ float accel_calc(float spd) {
  *         the function returns -1.0. If there is no relative acceleration, the time to collision is calculated
  *         as distance divided by speed.
  */
-float ttc_calc(float dis_rel, float spd_rel) {
-    float a, b, c, ttc, delta;
+double ttc_calc(double dis_rel, double spd_rel) {
+    double a, b, c, ttc, delta;
     
     a = accel_calc(spd_rel);
     b = spd_rel / 3.6;
@@ -105,8 +104,8 @@ float ttc_calc(float dis_rel, float spd_rel) {
  *       SwR-11, SwR-14, SwR-15, Sys-F-8, Sys-F-9, Sys-F-14).
  */
 void aeb_control(bool *enable_aeb, bool *alarm_cluster, bool *enable_breaking,
-                 bool *lk_seatbelt, bool *lk_doors, float *spd, float *dist) {
-    float ttc;
+                 bool *lk_seatbelt, bool *lk_doors, double *spd, double *dist) {
+    double ttc;
     
     ttc = ttc_calc(*dist, *spd);
     
