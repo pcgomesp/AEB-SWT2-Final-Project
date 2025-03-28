@@ -104,8 +104,8 @@ double ttc_calc(double dis_rel, double spd_rel) {
  *       SwR-11, SwR-14, SwR-15, Sys-F-8, Sys-F-9, Sys-F-14).
  */
 void aeb_control(bool *enable_aeb, bool *alarm_cluster, bool *enable_breaking,
-                 bool *lk_seatbelt, bool *lk_doors, float *spd, float *dist) {
-    float ttc;
+                 bool *lk_seatbelt, bool *lk_doors, double *spd, double *dist) {
+    double ttc;
     
     ttc = ttc_calc(*dist, *spd);
     
