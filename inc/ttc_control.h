@@ -10,6 +10,6 @@
 double accel_calc(double spd);
 double ttc_calc(double dist, double spd);
 void aeb_control(bool *enable_aeb, bool *alarm_cluster, bool *enable_breaking,
-                 bool *lk_seatbelt, bool *lk_doors, float *spd, float *dist);
+                 bool *lk_seatbelt, bool *lk_doors, double *spd, double *dist);
 
 #endif
