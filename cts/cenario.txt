@@ -1,6 +1,6 @@
-Tempo(ms) Distância(m)
-500 60
-1000 50
-2000 30
-3000 20
-4000 10
+Distance(m) Obstacle Speed(m/s) Brake Accelerator AEB_on_off Reverse
+60 1 108 0 1 1 0
+50 1 100 0 0 1 0
+30 1 200 0 0 1 0
+20 1 108 0 0 1 0
+10 1 108 0 0 1 0
