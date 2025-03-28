@@ -29,7 +29,7 @@ void updateInternalSpeedState(can_msg captured_frame);
 void updateInternalObstacleState(can_msg captured_frame);
 void updateInternalCarCState(can_msg captured_frame);
 can_msg updateCanMsgOutput(aeb_controller_state state);
-aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, int ttc);
+aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double ttc);
 
 mqd_t sensors_mq, actuators_mq;
 pthread_t aeb_controller_id;
@@ -95,7 +95,7 @@ void *mainWorkingLoop(void *arg)
 
             translateAndCallCanMsg(captured_can_frame);
 
-            int ttc = ttc_calc(aeb_internal_state.obstacle_distance, aeb_internal_state.relative_velocity);
+            double ttc = ttc_calc(aeb_internal_state.obstacle_distance, aeb_internal_state.relative_velocity);
 
             state = getAEBState(aeb_internal_state, ttc);
             printf("Meu state eh: %d\n", state);
@@ -293,7 +293,7 @@ can_msg updateCanMsgOutput(aeb_controller_state state)
     return aux;
 }
 
-aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, int ttc) // Abstraction according to [SwR-12]
+aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double ttc) // Abstraction according to [SwR-12]
 {
     if (aeb_internal_state.on_off_aeb_system == false)
         return AEB_STATE_STANDBY;
