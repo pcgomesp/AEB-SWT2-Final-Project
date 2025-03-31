@@ -19,13 +19,6 @@ all: $(SRCFILES:src/%.c=obj/%.o)
 obj/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-.PHONY: clean
-clean:
-	rm -rf obj/*
-	rm -rf bin/*
-	rm -f test/test_mq_utils
-	rm -f test/test_mq_utils_read
-
 run:
 	./bin/main_bin
 
@@ -59,3 +52,9 @@ clean-docs:
 	rm -rf docs/html
 	rm -rf docs/latex
 	rm -rf docs/rtf
+
+.PHONY: clean
+clean:
+	rm -rf obj/*
+	rm -rf bin/*
+	rm -f $(TESTS)
