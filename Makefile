@@ -29,18 +29,23 @@ clean:
 run:
 	./bin/main_bin
 
-test: build_test_executables
-	./test/test_mq_utils
-	./test/test_mq_utils_read
+TESTFILES := $(wildcard $(TESTFOLDER)test_*.c)
 
-.PHONY: build_test_executables
-build_test_executables: test/test_mq_utils test/test_mq_utils_read
+# Find all test source files and create a list of test executables
+TESTS := $(patsubst $(TESTFOLDER)%.c, $(TESTFOLDER)%, $(TESTFILES))
+
+# Run all test executables
+test: $(TESTS)
+	@for test in $^; do ./$$test; done
 
 test/test_mq_utils: test/test_mq_utils.c src/mq_utils.c test/unity.c
 	$(CC) $(CFLAGS) test/test_mq_utils.c src/mq_utils.c test/unity.c -o test/test_mq_utils -I$(TESTFOLDER)
 
 test/test_mq_utils_read: test/test_mq_utils_read.c src/mq_utils.c test/unity.c
 	$(CC) $(CFLAGS) test/test_mq_utils_read.c src/mq_utils.c test/unity.c -o test/test_mq_utils_read -I$(TESTFOLDER)
+
+test/test_ttc: test/test_ttc.c src/ttc_control.c test/unity.c
+	$(CC) $(CFLAGS) test/test_ttc.c src/ttc_control.c test/unity.c -o test/test_ttc -I$(TESTFOLDER) -lm
 
 cppcheck:
 	cppcheck --addon=misra -I ./inc --force --library=posix $(SRCFOLDER) $(INCFOLDER)
