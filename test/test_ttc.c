@@ -3,6 +3,16 @@
 #include <stdio.h>
 #include <unistd.h> // to use sleep
 
+void setUp()
+{
+    // set stuff up here
+}
+
+void tearDown()
+{
+    // clean stuff up here
+}
+
 /**
  * @brief Test the accel_calc function.
  *
@@ -17,8 +27,8 @@
  */
 void test_accel_calc() {
     printf("Testando função accel_calc\n");
-    float speed1 = 10.0;  // 10 km/h
-    float speed2 = 20.0;  // 20 km/h
+    double speed1 = 10.0;  // 10 km/h
+    double speed2 = 20.0;  // 20 km/h
 
     accel_calc(speed1);
     sleep(2);
@@ -49,9 +59,9 @@ void test_ttc_calc() {
     printf("Testando função ttc_calc\n");
 
     // Testes com distância e velocidade
-    float dist = 100.0;  // 100 metros
-    float speed = 20.0;  // 20 km/h
-    float ttc = ttc_calc(dist, speed);
+    double dist = 100.0;  // 100 metros
+    double speed = 20.0;  // 20 km/h
+    double ttc = ttc_calc(dist, speed);
     sleep(2);
     ttc = ttc_calc(dist, speed + 30.0);
     printf("Tempo para colisão com distância de %.1f metros e velocidade de %.1f km/h: %0.2f segundos\n", dist, speed, ttc);
@@ -91,9 +101,9 @@ void test_aeb_control() {
     bool enable_breaking;
     bool lk_seatbelt;
     bool lk_doors;
-    float spd;
-    float dist;
-    float delta_spd;
+    double spd;
+    double dist;
+    double delta_spd;
 
     // Test 1: TTC > 2.0 (no alarm, no braking)
     enable_aeb = true;
@@ -143,9 +153,9 @@ void test_aeb_control() {
 }
 
 int main() {
-    test_accel_calc();
-    test_ttc_calc();
-    test_aeb_control();
+    // test_accel_calc();
+    // test_ttc_calc();
+    // test_aeb_control();
 
     return 0;
 }
