@@ -258,7 +258,7 @@ void updateInternalSpeedState(can_msg captured_frame)
     }
     else
     {
-        // Conversion from CAN data frame, according to dbc in the requirement file  
+        // Conversion from CAN data frame, according to dbc in the requirement file
         // [SwR-10]
         data_speed = captured_frame.dataFrame[0] + (captured_frame.dataFrame[1] << 8);
         new_internal_speed = data_speed * RES_SPEED_S;
@@ -361,24 +361,24 @@ can_msg updateCanMsgOutput(aeb_controller_state state)
 
     switch (state)
     {
-        case AEB_STATE_BRAKE:
-            aux.dataFrame[0] = 0x01; // activate warning system
-            aux.dataFrame[1] = 0x01; // activate braking system
-            break;
-        case AEB_STATE_ALARM:
-            aux.dataFrame[0] = 0x01; // activate warning system
-            aux.dataFrame[1] = 0x00; // don't activate braking system
-            break;
-        case AEB_STATE_ACTIVE:
-            aux.dataFrame[0] = 0x00; // don't activate warning system
-            aux.dataFrame[1] = 0x00; // don't activate braking system
-            break;
-        case AEB_STATE_STANDBY:
-            aux.dataFrame[0] = 0x00; // don't activate warning system
-            aux.dataFrame[1] = 0x00; // don't activate braking system
-            break;
-        default:
-            break;
+    case AEB_STATE_BRAKE:
+        aux.dataFrame[0] = 0x01; // activate warning system
+        aux.dataFrame[1] = 0x01; // activate braking system
+        break;
+    case AEB_STATE_ALARM:
+        aux.dataFrame[0] = 0x01; // activate warning system
+        aux.dataFrame[1] = 0x00; // don't activate braking system
+        break;
+    case AEB_STATE_ACTIVE:
+        aux.dataFrame[0] = 0x00; // don't activate warning system
+        aux.dataFrame[1] = 0x00; // don't activate braking system
+        break;
+    case AEB_STATE_STANDBY:
+        aux.dataFrame[0] = 0x00; // don't activate warning system
+        aux.dataFrame[1] = 0x00; // don't activate braking system
+        break;
+    default:
+        break;
     }
 
     return aux;
