@@ -27,8 +27,18 @@ TESTFILES := $(wildcard $(TESTFOLDER)test_*.c)
 # Find all test source files and create a list of test executables
 TESTS := $(patsubst $(TESTFOLDER)%.c, $(TESTFOLDER)%, $(TESTFILES))
 
-# Run all test executables
-test: $(TESTS)
+.PHONY: test test_all
+test:
+	@if [ -z "$(file)" ]; then \
+		$(MAKE) --no-print-directory test_all; \
+	else \
+		test_exe="$(TESTFOLDER)$(basename $(file))"; \
+		echo "Compiling and running test $$test_exe"; \
+		$(MAKE) --no-print-directory $$test_exe; \
+		./$$test_exe; \
+	fi
+
+test_all: $(TESTS)
 	@for test in $^; do ./$$test; done
 
 test/test_mq_utils: test/test_mq_utils.c src/mq_utils.c test/unity.c
