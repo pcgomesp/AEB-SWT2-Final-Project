@@ -41,6 +41,30 @@ aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double t
 mqd_t sensors_mq, actuators_mq; /**< Message queues for sensors and actuators */
 pthread_t aeb_controller_id;     /**< Thread ID for the AEB controller */
 
+mqd_t sensors_mq, actuators_mq;
+pthread_t aeb_controller_id;
+
+sensors_input_data aeb_internal_state = {
+    .relative_velocity = 0.0,
+    .has_obstacle = false,
+    .obstacle_distance = 0.0,
+    .brake_pedal = false,
+    .accelerator_pedal = false,
+    .on_off_aeb_system = true,
+    .reverseEnabled = false};
+
+can_msg captured_can_frame = {
+    .identifier = ID_CAR_C,
+    .dataFrame = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
+
+can_msg out_can_frame = {
+    .identifier = ID_AEB_S,
+    .dataFrame = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
+
+can_msg empty_msg = { // [SwR-5]
+    .identifier = ID_EMPTY,
+    .dataFrame = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
+
 /**
  * @brief The main entry point of the AEB controller system.
  * 
@@ -75,10 +99,20 @@ int main()
  */
 void *mainWorkingLoop(void *arg)
 {
+    // Main Loop function for our AEB Controller ECU
+    // Step 01: Get CAN frames from the sensors message queue [SwR-9]
+    // Step 02: Translate the recieved CAN frame, according to its id
+    // Step 03: Call the correct Function, based on the new data recieved (o que eh new data recieved? acho que eh a mensagem nova)
+    // Step 04: Reactions from the AEB System: based on the new data, what should the AEB controller do?
+    // 4.1 - Calculate new ttc
+    // 4.2 - Update send_actuators_state
+    // Should we separate more or can we let everything in this single thread?
+    // Will separating things make us need to worry more about synchronization?
+    // Step 05: Simple sleep timer? This will change when new functions to fulfill requirements are added
+    
     aeb_controller_state state = AEB_STATE_STANDBY;  /**< Initial state is standby */
     int empty_mq_counter = 0;  /**< Counter for the number of empty message queue iterations */
     
-    // Main loop
     while (empty_mq_counter < LOOP_EMPTY_ITERATIONS_MAX)
     {
         if (read_mq(sensors_mq, &captured_can_frame) != -1) // Reads message from sensors [SwR-9]
@@ -91,7 +125,7 @@ void *mainWorkingLoop(void *arg)
             double ttc = ttc_calc(aeb_internal_state.obstacle_distance, aeb_internal_state.relative_velocity); 
 
             state = getAEBState(aeb_internal_state, ttc);  // Get the current AEB state
-            printf("Meu state eh: %d\n", state);  // Print the current state for debugging
+            printf("Actual state: %d\n", state);  // Print the current state for debugging
 
             out_can_frame = updateCanMsgOutput(state);  // Prepare the output CAN message based on the current state
             
