@@ -53,7 +53,6 @@ void *actuatorsResponseLoop(void *arg)
     // Step 03: Do the right activation from the actuator ->
     // i.e., in our project, writing the correct expected output in a txt ou csv, since this is an abstraction
     // Step 04: sleep, waiting the next message -> loop
-    // we must define a Stop criteria btw
 
     int empty_mq_counter = 0;
     while (empty_mq_counter < LOOP_EMPTY_ITERATIONS_MAX)
@@ -68,10 +67,8 @@ void *actuatorsResponseLoop(void *arg)
             empty_mq_counter++;
         }
 
-        uint32_t event_id = 0x63A5D2E1; // A simple event_id for testing purposes
+        uint32_t event_id = captured_can_frame.identifier; 
 
-        // write in file here
-        // The condition below is for test porpuse, should be changed to a ttc value
         log_event("AEB1", event_id, actuators_state); // [SwR-4]
 
         printf("belt_tightness: %s\n", actuators_state.belt_tightness ? "true" : "false");
