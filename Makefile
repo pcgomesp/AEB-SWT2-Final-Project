@@ -112,6 +112,18 @@ cov:
 test/test_ttc: test/test_ttc.c src/ttc_control.c test/unity.c
 	$(CC) $(CFLAGS) test/test_ttc.c src/ttc_control.c test/unity.c -o test/test_ttc -I$(TESTFOLDER) -lm
 
+.SILENT: cov
+cov:
+	if [ -z "$(src_file)" ] || [ -z "$(test_file)" ]; then \
+		echo "Please provide both src_file and test_file as arguments, e.g., 'make cov src_file=example.c test_file=test_example.c'"; \
+	else \
+		echo "Running gcov for source file $(src_file) and test $(test_file)"; \
+		echo ""; \
+		$(CC) $(TESTFLAGS) $(SRCFOLDER)$(src_file) $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
+		./$(OBJFOLDER)$(test_file:.c=)_gcov_bin > /dev/null 2>&1; \
+		gcov -b $(SRCFOLDER)$(src_file) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin-$(src_file:.c=.gcda); \
+	fi
+
 cppcheck:
 	cppcheck --addon=misra -I ./inc --force --library=posix $(SRCFOLDER) $(INCFOLDER)
 
