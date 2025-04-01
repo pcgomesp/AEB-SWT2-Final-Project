@@ -67,7 +67,8 @@ int main()
 /**
  * @brief Main loop for the AEB controller that processes sensor data and makes decisions.
  * 
- * This function continuously checks the message queue for new sensor data, processes it, and sends commands to the actuators based on the calculated AEB state.
+ * This function continuously checks the message queue for new sensor data, processes it, 
+ * and sends commands to the actuators based on the calculated AEB state.
  * 
  * @param arg Arguments passed to the thread (not used here).
  * @return NULL.
@@ -86,7 +87,8 @@ void *mainWorkingLoop(void *arg)
 
             translateAndCallCanMsg(captured_can_frame); // Process the received CAN message
 
-            double ttc = ttc_calc(aeb_internal_state.obstacle_distance, aeb_internal_state.relative_velocity);  // Calculate the time to collision
+            // Calculate the time to collision
+            double ttc = ttc_calc(aeb_internal_state.obstacle_distance, aeb_internal_state.relative_velocity); 
 
             state = getAEBState(aeb_internal_state, ttc);  // Get the current AEB state
             printf("Meu state eh: %d\n", state);  // Print the current state for debugging
@@ -113,7 +115,8 @@ void *mainWorkingLoop(void *arg)
 /**
  * @brief Prints debug information about the AEB system's internal state.
  * 
- * This function displays the current values of key variables such as relative velocity, obstacle distance, pedal states, and more.
+ * This function displays the current values of key variables such as relative velocity, 
+ * obstacle distance, pedal states, and more.
  */
 void print_info()
 {
@@ -127,9 +130,11 @@ void print_info()
 }
 
 /**
- * @brief Translates the received CAN message and calls the appropriate handler function based on the message identifier.
+ * @brief Translates the received CAN message and calls the appropriate handler 
+ * function based on the message identifier.
  * 
- * This function checks the message identifier and calls the appropriate function to handle the CAN message data.
+ * This function checks the message identifier and calls the appropriate function 
+ * to handle the CAN message data.
  * 
  * @param captured_frame The received CAN message to be processed.
  */
@@ -297,7 +302,8 @@ void updateInternalCarCState(can_msg captured_frame)
 /**
  * @brief Generates the appropriate CAN message for the AEB system state.
  * 
- * This function creates a CAN message to be sent to the actuators based on the current state of the AEB system (e.g., brake, alarm, etc.).
+ * This function creates a CAN message to be sent to the actuators based on the current 
+ * state of the AEB system (e.g., brake, alarm, etc.).
  * 
  * @param state The current state of the AEB system.
  * @return The generated CAN message.
@@ -334,19 +340,22 @@ can_msg updateCanMsgOutput(aeb_controller_state state)
 /**
  * @brief Determines the current state of the AEB system based on sensor input and TTC.
  * 
- * This function evaluates the current AEB state based on multiple sensor parameters, such as relative velocity, obstacle presence, and TTC (Time to Collision).
+ * This function evaluates the current AEB state based on multiple sensor 
+ * parameters, such as relative velocity, obstacle presence, and TTC (Time to Collision).
  * 
  * @param aeb_internal_state The current sensor data for the AEB system.
  * @param ttc The time-to-collision value, calculated based on obstacle distance and vehicle speed.
  * @return The current AEB state.
  */
-aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double ttc) // Abstraction according to [SwR-12]
-{
+aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double ttc) 
+{// Abstraction according to [SwR-12]
     if (aeb_internal_state.on_off_aeb_system == false)
         return AEB_STATE_STANDBY;
-    if(aeb_internal_state.relative_velocity < MIN_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-7][SwR-16]
+    // Required by [SwR-7][SwR-16]
+    if(aeb_internal_state.relative_velocity < MIN_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) 
         return AEB_STATE_STANDBY;
-    if (aeb_internal_state.relative_velocity > MAX_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-7][SwR-16]
+    // Required by [SwR-7][SwR-16]
+    if (aeb_internal_state.relative_velocity > MAX_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) 
         return AEB_STATE_STANDBY;
     if (aeb_internal_state.brake_pedal == false && aeb_internal_state.accelerator_pedal == false)
     {
