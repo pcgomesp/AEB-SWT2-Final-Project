@@ -1,7 +1,24 @@
+!.gitkeep
+
+# Ignore vscode configuration files
 .vscode/*
+
+# Ignore object and common binary files
 bin/*
 obj/*
-!.gitkeep
+
+# Ignore log files
+log/log.txt
+
+# Ignore test coverage files
+*.gcda
+*.gcno
+*.gcov
+
+# Ignore test binaries
+test/*
+!test/*.c
+!test/*.h
 
 # Ignore common binary files
 *.exe      # Executable files on Windows
@@ -16,18 +33,3 @@ obj/*
 *.pdb      # Debugging files on Windows
 *.class    # Java bytecode files
 *.jar      # Java JAR files
-
-
-# Ignore common build directories
-/build/
-*/build/
-out/
-*/out/
-
-#Ignora log files
-log/log.txt
-
-
-test/*
-!test/*.c
-!test/*.h

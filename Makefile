@@ -5,7 +5,8 @@ OBJFOLDER := obj/
 TESTFOLDER := test/
 
 CC := gcc
-CFLAGS := -Wall -lpthread -I$(INCFOLDER)
+CFLAGS := -Wall -lpthread -lm -lrt -I$(INCFOLDER)
+TESTFLAGS := -fprofile-arcs -ftest-coverage
 
 SRCFILES := $(wildcard $(SRCFOLDER)*.c)
 
@@ -50,6 +51,18 @@ test/test_mq_utils_read: test/test_mq_utils_read.c src/mq_utils.c test/unity.c
 test/test_ttc: test/test_ttc.c src/ttc_control.c test/unity.c
 	$(CC) $(CFLAGS) test/test_ttc.c src/ttc_control.c test/unity.c -o test/test_ttc -I$(TESTFOLDER) -lm
 
+.SILENT: cov
+cov:
+	if [ -z "$(src_file)" ] || [ -z "$(test_file)" ]; then \
+		echo "Please provide both src_file and test_file as arguments, e.g., 'make cov src_file=example.c test_file=test_example.c'"; \
+	else \
+		echo "Running gcov for source file $(src_file) and test $(test_file)"; \
+		echo ""; \
+		$(CC) $(TESTFLAGS) $(SRCFOLDER)$(src_file) $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
+		./$(OBJFOLDER)$(test_file:.c=)_gcov_bin > /dev/null 2>&1; \
+		gcov -b $(SRCFOLDER)$(src_file) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin-$(src_file:.c=.gcda); \
+	fi
+
 cppcheck:
 	cppcheck --addon=misra -I ./inc --force --library=posix $(SRCFOLDER) $(INCFOLDER)
 
@@ -68,3 +81,6 @@ clean:
 	rm -rf obj/*
 	rm -rf bin/*
 	rm -f $(TESTS)
+	rm -f *.gcov
+	rm -f *.gcda
+	rm -f *.gcno
