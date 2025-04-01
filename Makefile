@@ -51,6 +51,10 @@ test/test_mq_utils_read: test/test_mq_utils_read.c src/mq_utils.c test/unity.c
 test/test_ttc: test/test_ttc.c src/ttc_control.c test/unity.c
 	$(CC) $(CFLAGS) test/test_ttc.c src/ttc_control.c test/unity.c -o test/test_ttc -I$(TESTFOLDER) -lm
 
+test/test_file_reader: test/test_file_reader.c src/file_reader.c test/unity.c
+	$(CC) $(CFLAGS) test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER)
+
+
 .SILENT: cov
 cov:
 	if [ -z "$(src_file)" ] || [ -z "$(test_file)" ]; then \
