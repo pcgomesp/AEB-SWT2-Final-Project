@@ -73,17 +73,6 @@ int main()
 
 void *mainWorkingLoop(void *arg)
 {
-    // Main Loop function for our AEB Controller ECU
-    // Step 01: Get CAN frames from the sensors message queue [SwR-9]
-    // Step 02: Translate the recieved CAN frame, according to its id
-    // Step 03: Call the correct Function, based on the new data recieved (o que eh new data recieved? acho que eh a mensagem nova)
-    // Step 04: Reactions from the AEB System: based on the new data, what should the AEB controller do?
-    // 4.1 - Calculate new ttc
-    // 4.2 - Update send_actuators_state
-    // Should we separate more or can we let everything in this single thread?
-    // Will separating things make us need to worry more about synchronization?
-    // Step 05: Simple sleep timer? This will change when new functions to fulfill requirements are added
-
     aeb_controller_state state = AEB_STATE_STANDBY;
 
     int empty_mq_counter = 0;
@@ -101,7 +90,7 @@ void *mainWorkingLoop(void *arg)
             printf("Meu state eh: %d\n", state);
 
             out_can_frame = updateCanMsgOutput(state);
-            
+
             if (state == AEB_STATE_STANDBY) // [SwR-5]
                 write_mq(actuators_mq, &empty_msg);
             else
@@ -190,7 +179,7 @@ void updateInternalSpeedState(can_msg captured_frame)
     }
     else
     {
-        // Conversion from CAN data frame, according to dbc in the requirement file  
+        // Conversion from CAN data frame, according to dbc in the requirement file
         // [SwR-10]
         data_speed = captured_frame.dataFrame[0] + (captured_frame.dataFrame[1] << 8);
         new_internal_speed = data_speed * RES_SPEED_S;
@@ -270,24 +259,24 @@ can_msg updateCanMsgOutput(aeb_controller_state state)
 
     switch (state)
     {
-        case AEB_STATE_BRAKE:
-            aux.dataFrame[0] = 0x01; // activate warning system
-            aux.dataFrame[1] = 0x01; // activate braking system
-            break;
-        case AEB_STATE_ALARM:
-            aux.dataFrame[0] = 0x01; // activate warning system
-            aux.dataFrame[1] = 0x00; // don't activate braking system
-            break;
-        case AEB_STATE_ACTIVE:
-            aux.dataFrame[0] = 0x00; // don't activate warning system
-            aux.dataFrame[1] = 0x00; // don't activate braking system
-            break;
-        case AEB_STATE_STANDBY:
-            aux.dataFrame[0] = 0x00; // don't activate warning system
-            aux.dataFrame[1] = 0x00; // don't activate braking system
-            break;
-        default:
-            break;
+    case AEB_STATE_BRAKE:
+        aux.dataFrame[0] = 0x01; // activate warning system
+        aux.dataFrame[1] = 0x01; // activate braking system
+        break;
+    case AEB_STATE_ALARM:
+        aux.dataFrame[0] = 0x01; // activate warning system
+        aux.dataFrame[1] = 0x00; // don't activate braking system
+        break;
+    case AEB_STATE_ACTIVE:
+        aux.dataFrame[0] = 0x00; // don't activate warning system
+        aux.dataFrame[1] = 0x00; // don't activate braking system
+        break;
+    case AEB_STATE_STANDBY:
+        aux.dataFrame[0] = 0x00; // don't activate warning system
+        aux.dataFrame[1] = 0x00; // don't activate braking system
+        break;
+    default:
+        break;
     }
 
     return aux;
@@ -297,7 +286,7 @@ aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double t
 {
     if (aeb_internal_state.on_off_aeb_system == false)
         return AEB_STATE_STANDBY;
-    if(aeb_internal_state.relative_velocity < MIN_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-7][SwR-16]
+    if (aeb_internal_state.relative_velocity < MIN_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-7][SwR-16]
         return AEB_STATE_STANDBY;
     if (aeb_internal_state.relative_velocity > MAX_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-7][SwR-16]
         return AEB_STATE_STANDBY;
