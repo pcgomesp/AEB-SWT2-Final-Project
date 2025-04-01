@@ -6,6 +6,9 @@ char *mq_name = "/test_mq"; // this could be any name
 int mq_max_messages = 10;
 mqd_t mqd;
 
+char *mq_name = SENSORS_MQ;
+mqd_t mqd;
+
 void setUp()
 {
     // set stuff up here
@@ -54,7 +57,7 @@ void test_open_mq()
 
 void test_open_mq_fail()
 {
-    TEST_IGNORE_MESSAGE("Not possible to test exit() function at the moment");
+    TEST_IGNORE_MESSAGE("Impossible to test exit(1)");
 }
 
 void test_read_mq_empty_queue()
@@ -69,7 +72,7 @@ void test_write_mq_full_queue()
 {
     mqd = create_mq(mq_name);
     can_msg msg_to_write = {0};
-    for (int i = 0; i < mq_max_messages; i++)
+    for (int i = 0; i < MQ_MAX_MESSAGES; i++)
     {
         write_mq(mqd, &msg_to_write);
     }
