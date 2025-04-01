@@ -54,7 +54,7 @@ void test_open_mq()
 
 void test_open_mq_fail()
 {
-    TEST_IGNORE_MESSAGE("Impossible to test exit(1)");
+    TEST_IGNORE_MESSAGE("Not possible to test exit() function at the moment");
 }
 
 void test_read_mq_empty_queue()
