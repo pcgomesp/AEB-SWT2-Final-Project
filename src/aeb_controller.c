@@ -1,3 +1,4 @@
+// Necessary libraries
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -25,87 +26,15 @@ typedef enum // Abstraction according to [SwR-12]
     AEB_STATE_STANDBY   /**< AEB system is in standby, waiting for data or conditions */
 } aeb_controller_state;
 
-/**
- * @brief Main function that runs the working loop for the AEB system.
- * 
- * This function is responsible for fetching sensor data, processing it, and determining the state of the AEB system. It continuously reads messages from the sensors' message queue and reacts accordingly by sending control messages to the actuators.
- * 
- * @param arg Arguments passed to the thread (not used here).
- * @return NULL.
- */
+// Function prototypes
 void *mainWorkingLoop(void *arg);
-
-/**
- * @brief Prints the current state of various system parameters.
- * 
- * This function is used for debugging purposes to display the current values of key system variables such as relative velocity, obstacle distance, brake pedal state, etc.
- */
 void print_info();
-
-/**
- * @brief Translates the received CAN message and calls the appropriate handler function.
- * 
- * Based on the CAN message identifier, this function calls the appropriate function to process the message and update internal states (e.g., update pedal states, speed, obstacle information).
- * 
- * @param captured_frame The captured CAN message to be processed.
- */
 void translateAndCallCanMsg(can_msg captured_frame);
-
-/**
- * @brief Updates the internal state for the brake and accelerator pedal from the received CAN message.
- * 
- * This function updates the state of the brake and accelerator pedals based on the received CAN message data.
- * 
- * @param captured_frame The captured CAN message containing pedal data.
- */
 void updateInternalPedalsState(can_msg captured_frame);
-
-/**
- * @brief Updates the internal speed state based on the received CAN message.
- * 
- * This function updates the internal vehicle speed (relative velocity) from the data received in the CAN message.
- * 
- * @param captured_frame The captured CAN message containing speed data.
- */
 void updateInternalSpeedState(can_msg captured_frame);
-
-/**
- * @brief Updates the internal obstacle state based on the received CAN message.
- * 
- * This function updates whether an obstacle is detected and the distance to it based on the received CAN message.
- * 
- * @param captured_frame The captured CAN message containing obstacle data.
- */
 void updateInternalObstacleState(can_msg captured_frame);
-
-/**
- * @brief Updates the internal car state, such as whether the AEB system is enabled or not, based on the received CAN message.
- * 
- * This function updates the status of the AEB system (on/off) based on the data in the CAN message.
- * 
- * @param captured_frame The captured CAN message containing the car state data.
- */
 void updateInternalCarCState(can_msg captured_frame);
-
-/**
- * @brief Generates an output CAN message based on the current AEB system state.
- * 
- * This function generates a CAN message to be sent to the actuators, based on the current AEB state (e.g., active, alarm, brake, or standby).
- * 
- * @param state The current AEB system state.
- * @return The output CAN message to be sent.
- */
 can_msg updateCanMsgOutput(aeb_controller_state state);
-
-/**
- * @brief Determines the current state of the AEB system based on the internal sensor data and calculated TTC.
- * 
- * This function evaluates the current state of the AEB system based on factors such as relative velocity, obstacle distance, TTC (Time to Collision), and pedal states.
- * 
- * @param aeb_internal_state The current state of the AEB system (internal sensor data).
- * @param ttc The time to collision (calculated from the relative velocity and obstacle distance).
- * @return The AEB system's current state.
- */
 aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double ttc);
 
 // Global variables for message queues and internal state
