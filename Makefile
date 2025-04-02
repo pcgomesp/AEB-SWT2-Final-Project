@@ -53,8 +53,8 @@ test/test_ttc: test/test_ttc.c src/ttc_control.c test/unity.c
 test/test_file_reader: test/test_file_reader.c src/file_reader.c test/unity.c
 	$(CC) $(CFLAGS) test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER)
 
-test/test_dbc: test/test_dbc.c src/dbc.c test/unity.c
-	$(CC) $(CFLAGS) test/test_dbc.c src/dbc.c test/unity.c -o test/test_dbc -I$(TESTFOLDER)
+test/test_log_utils: test/test_log_utils.c src/log_utils.c test/unity.c
+	$(CC) $(CFLAGS) -Wl,--wrap=fopen -Wl,--wrap=perror test/test_log_utils.c src/log_utils.c test/unity.c -o test/test_log_utils -I$(TESTFOLDER)
 
 .SILENT: cov
 cov:
@@ -63,7 +63,12 @@ cov:
 	else \
 		echo "Running gcov for source file $(src_file) and test $(test_file)"; \
 		echo ""; \
-		$(CC) $(TESTFLAGS) $(SRCFOLDER)$(src_file) $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
+		if [ "$(test_file)" = "test_log_utils.c" ]; then \
+			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
+		else \
+			WRAP_FLAGS=""; \
+		fi; \
+		$(CC) $(TESTFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
 		./$(OBJFOLDER)$(test_file:.c=)_gcov_bin > /dev/null 2>&1; \
 		gcov -b $(SRCFOLDER)$(src_file) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin-$(src_file:.c=.gcda); \
 	fi
