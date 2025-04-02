@@ -86,6 +86,8 @@ test/test_ttc: test/test_ttc.c src/ttc_control.c test/unity.c
 test/test_file_reader: test/test_file_reader.c src/file_reader.c test/unity.c
 	$(CC) $(CFLAGS) test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER)
 
+test/test_log_utils: test/test_log_utils.c src/log_utils.c test/unity.c
+	$(CC) $(CFLAGS) -Wl,--wrap=fopen -Wl,--wrap=perror test/test_log_utils.c src/log_utils.c test/unity.c -o test/test_log_utils -I$(TESTFOLDER)
 
 .SILENT: cov
 cov:
