@@ -48,12 +48,6 @@ int main()
 
 void *actuatorsResponseLoop(void *arg)
 {
-    // Step 01: Recieve message from Message Queue, with new data sent by AEB
-    // Step 02: Convert data from the AEB can_msg to actuators_state memory
-    // Step 03: Do the right activation from the actuator ->
-    // i.e., in our project, writing the correct expected output in a txt ou csv, since this is an abstraction
-    // Step 04: sleep, waiting the next message -> loop
-
     int empty_mq_counter = 0;
     while (empty_mq_counter < LOOP_EMPTY_ITERATIONS_MAX)
     {
