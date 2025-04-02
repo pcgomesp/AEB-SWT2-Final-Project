@@ -30,6 +30,9 @@ can_msg captured_can_frame = {
     .identifier = 0x0CFFB027,
     .dataFrame = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
 
+
+#ifndef TEST_MODE //coloquei isso pra ver se ignorava essa main aqui 
+//deu certo amigos 
 int main()
 {
     actuators_mq = open_mq(ACTUATORS_MQ);
@@ -45,6 +48,8 @@ int main()
 
     return 0;
 }
+#endif
+
 
 void *actuatorsResponseLoop(void *arg)
 {
