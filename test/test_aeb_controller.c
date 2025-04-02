@@ -21,8 +21,8 @@ extern can_msg out_can_frame;
 extern can_msg empty_msg;
 
 // Declaration of functions implemented in aeb_controller.c
-void *mainWorkingLoop(void *arg);
-void print_info();
+//void *mainWorkingLoop(void *arg);
+//void print_info();
 void translateAndCallCanMsg(can_msg captured_frame);
 void updateInternalPedalsState(can_msg captured_frame);
 void updateInternalSpeedState(can_msg captured_frame);
@@ -57,26 +57,18 @@ int write_mq(mqd_t mq_sender, can_msg *msg) {
 int read_mq(mqd_t mq, can_msg *msg) {
     // Simulate a CAN message read from the queue
     msg->identifier = ID_SPEED_S;  // Simulate speed sensor data
-    msg->dataFrame[0] = 0x10;     // Simulate some speed data (e.g., 20.0 km/h)
+    msg->dataFrame[0] = 0x20;     // Simulate some speed data (e.g., 20.0 km/h)
     msg->dataFrame[1] = 0x02;
     msg->dataFrame[2] = 0x00;     // Simulate no reverse enabled
     return 0;  // Simulate success in reading the message
 }
 
-
-/*double ttc_calc(double distance, double velocity) {
-    if (velocity == 0.0) return INFINITY;  // Avoid division by zero
-    return distance / velocity;  // Simple formula for simulation
-}*/
-
-
-
 // Setup function, called before each test
 void setUp(void) {
     // Initial AEB input state setup
-    aeb_internal_state.relative_velocity = 20.0;
-    aeb_internal_state.has_obstacle = true;        
-    aeb_internal_state.obstacle_distance = 50.0;
+    aeb_internal_state.relative_velocity = 0.0;
+    aeb_internal_state.has_obstacle = false;        
+    aeb_internal_state.obstacle_distance = 0.0;
     aeb_internal_state.brake_pedal = false;
     aeb_internal_state.accelerator_pedal = false;
     aeb_internal_state.on_off_aeb_system = true;
@@ -94,43 +86,66 @@ void test_updateInternalPedalsState(void) {
     can_msg captured_frame = { .identifier = ID_PEDALS, .dataFrame = {0x01, 0x00} };
 
     updateInternalPedalsState(captured_frame);
+
     TEST_ASSERT_TRUE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be ON
     TEST_ASSERT_FALSE(aeb_internal_state.brake_pedal);  // Brake pedal should be OFF
 
     captured_frame.dataFrame[0] = 0x00;
     captured_frame.dataFrame[1] = 0x01;
-
     updateInternalPedalsState(captured_frame);
+
     TEST_ASSERT_FALSE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be OFF
     TEST_ASSERT_TRUE(aeb_internal_state.brake_pedal);  // Brake pedal should be ON
 }
 
 // Test for the function updateInternalSpeedState
 void test_updateInternalSpeedState(void) {
-    can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0x10, 0x02, 0x00} };
+    can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0x00, 0x64, 0x00} };
     
     updateInternalSpeedState(captured_frame);
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 20.0);  // Speed should be 20.0 (assuming RES_SPEED_S = 0.1)
+
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 100.0);
     
     captured_frame.dataFrame[0] = 0xFE;
     captured_frame.dataFrame[1] = 0xFF;
-    
     updateInternalSpeedState(captured_frame);
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 0.0);  // Speed should be zero (DBC reset values)
+
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 0.0);
+    TEST_ASSERT_FALSE(aeb_internal_state.reverseEnabled);
+
+    captured_frame.dataFrame[2] = 0x01;
+    updateInternalSpeedState(captured_frame);
+
+    TEST_ASSERT_TRUE(aeb_internal_state.reverseEnabled);
 }
 
 // Test for the function updateInternalObstacleState
 void test_updateInternalObstacleState(void) {
-    can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0x10, 0x01, 0x00} };
+    can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xD0, 0x07, 0x01} };
 
     updateInternalObstacleState(captured_frame);
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Obstacle distance should be 100.0 (assuming RES_OBSTACLE_S = 1)
+    
+    TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);
 
     captured_frame.dataFrame[0] = 0xFF;
     captured_frame.dataFrame[1] = 0xFF;
-    
     updateInternalObstacleState(captured_frame);
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 300.0);  // Obstacle distance should be at max limit
+    
+    TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 300.0);
+
+    captured_frame.dataFrame[0] = 0xFE;
+    captured_frame.dataFrame[1] = 0xFF;
+    updateInternalObstacleState(captured_frame);
+    
+    TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 300.0);
+
+    captured_frame.dataFrame[2] = 0x00;
+    updateInternalObstacleState(captured_frame);
+    
+    TEST_ASSERT_FALSE(aeb_internal_state.has_obstacle);
 }
 
 // Test for the function updateInternalCarCState
@@ -170,4 +185,7 @@ void test_translateAndCallCanMsg(void) {
     // Test translation and dispatch to pedals update function
     translateAndCallCanMsg(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be ON
+
+    captured_frame.identifier = ID_EMPTY;
+    translateAndCallCanMsg(captured_frame); // Should print "CAN Identifier unknown"
 }
