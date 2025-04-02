@@ -12,7 +12,7 @@
 #define ID_AEB_S 0x18FFA027
 #define ID_EMPTY 0x00000000
 
-// left most: least significant // right most: most significant
+// left most: least significant, right most: most significant
 #define BASE_DATA_FRAME {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
 
 #define MAX_SPEED_S 251
@@ -21,7 +21,7 @@
 #define RES_SPEED_S (1.0 / 256.0)
 #define RES_OBSTACLE_S (1.0 / 20.0)
 
-// Estrutura da mensagem estilo CAN a ser enviada para a fila
+// Struct to simulate a CAN message
 typedef struct
 {
     uint32_t identifier;
