@@ -66,27 +66,40 @@ can_msg empty_msg = { // [SwR-5]
     .dataFrame = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
 
 /**
- * @brief The main entry point of the AEB controller system.
+ * @brief The main entry point of the AEB (Autonomous Emergency Braking) controller system.
  * 
- * This function initializes the message queues and starts the AEB controller thread.
+ * This function initializes message queues for sensors and actuators, then starts the 
+ * AEB controller thread to begin processing. It is designed for use in a production environment 
+ * where the AEB controller operates continuously.
  * 
- * @return 0 on success.
+ * @return 0 on successful execution. If an error occurs while creating the AEB controller thread,
+ *         the function will terminate with an error code.
+ * 
+ * @note This function is only included in production builds, as it is enclosed in 
+ *       a preprocessor check (`#ifndef TEST_MODE_CONTROLLER`).
  */
-int main()
+#ifndef TEST_MODE_CONTROLLER // Main for the AEB controller process in production
+ int main()
 {
+    // Open message queues for communication with sensors and actuators
     sensors_mq = open_mq(SENSORS_MQ);
     actuators_mq = open_mq(ACTUATORS_MQ);
 
+    // Create the AEB controller thread
     int controller_thread = pthread_create(&aeb_controller_id, NULL, mainWorkingLoop, NULL);
     if (controller_thread != 0)
     {
+        // If thread creation fails, print error and exit
         perror("AEB Controller: It wasn't possible to create the associated thread\n");
         exit(53);
     }
+
+    // Wait for the controller thread to finish
     controller_thread = pthread_join(aeb_controller_id, NULL);
 
     return 0;
 }
+#endif
 
 /**
  * @brief Main loop for the AEB controller that processes sensor data and makes decisions.
