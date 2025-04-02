@@ -1,10 +1,11 @@
 #include "unity.h"
 #include "actuators.h"
 
-// Define the can_msg structure if not already defined
+// Define a estrutura can_msg caso ainda não esteja definida
+// Esta estrutura representa uma mensagem CAN com um identificador e um quadro de dados de 8 bytes
 typedef struct {
-    int identifier;
-    unsigned char dataFrame[8];
+    int identifier; // Identificador da mensagem CAN
+    unsigned char dataFrame[8]; // Quadro de dados da mensagem CAN (8 bytes)
 } can_msg;
 
 // Define the missing identifiers
