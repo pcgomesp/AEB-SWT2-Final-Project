@@ -81,10 +81,10 @@ cov:
 	fi
 
 test/test_ttc: test/test_ttc.c src/ttc_control.c test/unity.c
-	$(CC) $(CFLAGS) test/test_ttc.c src/ttc_control.c test/unity.c -o test/test_ttc -I$(TESTFOLDER) -lm
+	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_ttc.c src/ttc_control.c test/unity.c -o test/test_ttc -I$(TESTFOLDER) -lm
 
 test/test_file_reader: test/test_file_reader.c src/file_reader.c test/unity.c
-	$(CC) $(CFLAGS) test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER)
+	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER)
 
 test/test_log_utils: test/test_log_utils.c src/log_utils.c test/unity.c
 	$(CC) $(CFLAGS) -Wl,--wrap=fopen -Wl,--wrap=perror test/test_log_utils.c src/log_utils.c test/unity.c -o test/test_log_utils -I$(TESTFOLDER)
@@ -104,7 +104,7 @@ cov:
 		else \
 			WRAP_FLAGS=""; \
 		fi; \
-		$(CC) $(TESTFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
+		$(CC) $(TESTFLAGS) $(COVFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
 		./$(OBJFOLDER)$(test_file:.c=)_gcov_bin > /dev/null 2>&1; \
 		gcov -b $(SRCFOLDER)$(src_file) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin-$(src_file:.c=.gcda); \
 	fi
