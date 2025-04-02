@@ -190,7 +190,7 @@ void test_translateAndCallCanMsg(void) {
     translateAndCallCanMsg(captured_frame); // Should print "CAN Identifier unknown"
 }
 
-/*// Main function to run the tests
+// Main function to run the tests
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_updateInternalPedalsState);
@@ -200,4 +200,4 @@ int main(void) {
     RUN_TEST(test_getAEBState);
     RUN_TEST(test_translateAndCallCanMsg);
     return UNITY_END();
-}*/
+}
