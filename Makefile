@@ -6,7 +6,7 @@ TESTFOLDER := test/
 
 CC := gcc
 CFLAGS := -Wall -lpthread -lm -lrt -I$(INCFOLDER)
-TESTFLAGS := -fprofile-arcs -ftest-coverage
+TESTFLAGS := -fprofile-arcs -ftest-coverage -DTEST_MODE 
 
 SRCFILES := $(wildcard $(SRCFOLDER)*.c)
 
@@ -54,6 +54,8 @@ test/test_ttc: test/test_ttc.c src/ttc_control.c test/unity.c
 test/test_file_reader: test/test_file_reader.c src/file_reader.c test/unity.c
 	$(CC) $(CFLAGS) test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER)
 
+test/test_actuators: test/test_actuators.c src/actuators.c test/unity.c
+	$(CC) $(CFLAGS) -DTEST_MODE test/test_actuators.c src/actuators.c test/unity.c -o test/test_actuators -Iinc -Itest -lpthread
 
 .SILENT: cov
 cov:
