@@ -5,8 +5,9 @@ OBJFOLDER := obj/
 TESTFOLDER := test/
 
 CC := gcc
-CFLAGS := -Wall -lpthread -lm -lrt -I$(INCFOLDER) -DUNITY_OUTPUT_COLOR
-TESTFLAGS := -fprofile-arcs -ftest-coverage
+CFLAGS := -Wall -lpthread -lm -lrt -I$(INCFOLDER)
+TESTFLAGS := -DUNITY_OUTPUT_COLOR -DTEST_MODE
+COVFLAGS := -fprofile-arcs -ftest-coverage
 
 SRCFILES := $(wildcard $(SRCFOLDER)*.c)
 
@@ -45,16 +46,16 @@ test_all: $(TESTS)
 	done
 
 test/test_mq_utils: test/test_mq_utils.c src/mq_utils.c test/unity.c
-	$(CC) $(CFLAGS) test/test_mq_utils.c src/mq_utils.c test/unity.c -o test/test_mq_utils -I$(TESTFOLDER)
+	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_mq_utils.c src/mq_utils.c test/unity.c -o test/test_mq_utils -I$(TESTFOLDER)
 
 test/test_ttc: test/test_ttc.c src/ttc_control.c test/unity.c
-	$(CC) $(CFLAGS) test/test_ttc.c src/ttc_control.c test/unity.c -o test/test_ttc -I$(TESTFOLDER) -lm
+	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_ttc.c src/ttc_control.c test/unity.c -o test/test_ttc -I$(TESTFOLDER) -lm
 
 test/test_file_reader: test/test_file_reader.c src/file_reader.c test/unity.c
-	$(CC) $(CFLAGS) test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER)
+	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER)
 
 test/test_log_utils: test/test_log_utils.c src/log_utils.c test/unity.c
-	$(CC) $(CFLAGS) -Wl,--wrap=fopen -Wl,--wrap=perror test/test_log_utils.c src/log_utils.c test/unity.c -o test/test_log_utils -I$(TESTFOLDER)
+	$(CC) $(CFLAGS) $(TESTFLAGS) -Wl,--wrap=fopen -Wl,--wrap=perror test/test_log_utils.c src/log_utils.c test/unity.c -o test/test_log_utils -I$(TESTFOLDER)
 
 .SILENT: cov
 cov:
@@ -68,7 +69,7 @@ cov:
 		else \
 			WRAP_FLAGS=""; \
 		fi; \
-		$(CC) $(TESTFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
+		$(CC) $(TESTFLAGS) $(COVFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
 		./$(OBJFOLDER)$(test_file:.c=)_gcov_bin > /dev/null 2>&1; \
 		gcov -b $(SRCFOLDER)$(src_file) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin-$(src_file:.c=.gcda); \
 	fi
