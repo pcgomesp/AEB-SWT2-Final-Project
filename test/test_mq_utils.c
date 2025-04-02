@@ -6,9 +6,6 @@ char *mq_name = "/test_mq"; // this could be any name
 int mq_max_messages = 10;
 mqd_t mqd;
 
-char *mq_name = SENSORS_MQ;
-mqd_t mqd;
-
 void setUp()
 {
     // set stuff up here
@@ -24,6 +21,8 @@ void test_get_mq_attr()
     struct mq_attr attr = get_mq_attr();
     TEST_ASSERT_EQUAL(O_NONBLOCK, attr.mq_flags);
     TEST_ASSERT_EQUAL(0, attr.mq_curmsgs);
+    TEST_ASSERT_EQUAL(10, attr.mq_maxmsg);
+    TEST_ASSERT_EQUAL(12, attr.mq_msgsize);
     TEST_ASSERT_EQUAL(10, attr.mq_maxmsg);
     TEST_ASSERT_EQUAL(12, attr.mq_msgsize);
 }
@@ -72,7 +71,7 @@ void test_write_mq_full_queue()
 {
     mqd = create_mq(mq_name);
     can_msg msg_to_write = {0};
-    for (int i = 0; i < MQ_MAX_MESSAGES; i++)
+    for (int i = 0; i < mq_max_messages; i++)
     {
         write_mq(mqd, &msg_to_write);
     }
