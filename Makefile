@@ -96,7 +96,12 @@ cov:
 	else \
 		echo "Running gcov for source file $(src_file) and test $(test_file)"; \
 		echo ""; \
-		$(CC) $(TESTFLAGS) $(SRCFOLDER)$(src_file) $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
+		if [ "$(test_file)" = "test_log_utils.c" ]; then \
+			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
+		else \
+			WRAP_FLAGS=""; \
+		fi; \
+		$(CC) $(TESTFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
 		./$(OBJFOLDER)$(test_file:.c=)_gcov_bin > /dev/null 2>&1; \
 		gcov -b $(SRCFOLDER)$(src_file) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin-$(src_file:.c=.gcda); \
 	fi
