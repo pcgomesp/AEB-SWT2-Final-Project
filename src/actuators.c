@@ -31,8 +31,16 @@ can_msg captured_can_frame = {
     .dataFrame = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
 
 
-#ifndef TEST_MODE //coloquei isso pra ver se ignorava essa main aqui 
-//deu certo amigos 
+//Workaround to avoid the main function in this file
+// Write just the main function in the test file
+//Put the #ifndef TEST_MODE in the test file, as bellow
+//After the last line of main, put #endif
+
+//The next step is put the flag TEST_MODE in the Makefile
+//See the example:
+// 	$(CC) $(CFLAGS) -DTEST_MODE test/test_actuators.c src/actuators.c test/unity.c -o test/test_actuators -Iinc -Itest -lpthread
+//Put the flag TEST_MODE in the Makefile: -DTEST_MODE
+#ifndef TEST_MODE 
 int main()
 {
     actuators_mq = open_mq(ACTUATORS_MQ);
@@ -48,7 +56,7 @@ int main()
 
     return 0;
 }
-#endif
+#endif 
 
 
 void *actuatorsResponseLoop(void *arg)
