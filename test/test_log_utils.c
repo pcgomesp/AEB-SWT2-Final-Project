@@ -8,7 +8,6 @@
 
 static bool wrap_fopen_fail = false;
 static bool wrap_perror_called = false;
-//static const char *test_log_path = "test_log.txt"; // Arquivo temporário
 
 can_msg can_frame_test = {
     .identifier = ID_AEB_S,
@@ -25,6 +24,8 @@ actuators_abstraction actuators_test = {
     .alarm_led = false,
     .alarm_buzzer = false
 };
+
+actuators_abstraction actuators_try;
 
 // FOpen function mock -> Forwards unmocked calls to the real fopen
 FILE *__real_fopen(const char *path, const char *mode);
@@ -57,7 +58,7 @@ void setUp(){
 
 void tearDown(){
     // clean stuff up here
-    //remove(test_log_path);
+    remove("test/test_log.txt");
 }
 
 // first test: verify if the fopen is catchable by a test (using mock functions)
@@ -65,7 +66,6 @@ void test_log_event_fopen_fail(){
     // Try to write:
     // Verify if write
     // If didn't write, assert test
-    // Configura o mock para falhar
     wrap_fopen_fail = true;
     wrap_perror_called = false;
 
@@ -76,20 +76,47 @@ void test_log_event_fopen_fail(){
     TEST_ASSERT_TRUE(wrap_perror_called);
 }
 
-// second test: verify if the last line is written according to the proposed specification
-void test_log_event_check_writing(){
+actuators_abstraction read_line_test(){
+    FILE *file = fopen("test/test_log.txt", "r"); // Abrir o arquivo para leitura
+
+    char line[256];
+
+    while (fgets(line, 256, file) != NULL) {  // Ler cada linha do arquivo
+        int v1, v2, v3, v4, v5;  // Variáveis para armazenar os números
+        if (sscanf(line, "%*[^|] | %d | %d | %d | %d | %d", &v1, &v2, &v3, &v4, &v5) == 5) {
+            printf("Valores extraídos: %d %d %d %d %d\n", v1, v2, v3, v4, v5);
+        }
+        actuators_test.belt_tightness = v1;
+        actuators_test.door_lock = v2;
+        actuators_test.should_activate_abs = v3;
+        actuators_test.alarm_led = v4;
+        actuators_test.alarm_buzzer = v5;
+    }
+    fclose(file);
+
+    return actuators_test;
+}
+
+void test_log_event_check_writing_no1(){
     // Try to write: done
     // Verify if write: done
     // If write correctly, read last line and assert test -> to do
     wrap_fopen_fail = false;
-    printf("Oie\n");
-    log_event("Check_Writing", can_frame_test.identifier, actuators_test);
-}
 
+    log_event("Check_Writing", can_frame_test.identifier, actuators_test);
+    
+    actuators_try = read_line_test();
+
+    TEST_ASSERT_EQUAL(actuators_test.belt_tightness, actuators_try.belt_tightness);
+    TEST_ASSERT_EQUAL(actuators_test.door_lock, actuators_try.door_lock);
+    TEST_ASSERT_EQUAL(actuators_test.should_activate_abs, actuators_try.should_activate_abs);
+    TEST_ASSERT_EQUAL(actuators_test.alarm_led, actuators_try.alarm_led);
+    TEST_ASSERT_EQUAL(actuators_test.alarm_buzzer, actuators_try.alarm_buzzer);
+}
 
 int main(){
     UNITY_BEGIN();
     RUN_TEST(test_log_event_fopen_fail);
-    RUN_TEST(test_log_event_check_writing);
+    RUN_TEST(test_log_event_check_writing_no1);
     return UNITY_END();
 }
