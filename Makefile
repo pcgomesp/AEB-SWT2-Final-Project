@@ -25,22 +25,27 @@ clean:
 	rm -rf bin/*
 	rm -f test/test_mq_utils
 	rm -f test/test_mq_utils_read
-
+	rm -f test/test_aeb_controller
 run:
 	./bin/main_bin
 
 test: build_test_executables
 	./test/test_mq_utils
 	./test/test_mq_utils_read
+	./test/test_aeb_controller
 
 .PHONY: build_test_executables
-build_test_executables: test/test_mq_utils test/test_mq_utils_read
+build_test_executables: test/test_mq_utils test/test_mq_utils_read test/test_aeb_controller
 
 test/test_mq_utils: test/test_mq_utils.c src/mq_utils.c test/unity.c
 	$(CC) $(CFLAGS) test/test_mq_utils.c src/mq_utils.c test/unity.c -o test/test_mq_utils -I$(TESTFOLDER)
 
 test/test_mq_utils_read: test/test_mq_utils_read.c src/mq_utils.c test/unity.c
 	$(CC) $(CFLAGS) test/test_mq_utils_read.c src/mq_utils.c test/unity.c -o test/test_mq_utils_read -I$(TESTFOLDER)
+
+test/test_aeb_controller: test/test_aeb_controller.c src/aeb_controller.c test/unity.c
+	$(CC) $(CFLAGS) test/test_aeb_controller.c src/aeb_controller.c test/unity.c -o test/test_aeb_controller -I$(TESTFOLDER)
+	
 
 cppcheck:
 	cppcheck --addon=misra -I ./inc --force --library=posix $(SRCFOLDER) $(INCFOLDER)

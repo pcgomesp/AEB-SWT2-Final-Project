@@ -56,11 +56,11 @@ int write_mq(mqd_t mq_sender, can_msg *msg) {
 // Mock for read_mq
 int read_mq(mqd_t mq, can_msg *msg) {
     // Simulate a CAN message read from the queue
-    msg->identifier = ID_SPEED_S;  // Simulate speed sensor data
-    msg->dataFrame[0] = 0x20;     // Simulate some speed data (e.g., 20.0 km/h)
-    msg->dataFrame[1] = 0x02;
+    /*msg->identifier = ID_SPEED_S;  // Simulate speed sensor data
+    msg->dataFrame[0] = 0x00;     // Simulate some speed data (e.g., 100.0 km/h)
+    msg->dataFrame[1] = 0x64;
     msg->dataFrame[2] = 0x00;     // Simulate no reverse enabled
-    return 0;  // Simulate success in reading the message
+    */return 0;  // Simulate success in reading the message
 }
 
 // Setup function, called before each test
@@ -162,9 +162,9 @@ void test_updateInternalCarCState(void) {
 
 // Test for the function getAEBState
 void test_getAEBState(void) {
-    aeb_internal_state.relative_velocity = 10.0;
+    aeb_internal_state.relative_velocity = 100.0;
     aeb_internal_state.has_obstacle = true;
-    aeb_internal_state.obstacle_distance = 5.0;
+    aeb_internal_state.obstacle_distance = 10.0;
     aeb_internal_state.brake_pedal = false;
     aeb_internal_state.accelerator_pedal = false;
 
@@ -173,7 +173,7 @@ void test_getAEBState(void) {
     aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
     TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ALARM);  // Should be in ALARM state
 
-    aeb_internal_state.relative_velocity = 50.0;
+    aeb_internal_state.relative_velocity = 150.0;
     state = getAEBState(aeb_internal_state, ttc);
     TEST_ASSERT_EQUAL_INT(state, AEB_STATE_BRAKE);  // Should be in BRAKE state if high speed and low TTC
 }
@@ -189,3 +189,15 @@ void test_translateAndCallCanMsg(void) {
     captured_frame.identifier = ID_EMPTY;
     translateAndCallCanMsg(captured_frame); // Should print "CAN Identifier unknown"
 }
+
+/*// Main function to run the tests
+int main(void) {
+    UNITY_BEGIN();
+    RUN_TEST(test_updateInternalPedalsState);
+    RUN_TEST(test_updateInternalSpeedState);
+    RUN_TEST(test_updateInternalObstacleState);
+    RUN_TEST(test_updateInternalCarCState);
+    RUN_TEST(test_getAEBState);
+    RUN_TEST(test_translateAndCallCanMsg);
+    return UNITY_END();
+}*/
