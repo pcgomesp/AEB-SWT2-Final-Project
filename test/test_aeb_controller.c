@@ -81,6 +81,20 @@ void test_updateInternalPedalsState(void) {
     TEST_ASSERT_TRUE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be ON
     TEST_ASSERT_FALSE(aeb_internal_state.brake_pedal);  // Brake pedal should be OFF
 
+    captured_frame.dataFrame[0] = 0x01;
+    captured_frame.dataFrame[1] = 0x01;
+    updateInternalPedalsState(captured_frame);
+
+    TEST_ASSERT_TRUE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be ON
+    TEST_ASSERT_TRUE(aeb_internal_state.brake_pedal);  // Brake pedal should be ON
+
+    captured_frame.dataFrame[0] = 0x00;
+    captured_frame.dataFrame[1] = 0x00;
+    updateInternalPedalsState(captured_frame);
+
+    TEST_ASSERT_FALSE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be OFF
+    TEST_ASSERT_FALSE(aeb_internal_state.brake_pedal);  // Brake pedal should be OFF
+
     captured_frame.dataFrame[0] = 0x00;
     captured_frame.dataFrame[1] = 0x01;
     updateInternalPedalsState(captured_frame);
@@ -93,21 +107,39 @@ void test_updateInternalPedalsState(void) {
 void test_updateInternalSpeedState(void) {
     can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0x00, 0x64, 0x00} };
     
+    // Case 1: Normal case where the speed is updated correctly
     updateInternalSpeedState(captured_frame);
-
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 100.0);
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 100.0); // 0x64 + (0x00 << 8) = 100.0 * RES_SPEED_S
     
+    // Case 2: Case where the CAN data is set to clear data (0xFE, 0xFF)
     captured_frame.dataFrame[0] = 0xFE;
     captured_frame.dataFrame[1] = 0xFF;
     updateInternalSpeedState(captured_frame);
-
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 0.0);
-    TEST_ASSERT_FALSE(aeb_internal_state.reverseEnabled);
-
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 0.0); // Should reset speed to 0.0
+    TEST_ASSERT_FALSE(aeb_internal_state.reverseEnabled); // Should also reset reverseEnabled to false
+    
+    // Case 3: Case where the CAN data is set to indicate reverse (0x01 in dataFrame[2])
     captured_frame.dataFrame[2] = 0x01;
     updateInternalSpeedState(captured_frame);
+    TEST_ASSERT_TRUE(aeb_internal_state.reverseEnabled); // Should enable reverse
 
-    TEST_ASSERT_TRUE(aeb_internal_state.reverseEnabled);
+    // Case 4: Max speed value constraint (should be capped at 251.0)
+    captured_frame.dataFrame[0] = 0xFF; 
+    captured_frame.dataFrame[1] = 0xFD; // Maximum possible value
+    updateInternalSpeedState(captured_frame);
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 251.0); // Should be capped at 251.0
+    
+    // Case 5: Test when the CAN frame data doesn't require any action (0xFF, 0xFF in dataFrame[0] and dataFrame[1])
+    captured_frame.dataFrame[0] = 0xFF;
+    captured_frame.dataFrame[1] = 0xFF;
+    updateInternalSpeedState(captured_frame);
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 0.0); // Should set speed to 0.0
+    TEST_ASSERT_TRUE(aeb_internal_state.reverseEnabled); // Should remain in the reverseDisabled state
+
+    // Case 6: Ensure that reverseEnabled remains false for non-reverse signals
+    captured_frame.dataFrame[2] = 0x00; // Non-reverse case
+    updateInternalSpeedState(captured_frame);
+    TEST_ASSERT_FALSE(aeb_internal_state.reverseEnabled); // Reverse should not be enabled
 }
 
 // Test for the function updateInternalObstacleState
