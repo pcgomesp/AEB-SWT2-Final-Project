@@ -47,10 +47,7 @@ int main()
 
 void *getSensorsData(void *arg)
 {
-    FILE *file = (FILE *)arg; // Recebe o arquivo como argumento
-
-    while (1)
-    {
+    FILE *file = (FILE *) arg;
     while (1)
     {
         // Read a new line from the file [SwR-9]
@@ -218,3 +215,4 @@ can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal)
 
     return aux;
 }
+
