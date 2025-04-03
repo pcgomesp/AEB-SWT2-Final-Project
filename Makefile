@@ -57,6 +57,9 @@ test/test_file_reader: test/test_file_reader.c src/file_reader.c test/unity.c
 test/test_log_utils: test/test_log_utils.c src/log_utils.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) -Wl,--wrap=fopen -Wl,--wrap=perror test/test_log_utils.c src/log_utils.c test/unity.c -o test/test_log_utils -I$(TESTFOLDER)
 
+test/test_actuators: test/test_actuators.c src/actuators.c test/unity.c
+	$(CC) $(CFLAGS) -DTEST_MODE test/test_actuators.c src/actuators.c test/unity.c -o test/test_actuators -Iinc -Itest -lpthread	
+
 .SILENT: cov
 cov:
 	if [ -z "$(src_file)" ] || [ -z "$(test_file)" ]; then \
