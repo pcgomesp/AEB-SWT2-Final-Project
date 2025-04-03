@@ -16,25 +16,30 @@ void terminate_execution();
 
 jmp_buf test_exit_buf;
 
-void __wrap_exit(int status) {
+void __wrap_exit(int status)
+{
     printf("Mocked exit() called with status: %d\n", status);
-    longjmp(test_exit_buf, 1);  // Jump back to test
+    longjmp(test_exit_buf, 1);
 }
 
-int __wrap_waitpid(pid_t pid, int *status, int options) {
+int __wrap_waitpid(pid_t pid, int *status, int options)
+{
     return pid;
 }
 
-int __wrap_kill(pid_t pid, int sig) {
+int __wrap_kill(pid_t pid, int sig)
+{
     printf("Mocked kill() called with pid: %d, sig: %d\n", pid, sig);
     return 0;
 }
 
-void __wrap_close_mq(mqd_t mq, const char *name) {
+void __wrap_close_mq(mqd_t mq, const char *name)
+{
     printf("Mocked close_mq() called for queue: %s\n", name);
 }
 
-mqd_t __wrap_create_mq(const char *name) {
+mqd_t __wrap_create_mq(const char *name)
+{
     printf("Mocked create_mq() called for queue: %s\n", name);
     return (mqd_t) 1; // Return a non-zero value to simulate a valid message queue descriptor.
 }
