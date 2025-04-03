@@ -44,7 +44,7 @@ int main()
 
 void* getSensorsData(void *arg)
 {
-
+    FILE *file = (FILE *) arg;
     while (1)
     {
         // Read a new line from the file [SwR-9]
