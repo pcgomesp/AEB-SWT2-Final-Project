@@ -17,18 +17,16 @@ void wait_terminate_execution()
     waitpid(controller_pid, NULL, 0);
     waitpid(actuators_pid, NULL, 0);
 
-    printf("Closing message queue\n");
     close_mq(sensors_mq, SENSORS_MQ);
     close_mq(actuators_mq, ACTUATORS_MQ);
 
     exit(0);
 }
 
-void terminate_execution(int sig)
+void terminate_execution()
 {
-    printf("Closing message queue\n");
     close_mq(sensors_mq, SENSORS_MQ);
-    close_mq(sensors_mq, ACTUATORS_MQ);
+    close_mq(actuators_mq, ACTUATORS_MQ);
 
     printf("Closing child processes\n");
     kill(sensors_pid, SIGTERM);
@@ -65,6 +63,7 @@ pid_t create_processes(char *process_name)
     return child_pid;
 }
 
+#ifndef TEST_MODE
 int main()
 {
     printf("Main process PID: %d\n", getpid());
@@ -88,3 +87,4 @@ int main()
 
     return EXIT_SUCCESS;
 }
+#endif

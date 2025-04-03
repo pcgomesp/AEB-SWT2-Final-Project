@@ -35,7 +35,6 @@ void test_conv2CANCarClusterData_AEB_on()
     
     TEST_ASSERT_EQUAL_INT(ID_CAR_C, result.identifier);
     TEST_ASSERT_EQUAL_UINT8(0x01, result.dataFrame[0]); // Check if AEB is on
-
 }
 
 void test_conv2CANCarClusterData_AEB_off()
@@ -45,7 +44,6 @@ void test_conv2CANCarClusterData_AEB_off()
     
     TEST_ASSERT_EQUAL_INT(ID_CAR_C, result.identifier);
     TEST_ASSERT_EQUAL_UINT8(0x00, result.dataFrame[0]); // Check if AEB is off
-    
 }
 
 void test_conv2CANVelocityData_Forward() 

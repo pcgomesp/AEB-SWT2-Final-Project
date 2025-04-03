@@ -97,7 +97,6 @@ can_msg conv2CANCarClusterData(bool on_off_aeb_system)
     return aux;
 }
 
-
 can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity)
 {
     can_msg aux = {.identifier = ID_SPEED_S, .dataFrame = BASE_DATA_FRAME};
