@@ -30,6 +30,17 @@ can_msg captured_can_frame = {
     .identifier = 0x0CFFB027,
     .dataFrame = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
 
+
+//Workaround to avoid the main function in this file
+// Write just the main function in the test file
+//Put the #ifndef TEST_MODE in the test file, as bellow
+//After the last line of main, put #endif
+
+//The next step is put the flag TEST_MODE in the Makefile
+//See the example:
+// 	$(CC) $(CFLAGS) -DTEST_MODE test/test_actuators.c src/actuators.c test/unity.c -o test/test_actuators -Iinc -Itest -lpthread
+//Put the flag TEST_MODE in the Makefile: -DTEST_MODE
+#ifndef TEST_MODE 
 int main()
 {
     actuators_mq = open_mq(ACTUATORS_MQ);
@@ -45,15 +56,11 @@ int main()
 
     return 0;
 }
+#endif 
+
 
 void *actuatorsResponseLoop(void *arg)
 {
-    // Step 01: Recieve message from Message Queue, with new data sent by AEB
-    // Step 02: Convert data from the AEB can_msg to actuators_state memory
-    // Step 03: Do the right activation from the actuator ->
-    // i.e., in our project, writing the correct expected output in a txt ou csv, since this is an abstraction
-    // Step 04: sleep, waiting the next message -> loop
-
     int empty_mq_counter = 0;
     while (empty_mq_counter < LOOP_EMPTY_ITERATIONS_MAX)
     {

@@ -2,7 +2,7 @@
  * @file can_utils.c
  * @brief Utilities for handling CAN messages, according to the DBC specification.
  *
- * This file contains a function for displaying CAN messages, 
+ * This file contains a function for displaying CAN messages,
  * to help with debugging the code under development.
  */
 
@@ -16,10 +16,12 @@
  *
  * @param msg Pointer to the structure of the CAN message to be printed.
  */
-void print_can_msg(const can_msg *msg) {
+void print_can_msg(const can_msg *msg)
+{
     printf("Identifier: %08X\n", msg->identifier);
     printf("Data Frame: ");
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++)
+    {
         printf("%02X ", msg->dataFrame[i]);
     }
     printf("\n");
