@@ -65,7 +65,7 @@ test/test_sensors: test/test_sensors.c src/sensors.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) -DTEST_MODE test/test_sensors.c src/sensors.c test/unity.c -o test/test_sensors -I$(TESTFOLDER) -Itest -lpthread
 
 test/test_main: test/test_main.c src/main.c test/unity.c src/mq_utils.c
-	$(CC) $(CFLAGS) $(TESTFLAGS) -Wl,--wrap=exit -Wl,--wrap=waitpid -Wl,--wrap=kill test/test_main.c -Wl,--wrap=close_mq -Wl,--wrap=create_mq src/main.c src/mq_utils.c test/unity.c -o test/test_main -Iinc -Itest -lpthread
+	$(CC) $(CFLAGS) $(TESTFLAGS) -Wl,--wrap=exit -Wl,--wrap=waitpid -Wl,--wrap=kill test/test_main.c -Wl,--wrap=close_mq -Wl,--wrap=create_mq -Wl,--wrap=fork -Wl,--wrap=execl src/main.c src/mq_utils.c test/unity.c -o test/test_main -Iinc -Itest -lpthread
 
 
 .SILENT: cov
@@ -79,14 +79,14 @@ cov:
 			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
 		else \
 			if [ "$(test_file)" = "test_main.c" ]; then \
-				WRAP_FLAGS=" -Wl,--wrap=exit -Wl,--wrap=waitpid -Wl,--wrap=kill -Wl,--wrap=close_mq -Wl,--wrap=create_mq"; \
+				WRAP_FLAGS=" -Wl,--wrap=exit -Wl,--wrap=waitpid -Wl,--wrap=kill -Wl,--wrap=close_mq -Wl,--wrap=create_mq -Wl,--wrap=fork -Wl,--wrap=execl"; \
 			else \
 				WRAP_FLAGS=""; \
 			fi; \
 		fi; \
 		$(CC) $(TESTFLAGS) $(COVFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
 		./$(OBJFOLDER)$(test_file:.c=)_gcov_bin > /dev/null 2>&1; \
-		gcov -b $(SRCFOLDER)$(src_file) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin-$(src_file:.c=.gcda); \
+		gcov -b -k $(SRCFOLDER)$(src_file) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin-$(src_file:.c=.gcda); \
 	fi
 
 cppcheck:
