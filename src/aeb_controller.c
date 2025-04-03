@@ -78,7 +78,7 @@ can_msg empty_msg = { // [SwR-5]
  * @note This function is only included in production builds, as it is enclosed in 
  *       a preprocessor check (`#ifndef TEST_MODE_CONTROLLER`).
  */
-#ifndef TEST_MODE_CONTROLLER // Main for the AEB controller process in production
+#ifndef TEST_MODE // Main for the AEB controller process in production
  int main()
 {
     // Open message queues for communication with sensors and actuators
