@@ -22,6 +22,7 @@ sensors_input_data sensorsData;
 
 can_msg can_car_cluster, can_velocity_sensor, can_obstacle_sensor, can_pedals_sensor;
 
+#ifndef TEST_MODE 
 int main(){
     int sensors_thr;
 
@@ -42,6 +43,8 @@ int main(){
 
     return 0;
 }
+#endif
+
 
 void* getSensorsData(void *arg){
     // Part 1: take data from txt/csv file
@@ -88,6 +91,19 @@ void* getSensorsData(void *arg){
 // The location of information in the data frame location, in the following functions, 
 // is according to the dbc file in the requirements specification
 
+/**
+ * @brief Converts the AEB power status into a CAN Message
+ * 
+ * This function mounts the can message frame of the car cluster with the least
+ * significant byte of the data frame being the power state of the AEB system. 
+ * If it is on, it encapsulates 0x01, and if it is off, 0x00
+ * 
+ * @param on_off_aeb_system The power status of the AEB system (on or off)
+ * 
+ * @return The Car Cluster CAN Message with the power status of the AEB system 
+ * 
+ */
+
 can_msg conv2CANCarClusterData(bool on_off_aeb_system){
     can_msg aux = {.identifier = ID_CAR_C, .dataFrame = BASE_DATA_FRAME};
 
@@ -101,6 +117,21 @@ can_msg conv2CANCarClusterData(bool on_off_aeb_system){
 
     return aux;
 }
+
+/**
+ * @brief Converts vehicle velocity data into a CAN message.
+ * 
+ * This function encapsulates the vehicle's relative velocity and direction 
+ * into a CAN message format according to the DBC specification.
+ * 
+ * @param vehicle_direction Indicates the vehicle direction:
+ *                                  - false: reverse
+ *                                  - true: forward
+ * @param relative_velocity The relative velocity of the vehicle in km/h
+ * 
+ * @return can_msg Encapsulated CAN message containing velocity and direction data. 
+ * 
+ */
 
 can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity){
     can_msg aux = {.identifier = ID_SPEED_S, .dataFrame = BASE_DATA_FRAME};
@@ -125,6 +156,20 @@ can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity){
     return aux;
 }
 
+/**
+ * @brief Converts obstacle detection data into a CAN message.
+ * 
+ * This function encapsulates obstacle presence and distance into a CAN message 
+ * format according to the DBC specification.
+ * 
+ * @param has_obstacle Boolean indicating the presence of an obstacle:
+ *                     - true: Obstacle detected
+ *                     - false: No obstacle detected
+ * @param obstacle_distance Distance to the detected obstacle in meters.
+ * 
+ * @return can_msg Encapsulated CAN message containing obstacle detection and distance data.
+ */
+
 can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance){
     can_msg aux = {.identifier = ID_OBSTACLE_S, .dataFrame = BASE_DATA_FRAME};
 
@@ -147,6 +192,22 @@ can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance){
 
     return aux;
 }
+
+/**
+ * @brief Converts brake and accelerator pedal activation data into a CAN message.
+ * 
+ * This function encapsulates the activation status of the brake and accelerator pedals 
+ * into a CAN message format according to the DBC specification.
+ * 
+ * @param brake_pedal Boolean indicating the brake pedal status:
+ *                    - true: Brake pedal pressed
+ *                    - false: Brake pedal released
+ * @param accelerator_pedal Boolean indicating the accelerator pedal status:
+ *                          - true: Accelerator pedal pressed
+ *                          - false: Accelerator pedal released
+ * 
+ * @return can_msg Encapsulated CAN message containing pedal activation data.
+ */
 
 can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal){
     can_msg aux = {.identifier = ID_PEDALS, .dataFrame = BASE_DATA_FRAME};
