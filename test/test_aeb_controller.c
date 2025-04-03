@@ -109,7 +109,7 @@ void test_updateInternalSpeedState(void) {
     
     // Case 1: Normal case where the speed is updated correctly
     updateInternalSpeedState(captured_frame);
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 100.0); // 0x64 + (0x00 << 8) = 100.0 * RES_SPEED_S
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 100.0); // (0x64 + (0x00 << 8)) * RES_SPEED_S = 100.0 
     
     // Case 2: Case where the CAN data is set to clear data (0xFE, 0xFF)
     captured_frame.dataFrame[0] = 0xFE;
@@ -207,41 +207,109 @@ void test_updateInternalCarCState(void) {
     updateInternalCarCState(captured_frame);
     TEST_ASSERT_FALSE(aeb_internal_state.on_off_aeb_system);  // AEB system should remain OFF
 
-    // Caso 4: Verifica que o sistema AEB permanece ON quando dataFrame[0] for 0x01 novamente
+    // Caso 4: Verifica que o sistema AEB volta a ON quando dataFrame[0] for 0x01 novamente
     captured_frame.dataFrame[0] = 0x01;
     updateInternalCarCState(captured_frame);
-    TEST_ASSERT_TRUE(aeb_internal_state.on_off_aeb_system);  // AEB system should remain ON
+    TEST_ASSERT_TRUE(aeb_internal_state.on_off_aeb_system);  // AEB system should be back ON
 }
 
 // Test for the function getAEBState
 void test_getAEBState(void) {
+    // Configuração inicial do estado do AEB
     aeb_internal_state.relative_velocity = 80.0;
     aeb_internal_state.has_obstacle = true;
     aeb_internal_state.obstacle_distance = 10.0;
     aeb_internal_state.brake_pedal = false;
     aeb_internal_state.accelerator_pedal = false;
+    aeb_internal_state.on_off_aeb_system = true;  // AEB system is ON
+    aeb_internal_state.reverseEnabled = false;   // Reversing is not enabled
 
-    double ttc = 1.9;  // Example TTC
+    double ttc = 1.9;  // Exemplo de TTC
 
+    // Caso 1: Sistema AEB ativo e TTC indicando estado de alarme
     aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ALARM);  // Should be in ALARM state
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ALARM);  // Deveria estar no estado ALARM
 
-    aeb_internal_state.relative_velocity = 60.0;
+    // Caso 2: Sistema AEB ativo, mas TTC muito baixo (deve ir para o estado de freio)
     ttc = 0.9;
     state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_BRAKE);  // Should be in BRAKE state if high speed and low TTC
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_BRAKE);  // Deveria ir para o estado BRAKE se a velocidade é alta e o TTC baixo
+
+    // Caso 3: Sistema AEB OFF (on_off_aeb_system == false)
+    aeb_internal_state.on_off_aeb_system = false;
+    state = getAEBState(aeb_internal_state, ttc);
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_STANDBY);  // Deveria estar no estado STANDBY
+
+    // Caso 4: Velocidade abaixo de MIN_SPD_ENABLED e sem reversão habilitada (deve ir para STANDBY)
+    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.relative_velocity = MIN_SPD_ENABLED - 1;
+    state = getAEBState(aeb_internal_state, ttc);
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_STANDBY);  // Deveria ir para o estado STANDBY
+
+    // Caso 5: Velocidade acima de MAX_SPD_ENABLED e sem reversão habilitada (deve ir para STANDBY)
+    aeb_internal_state.relative_velocity = MAX_SPD_ENABLED + 1;
+    state = getAEBState(aeb_internal_state, ttc);
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_STANDBY);  // Deveria ir para o estado STANDBY
+
+    // Caso 6: Pedais desativados (acelerador e freio) com TTC baixo (deve ir para o estado BRAKE)
+    aeb_internal_state.relative_velocity = 60.0;  // Velocidade dentro do intervalo permitido
+    ttc = 0.8;  // TTC menor que o limiar de frenagem
+    state = getAEBState(aeb_internal_state, ttc);
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_BRAKE);  // Deveria ir para o estado BRAKE devido ao TTC baixo
+
+    // Caso 7: Pedais desativados (acelerador e freio) com TTC dentro do intervalo de alarme (deve ir para o estado ALARM)
+    ttc = 1.5;  // TTC maior que o limiar de frenagem, mas menor que o limiar de alarme
+    state = getAEBState(aeb_internal_state, ttc);
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ALARM);  // Deveria ir para o estado ALARM
+
+    // Caso 8: Pedais desativados (acelerador e freio) com TTC maior que o limiar de alarme (deve ir para o estado ACTIVE)
+    ttc = 2.0;  // TTC maior que o limiar de alarme
+    state = getAEBState(aeb_internal_state, ttc);
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ACTIVE);  // Deveria ir para o estado ACTIVE
+
+    // Caso 9: Pedal de freio pressionado (deve ir para o estado ACTIVE)
+    aeb_internal_state.brake_pedal = true;  // Pedal de freio pressionado
+    state = getAEBState(aeb_internal_state, ttc);
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ACTIVE);  // Deveria ir para o estado ACTIVE independentemente do TTC
+
+    // Caso 10: Pedal de acelerador pressionado (deve ir para o estado ACTIVE)
+    aeb_internal_state.accelerator_pedal = true;  // Pedal de acelerador pressionado
+    state = getAEBState(aeb_internal_state, ttc);
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ACTIVE);  // Deveria ir para o estado ACTIVE independentemente do TTC
 }
 
 // Test for the function translateAndCallCanMsg
 void test_translateAndCallCanMsg(void) {
     can_msg captured_frame = { .identifier = ID_PEDALS, .dataFrame = {0x01, 0x00} };
     
-    // Test translation and dispatch to pedals update function
+    // Caso 1: Identificador de pedais (ID_PEDALS) deve chamar updateInternalPedalsState
     translateAndCallCanMsg(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be ON
 
-    //captured_frame.identifier = ID_EMPTY;
-    //TEST_ASSERT_EQUAL_STRING("CAN Identifier unknown", translateAndCallCanMsg(captured_frame));
+    // Caso 2: Identificador de velocidade (ID_SPEED_S) deve chamar updateInternalSpeedState
+    captured_frame.identifier = ID_SPEED_S;
+    translateAndCallCanMsg(captured_frame);
+    // Aqui, o teste verificaria o comportamento de updateInternalSpeedState.
+    // Não há um estado específico a ser verificado diretamente aqui, pois depende de implementações anteriores.
+
+    // Caso 3: Identificador de obstáculo (ID_OBSTACLE_S) deve chamar updateInternalObstacleState
+    captured_frame.identifier = ID_OBSTACLE_S;
+    translateAndCallCanMsg(captured_frame);
+    // Aqui, o teste verificaria o comportamento de updateInternalObstacleState.
+    // Não há um estado específico a ser verificado diretamente aqui, pois depende de implementações anteriores.
+
+    // Caso 4: Identificador de carro (ID_CAR_C) deve chamar updateInternalCarCState
+    captured_frame.identifier = ID_CAR_C;
+    translateAndCallCanMsg(captured_frame);
+    // Aqui, o teste verificaria o comportamento de updateInternalCarCState.
+    // Não há um estado específico a ser verificado diretamente aqui, pois depende de implementações anteriores.
+
+    // Caso 5: Identificador desconhecido deve imprimir "CAN Identifier unknown"
+    //captured_frame.identifier = ID_EMPTY; // ID desconhecido
+    // Aqui, o teste pode capturar a saída do printf e verificar a mensagem impressa.
+    // Para simular a captura de saída, você pode usar uma função que capture a saída do printf e compare com a string esperada.
+    //translateAndCallCanMsg(captured_frame);
+    //TEST_ASSERT_EQUAL_STRING("CAN Identifier unknown\n", capture_stdout());  // Verifica se a saída padrão foi a esperada
 }
 
 // Main function to run the tests
