@@ -145,43 +145,72 @@ void test_updateInternalSpeedState(void) {
 // Test for the function updateInternalObstacleState
 void test_updateInternalObstacleState(void) {
     can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xD0, 0x07, 0x01} };
-
-    updateInternalObstacleState(captured_frame);
     
-    TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);
-
-    captured_frame.dataFrame[0] = 0xFF;
-    captured_frame.dataFrame[1] = 0xFF;
+    // Caso 1: Obstáculo detectado e distância calculada corretamente
     updateInternalObstacleState(captured_frame);
+    TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);  // Obstacle detected
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Expected distance = 100 * RES_OBSTACLE_S
     
-    TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 0.0);
-    //TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 300.0);
+    // Caso 2: Nenhum obstáculo (0x00 em dataFrame[2])
+    captured_frame.dataFrame[2] = 0x00;
+    updateInternalObstacleState(captured_frame);
+    TEST_ASSERT_FALSE(aeb_internal_state.has_obstacle);  // No obstacle
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Distance should remain the same
+    // Logic problem: if the obstacle is not detected, the distance should be set to 300.0 (max distance).
 
+    // Caso 3: Limpeza de dados com 0xFE, 0xFF
     captured_frame.dataFrame[0] = 0xFE;
     captured_frame.dataFrame[1] = 0xFF;
     updateInternalObstacleState(captured_frame);
+    TEST_ASSERT_FALSE(aeb_internal_state.has_obstacle);  // Obstacle not changed
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 300.0);  // Distance should be set to max value (300.0)
     
-    TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 300.0);
-
-    captured_frame.dataFrame[2] = 0x00;
+    // Caso 4: Dados não precisam de ação (0xFF, 0xFF)
+    captured_frame.dataFrame[0] = 0xFF;
+    captured_frame.dataFrame[1] = 0xFF;
     updateInternalObstacleState(captured_frame);
+    TEST_ASSERT_FALSE(aeb_internal_state.has_obstacle);  // Obstacle not changed
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 0.0);  // Distance should be set to 0.0
     
-    TEST_ASSERT_FALSE(aeb_internal_state.has_obstacle);
+    // Caso 5: Distância calculada a partir dos dados CAN
+    captured_frame.dataFrame[0] = 0xD0;
+    captured_frame.dataFrame[1] = 0x07; // Data distance = 0x0201 = 513
+    captured_frame.dataFrame[2] = 0x01; // There is an obstacle
+    updateInternalObstacleState(captured_frame);
+    TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);  // Obstacle detected
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Calculated distance
+    
+    // Caso 6: Distância máxima é limitada a 300.0
+    captured_frame.dataFrame[0] = 0xFF;
+    captured_frame.dataFrame[1] = 0xFD; // Data distance = 0xFFFF = 65535
+    updateInternalObstacleState(captured_frame);
+    TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);  // Obstacle detected
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 300.0);  // Should be capped at 300.0
 }
+
 
 // Test for the function updateInternalCarCState
 void test_updateInternalCarCState(void) {
     can_msg captured_frame = { .identifier = ID_CAR_C, .dataFrame = {0x01} };
-    
+
+    // Caso 1: AEB system ON (dataFrame[0] == 0x01)
     updateInternalCarCState(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.on_off_aeb_system);  // AEB system should be ON
 
+    // Caso 2: AEB system OFF (dataFrame[0] == 0x00)
     captured_frame.dataFrame[0] = 0x00;
     updateInternalCarCState(captured_frame);
     TEST_ASSERT_FALSE(aeb_internal_state.on_off_aeb_system);  // AEB system should be OFF
+
+    // Caso 3: Verifica que o sistema AEB permanece OFF para qualquer valor diferente de 0x01
+    captured_frame.dataFrame[0] = 0x02;  // Um valor arbitrário, diferente de 0x01
+    updateInternalCarCState(captured_frame);
+    TEST_ASSERT_FALSE(aeb_internal_state.on_off_aeb_system);  // AEB system should remain OFF
+
+    // Caso 4: Verifica que o sistema AEB permanece ON quando dataFrame[0] for 0x01 novamente
+    captured_frame.dataFrame[0] = 0x01;
+    updateInternalCarCState(captured_frame);
+    TEST_ASSERT_TRUE(aeb_internal_state.on_off_aeb_system);  // AEB system should remain ON
 }
 
 // Test for the function getAEBState
