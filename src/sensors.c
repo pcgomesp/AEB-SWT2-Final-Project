@@ -43,7 +43,6 @@ int main(){
 
     return 0;
 }
-#endif
 
 
 void* getSensorsData(void *arg){
@@ -87,6 +86,7 @@ void* getSensorsData(void *arg){
     fclose(file); // Closes the file at the end
     return NULL;
 }
+#endif
 
 // The location of information in the data frame location, in the following functions, 
 // is according to the dbc file in the requirements specification
