@@ -21,6 +21,7 @@ sensors_input_data sensorsData;
 
 can_msg can_car_cluster, can_velocity_sensor, can_obstacle_sensor, can_pedals_sensor;
 
+#ifndef TEST_MODE 
 int main()
 {
     int sensors_thr;
@@ -41,10 +42,9 @@ int main()
     return 0;
 }
 
-void *getSensorsData(void *arg)
+void* getSensorsData(void *arg)
 {
-    FILE *file = (FILE *)arg; // Recebe o arquivo como argumento
-
+    FILE *file = (FILE *) arg;
     while (1)
     {
         // Read a new line from the file [SwR-9]
@@ -75,6 +75,7 @@ void *getSensorsData(void *arg)
     fclose(file);
     return NULL;
 }
+#endif
 
 // The location of information in the data frame location, in the following functions,
 // is according to the dbc file in the requirements specification
@@ -95,6 +96,7 @@ can_msg conv2CANCarClusterData(bool on_off_aeb_system)
 
     return aux;
 }
+
 
 can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity)
 {
