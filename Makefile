@@ -6,7 +6,7 @@ TESTFOLDER := test/
 
 CC := gcc
 CFLAGS := -Wall -lpthread -lm -lrt -I$(INCFOLDER)
-TESTFLAGS := -DUNITY_OUTPUT_COLOR -DTEST_MODE
+TESTFLAGS := -DUNITY_OUTPUT_COLOR -DTEST_MODE -DUNITY_INCLUDE_DOUBLE
 COVFLAGS := -fprofile-arcs -ftest-coverage
 
 SRCFILES := $(wildcard $(SRCFOLDER)*.c)
@@ -57,6 +57,9 @@ test/test_file_reader: test/test_file_reader.c src/file_reader.c test/unity.c
 test/test_log_utils: test/test_log_utils.c src/log_utils.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) -Wl,--wrap=fopen -Wl,--wrap=perror test/test_log_utils.c src/log_utils.c test/unity.c -o test/test_log_utils -I$(TESTFOLDER)
 
+test/test_ttc_control: test/test_ttc_control.c src/file_reader.c test/unity.c
+	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_ttc_control.c src/ttc_control.c test/unity.c -o test/test_ttc_control -I$(TESTFOLDER) -lm -lrt
+
 .SILENT: cov
 cov:
 	if [ -z "$(src_file)" ] || [ -z "$(test_file)" ]; then \
@@ -69,7 +72,7 @@ cov:
 		else \
 			WRAP_FLAGS=""; \
 		fi; \
-		$(CC) $(TESTFLAGS) $(COVFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
+		$(CC) $(TESTFLAGS) $(COVFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) -lm -lrt $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
 		./$(OBJFOLDER)$(test_file:.c=)_gcov_bin > /dev/null 2>&1; \
 		gcov -b $(SRCFOLDER)$(src_file) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin-$(src_file:.c=.gcda); \
 	fi
