@@ -58,10 +58,10 @@ test/test_log_utils: test/test_log_utils.c src/log_utils.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) -Wl,--wrap=fopen -Wl,--wrap=perror test/test_log_utils.c src/log_utils.c test/unity.c -o test/test_log_utils -I$(TESTFOLDER)
 
 test/test_actuators: test/test_actuators.c src/actuators.c test/unity.c
-	$(CC) $(CFLAGS) $(TESTFLAGS) -DTEST_MODE test/test_actuators.c src/actuators.c test/unity.c -o test/test_actuators -Iinc -Itest -lpthread	
+	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_actuators.c src/actuators.c test/unity.c -o test/test_actuators -Iinc -Itest -lpthread	
 
 test/test_sensors: test/test_sensors.c src/sensors.c test/unity.c
-	$(CC) $(CFLAGS) $(TESTFLAGS) -DTEST_MODE test/test_sensors.c src/sensors.c test/unity.c -o test/test_sensors -I$(TESTFOLDER) -Itest -lpthread
+	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_sensors.c src/sensors.c test/unity.c -o test/test_sensors -I$(TESTFOLDER) -Itest -lpthread
 
 .SILENT: cov
 cov:
