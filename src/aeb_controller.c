@@ -99,7 +99,6 @@ can_msg empty_msg = { // [SwR-5]
 
     return 0;
 }
-#endif
 
 /**
  * @brief Main loop for the AEB controller that processes sensor data and makes decisions.
@@ -175,6 +174,7 @@ void print_info()
     printf("on_off_aeb_system: %s\n", aeb_internal_state.on_off_aeb_system ? "true" : "false");
     printf("Is vehicle in reverse: %s\n", aeb_internal_state.reverseEnabled ? "true" : "false");
 }
+#endif
 
 /**
  * @brief Translates the received CAN message and calls the appropriate handler 
