@@ -35,13 +35,14 @@ FILE* open_file(const char* filename) {
             Distance(m) Obstacle Speed(m/s) Brake Accelerator AEB_on_off Reverse
  */
 int read_sensor_data(FILE *file, sensors_input_data *sensor_data) {
-    return fscanf(file, "%lf %d %lf %d %d %d %d", 
+    return fscanf(file, "%lf %d %lf %d %d %d %d %lf", 
                   &sensor_data->obstacle_distance, 
                   &sensor_data->has_obstacle, 
                   &sensor_data->relative_velocity, 
                   &sensor_data->brake_pedal, 
                   &sensor_data->accelerator_pedal, 
                   &sensor_data->on_off_aeb_system,
-                  &sensor_data->reverseEnabled
-                ) == 7;
+                  &sensor_data->reverseEnabled,
+                  &sensor_data->relative_acceleration
+                ) == 8;
 }

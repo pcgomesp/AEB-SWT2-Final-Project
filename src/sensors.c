@@ -11,7 +11,7 @@
 
 void *getSensorsData(void *arg);
 can_msg conv2CANCarClusterData(bool on_off_aeb_system);
-can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity);
+can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity, double relative_acceleration);
 can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance);
 can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal);
 
@@ -51,7 +51,7 @@ void* getSensorsData(void *arg)
         if (read_sensor_data(file, &sensorsData))
         {
             can_car_cluster = conv2CANCarClusterData(sensorsData.on_off_aeb_system);
-            can_velocity_sensor = conv2CANVelocityData(sensorsData.reverseEnabled, sensorsData.relative_velocity); // [SwR-10]
+            can_velocity_sensor = conv2CANVelocityData(sensorsData.reverseEnabled, sensorsData.relative_velocity, sensorsData.relative_acceleration); // [SwR-10]
             can_obstacle_sensor = conv2CANObstacleData(sensorsData.has_obstacle, sensorsData.obstacle_distance);
             can_pedals_sensor = conv2CANPedalsData(sensorsData.brake_pedal, sensorsData.accelerator_pedal);
 
@@ -98,8 +98,9 @@ can_msg conv2CANCarClusterData(bool on_off_aeb_system)
 }
 
 
-can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity)
+can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity, double relative_acceleration)
 {
+    printf("Calma calabreso: %lf\n", relative_acceleration);
     can_msg aux = {.identifier = ID_SPEED_S, .dataFrame = BASE_DATA_FRAME};
 
     // Vehicle direction (forward or reverse) data encapsulation
@@ -121,6 +122,16 @@ can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity)
     // Defines most and least significant bytes, according to the DBC specification
     aux.dataFrame[0] = ls_speed;
     aux.dataFrame[1] = ms_speed;
+
+    // Acceleration data ​​encapsulation
+    unsigned int data_acel = ((relative_acceleration / RES_ACCELERATION_S) - OFFSET_ACCELERATION_S);
+    unsigned char ms_acel, ls_acel;
+    ls_acel = data_acel;
+    ms_acel = data_acel >> 8;
+
+    // Defines most and least significant bytes, according to the DBC specification
+    aux.dataFrame[3] = ls_acel;
+    aux.dataFrame[4] = ms_acel;
 
     return aux;
 }

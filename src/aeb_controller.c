@@ -41,7 +41,8 @@ sensors_input_data aeb_internal_state = {
     .brake_pedal = false,
     .accelerator_pedal = false,
     .on_off_aeb_system = true,
-    .reverseEnabled = false};
+    .reverseEnabled = false,
+    .relative_acceleration = 0.0};
 
 can_msg captured_can_frame = {
     .identifier = ID_CAR_C,
@@ -87,7 +88,7 @@ void *mainWorkingLoop(void *arg)
             double ttc = ttc_calc(aeb_internal_state.obstacle_distance, aeb_internal_state.relative_velocity);
 
             state = getAEBState(aeb_internal_state, ttc);
-            printf("Meu state eh: %d\n", state);
+            //printf("Meu state eh: %d\n", state);
 
             out_can_frame = updateCanMsgOutput(state);
 
@@ -97,7 +98,7 @@ void *mainWorkingLoop(void *arg)
                 write_mq(actuators_mq, &out_can_frame); // [SwR-2][SwR-3][SwR-4][SwR-6][SwR-14][SwR-15]
 
             // Testing changes, exclude this on production code
-            print_info();
+            //print_info();
         }
         else
             empty_mq_counter++;
@@ -167,6 +168,8 @@ void updateInternalSpeedState(can_msg captured_frame)
 {
     unsigned int data_speed; // used for can frame conversion
     double new_internal_speed = 0.0;
+    unsigned int data_acel; // used for can frame conversion for acceleration
+    double new_internal_acel = 0.0;
 
     // update internal data according to the relative velocity detected by the sensor
     if (captured_frame.dataFrame[0] == 0xFE && captured_frame.dataFrame[1] == 0xFF)
@@ -201,6 +204,37 @@ void updateInternalSpeedState(can_msg captured_frame)
     {
         aeb_internal_state.reverseEnabled = true;
     }
+
+    // update internal data according to the relative acceleration detected by the sensor
+    if (captured_frame.dataFrame[3] == 0xFE && captured_frame.dataFrame[4] == 0xFF)
+    { // DBC: Clear Data
+        new_internal_acel = 0.0;
+    }
+    else if (captured_frame.dataFrame[3] == 0xFF && captured_frame.dataFrame[4] == 0xFF)
+    { // DBC: Do nothing
+        ;
+    }
+    else
+    {
+        // Conversion from CAN data frame, according to dbc in the requirement file
+        // [SwR-10]
+        data_acel = captured_frame.dataFrame[3] + (captured_frame.dataFrame[4] << 8);
+        new_internal_acel = (data_acel * RES_ACCELERATION_S) + OFFSET_ACCELERATION_S;
+    }
+    printf("A calculada eh: %.3lf\n", new_internal_acel);
+
+
+    if (new_internal_acel > MAX_ACCELERATION_S)
+    { // DBC: Max value constraint
+        new_internal_acel = MAX_ACCELERATION_S;
+    } else if(new_internal_acel < MIN_ACCELERATION_S){
+        // DBC: Min value constraint
+        new_internal_acel = MIN_ACCELERATION_S;
+    }
+
+    aeb_internal_state.relative_acceleration = new_internal_acel;
+
+    printf("minha nova acel eh: %.3lf\n", aeb_internal_state.relative_acceleration);
 }
 
 void updateInternalObstacleState(can_msg captured_frame)
