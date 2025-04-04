@@ -222,8 +222,13 @@ void updateInternalSpeedState(can_msg captured_frame)
         //new_internal_acel = (data_acel * RES_ACCELERATION_S) + OFFSET_ACCELERATION_S;
         new_internal_acel = (data_acel + OFFSET_ACCELERATION_S) * RES_ACCELERATION_S;
     }
-    printf("A calculada eh: %.3lf\n", new_internal_acel);
+    //printf("A calculada eh: %.3lf\n", new_internal_acel);
 
+    if(captured_frame.dataFrame[5] == 0x01){
+        new_internal_acel *= -1;
+    } else {
+        ;
+    }
 
     if (new_internal_acel > MAX_ACCELERATION_S)
     { // DBC: Max value constraint

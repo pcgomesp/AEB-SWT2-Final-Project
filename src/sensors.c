@@ -124,7 +124,15 @@ can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity, d
     aux.dataFrame[1] = ms_speed;
 
     // Acceleration data ​​encapsulation
-    unsigned int data_acel = ((relative_acceleration / RES_ACCELERATION_S) - OFFSET_ACCELERATION_S);
+    double aux_acel = relative_acceleration;
+    if(aux_acel < 0){
+        aux_acel *= -1;
+        aux.dataFrame[5] = 0x01;
+    } else {
+        aux.dataFrame[5] = 0x00;
+    }
+
+    unsigned int data_acel = ((aux_acel * RES_ACCELERATION_DIV_S) - OFFSET_ACCELERATION_S);
     unsigned char ms_acel, ls_acel;
     ls_acel = data_acel;
     ms_acel = data_acel >> 8;
