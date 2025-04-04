@@ -156,6 +156,20 @@ void test_create_processes_fork_failure()
     }
 }
 
+void test_create_processes_execl_succeeds()
+{
+    printf("\nRunning test: create_processes() when execl fails\n");
+
+    if (setjmp(test_exit_buf) == 0) 
+    {
+        fork_mock = 0; // Simulate child process
+        create_processes("/valid/path");
+
+        // If we reach here, exit(1) was NOT called (expected)
+        TEST_PASS();
+    }
+}
+
 void test_create_processes_execl_failure()
 {
     printf("\nRunning test: create_processes() when execl fails\n");
@@ -182,6 +196,7 @@ int main()
     RUN_TEST(test_terminate_execution);
     RUN_TEST(test_create_processes_fork_success);
     RUN_TEST(test_create_processes_fork_failure);
+    RUN_TEST(test_create_processes_execl_succeeds);
     RUN_TEST(test_create_processes_execl_failure);
     return UNITY_END();
 }
