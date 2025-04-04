@@ -219,7 +219,8 @@ void updateInternalSpeedState(can_msg captured_frame)
         // Conversion from CAN data frame, according to dbc in the requirement file
         // [SwR-10]
         data_acel = captured_frame.dataFrame[3] + (captured_frame.dataFrame[4] << 8);
-        new_internal_acel = (data_acel * RES_ACCELERATION_S) + OFFSET_ACCELERATION_S;
+        //new_internal_acel = (data_acel * RES_ACCELERATION_S) + OFFSET_ACCELERATION_S;
+        new_internal_acel = (data_acel + OFFSET_ACCELERATION_S) * RES_ACCELERATION_S;
     }
     printf("A calculada eh: %.3lf\n", new_internal_acel);
 

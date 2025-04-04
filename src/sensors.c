@@ -100,7 +100,7 @@ can_msg conv2CANCarClusterData(bool on_off_aeb_system)
 
 can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity, double relative_acceleration)
 {
-    printf("Calma calabreso: %lf\n", relative_acceleration);
+    printf("Rel acel: %lf\n", relative_acceleration);
     can_msg aux = {.identifier = ID_SPEED_S, .dataFrame = BASE_DATA_FRAME};
 
     // Vehicle direction (forward or reverse) data encapsulation

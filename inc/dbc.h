@@ -25,7 +25,7 @@
 //#define RES_ACCELERATION_S 0.001
 #define RES_ACCELERATION_S (1.0 / 1000.0)
 
-#define OFFSET_ACCELERATION_S -12.500
+#define OFFSET_ACCELERATION_S -12500
 
 // Struct to simulate a CAN message
 typedef struct
