@@ -56,10 +56,11 @@ double accel_calc(double spd) {
  *         the function returns -1.0. If there is no relative acceleration, the time to collision is calculated
  *         as distance divided by speed.
  */
-double ttc_calc(double dis_rel, double spd_rel) {
+double ttc_calc(double dis_rel, double spd_rel, double rel_acel) {
     double a, b, c, ttc, delta;
     
-    a = accel_calc(spd_rel);
+    //a = accel_calc(spd_rel);
+    a = rel_acel;
     b = spd_rel / 3.6;
     c = dis_rel;
 
@@ -104,10 +105,10 @@ double ttc_calc(double dis_rel, double spd_rel) {
  *       SwR-11, SwR-14, SwR-15, Sys-F-8, Sys-F-9, Sys-F-14).
  */
 void aeb_control(bool *enable_aeb, bool *alarm_cluster, bool *enable_breaking,
-                 bool *lk_seatbelt, bool *lk_doors, double *spd, double *dist) {
+                 bool *lk_seatbelt, bool *lk_doors, double *spd, double *dist, double *acel) {
     double ttc;
     
-    ttc = ttc_calc(*dist, *spd);
+    ttc = ttc_calc(*dist, *spd, *acel);
     
     if ((*enable_aeb) && (ttc > 0.0) && (ttc < THRESHOLD_ALARM)) {
         *alarm_cluster = true;

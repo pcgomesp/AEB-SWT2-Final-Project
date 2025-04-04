@@ -85,7 +85,8 @@ void *mainWorkingLoop(void *arg)
 
             translateAndCallCanMsg(captured_can_frame);
 
-            double ttc = ttc_calc(aeb_internal_state.obstacle_distance, aeb_internal_state.relative_velocity);
+            double ttc = ttc_calc(aeb_internal_state.obstacle_distance, aeb_internal_state.relative_velocity, 
+                aeb_internal_state.relative_acceleration);
 
             state = getAEBState(aeb_internal_state, ttc);
             //printf("Meu state eh: %d\n", state);
@@ -216,13 +217,11 @@ void updateInternalSpeedState(can_msg captured_frame)
     }
     else
     {
-        // Conversion from CAN data frame, according to dbc in the requirement file
+        // Conversion from CAN data frame, according to dbc in the requirement file 
         // [SwR-10]
         data_acel = captured_frame.dataFrame[3] + (captured_frame.dataFrame[4] << 8);
-        //new_internal_acel = (data_acel * RES_ACCELERATION_S) + OFFSET_ACCELERATION_S;
         new_internal_acel = (data_acel + OFFSET_ACCELERATION_S) * RES_ACCELERATION_S;
     }
-    //printf("A calculada eh: %.3lf\n", new_internal_acel);
 
     if(captured_frame.dataFrame[5] == 0x01){
         new_internal_acel *= -1;
@@ -240,7 +239,7 @@ void updateInternalSpeedState(can_msg captured_frame)
 
     aeb_internal_state.relative_acceleration = new_internal_acel;
 
-    printf("minha nova acel eh: %.3lf\n", aeb_internal_state.relative_acceleration);
+    //printf("acel is: %.3lf\n", aeb_internal_state.relative_acceleration);
 }
 
 void updateInternalObstacleState(can_msg captured_frame)
