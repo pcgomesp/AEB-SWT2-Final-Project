@@ -1,3 +1,4 @@
+// Necessary libraries
 #include "unity.h"
 #include "constants.h"
 #include "sensors_input.h"
@@ -5,21 +6,22 @@
 #include <mqueue.h>
 #include "ttc_control.h"
 
-// Declaration of AEB states
+/**
+ * @brief Enumeration of AEB controller states.
+ */
 typedef enum {
-    AEB_STATE_ACTIVE,
-    AEB_STATE_ALARM,
-    AEB_STATE_BRAKE,
-    AEB_STATE_STANDBY
+    AEB_STATE_ACTIVE, /**< AEB is active and functioning normally */
+    AEB_STATE_ALARM, /**< AEB system is in alarm state due to a potential collision */
+    AEB_STATE_BRAKE, /**< AEB system is in brake state to avoid a collision */
+    AEB_STATE_STANDBY /**< AEB system is in standby mode, awaiting activation */
 } aeb_controller_state;
 
-// External declaration of global variables
-extern sensors_input_data aeb_internal_state;
-extern can_msg captured_can_frame;
-extern can_msg out_can_frame;
-extern can_msg empty_msg;
+/** External declaration of global variables */
+extern sensors_input_data aeb_internal_state; /**< Internal AEB system state data */
+extern can_msg captured_can_frame; /**< Captured CAN message */
+extern can_msg out_can_frame; /**< Output CAN message */
+extern can_msg empty_msg; /**< Empty CAN message */
 
-// Declaration of functions implemented in aeb_controller.c that will be tested
 void translateAndCallCanMsg(can_msg captured_frame);
 void updateInternalPedalsState(can_msg captured_frame);
 void updateInternalSpeedState(can_msg captured_frame);
@@ -28,35 +30,46 @@ void updateInternalCarCState(can_msg captured_frame);
 can_msg updateCanMsgOutput(aeb_controller_state state);
 aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double ttc);
 
-// Mock functions
-// Mock for open_mq
+/**
+ * @brief Mock function to simulate opening a message queue.
+ * 
+ * @param mq_name The name of the message queue to open.
+ * @return mqd_t The mock message queue descriptor.
+ */
 mqd_t open_mq(char *mq_name) {
-    printf("Opening message queue: %s\n\n", mq_name);  // Debug print to show which queue is being opened
+    printf("Opening message queue: %s\n\n", mq_name);
     return 1;  // Return a mock handle for the message queue
 }
 
-// Mock for write_mq
+/**
+ * @brief Mock function to simulate writing a message to a message queue.
+ * 
+ * @param mq_sender The message queue descriptor.
+ * @param msg The CAN message to be written.
+ * @return int The status of the write operation (0 for success).
+ */
 int write_mq(mqd_t mq_sender, can_msg *msg) {
-    // Print out the message data for debugging purposes
-    printf("Writing message to MQ: Identifier: %d, Data: %02X %02X %02X %02X %02X %02X %02X %02X\n\n",
-            msg->identifier, msg->dataFrame[0], msg->dataFrame[1], msg->dataFrame[2], 
-            msg->dataFrame[3], msg->dataFrame[4], msg->dataFrame[5], msg->dataFrame[6], msg->dataFrame[7]);
+    //printf("Writing message to MQ: Identifier: %d, Data: %02X %02X %02X %02X %02X %02X %02X %02X\n\n",
+    //        msg->identifier, msg->dataFrame[0], msg->dataFrame[1], msg->dataFrame[2], 
+    //        msg->dataFrame[3], msg->dataFrame[4], msg->dataFrame[5], msg->dataFrame[6], msg->dataFrame[7]);
     return 0;  // Simulate success in writing to the message queue
 }
 
-// Mock for read_mq
+/**
+ * @brief Mock function to simulate reading a message from a message queue.
+ * 
+ * @param mq The message queue descriptor.
+ * @param msg The CAN message to store the read data.
+ * @return int The status of the read operation (0 for success).
+ */
 int read_mq(mqd_t mq, can_msg *msg) {
-    // Simulate a CAN message read from the queue
-    /*msg->identifier = ID_SPEED_S;  // Simulate speed sensor data
-    msg->dataFrame[0] = 0x00;     // Simulate some speed data (e.g., 100.0 km/h)
-    msg->dataFrame[1] = 0x64;
-    msg->dataFrame[2] = 0x00;     // Simulate no reverse enabled
-    */return 0;  // Simulate success in reading the message
+    return 0;  // Simulate success in reading the message
 }
 
-// Setup function, called before each test
+/**
+ * @brief Setup function to initialize AEB input state before each test.
+ */
 void setUp(void) {
-    // Initial AEB input state setup
     aeb_internal_state.relative_velocity = 0.0;
     aeb_internal_state.has_obstacle = false;        
     aeb_internal_state.obstacle_distance = 0.0;
@@ -66,13 +79,16 @@ void setUp(void) {
     aeb_internal_state.reverseEnabled = false;
 }
 
-
-// Teardown function, called after each test
+/**
+ * @brief Teardown function to clean up after each test.
+ */
 void tearDown(void) {
     // No cleanup required for now
 }
 
-// Test for the function updateInternalPedalsState
+/**
+ * @brief Test for the function updateInternalPedalsState.
+ */
 void test_updateInternalPedalsState(void) {
     can_msg captured_frame = { .identifier = ID_PEDALS, .dataFrame = {0x01, 0x00} };
 
@@ -80,30 +96,32 @@ void test_updateInternalPedalsState(void) {
 
     TEST_ASSERT_TRUE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be ON
     TEST_ASSERT_FALSE(aeb_internal_state.brake_pedal);  // Brake pedal should be OFF
-
+    
     captured_frame.dataFrame[0] = 0x01;
     captured_frame.dataFrame[1] = 0x01;
     updateInternalPedalsState(captured_frame);
-
+    
     TEST_ASSERT_TRUE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be ON
     TEST_ASSERT_TRUE(aeb_internal_state.brake_pedal);  // Brake pedal should be ON
-
+    
     captured_frame.dataFrame[0] = 0x00;
     captured_frame.dataFrame[1] = 0x00;
     updateInternalPedalsState(captured_frame);
-
+    
     TEST_ASSERT_FALSE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be OFF
     TEST_ASSERT_FALSE(aeb_internal_state.brake_pedal);  // Brake pedal should be OFF
-
+    
     captured_frame.dataFrame[0] = 0x00;
     captured_frame.dataFrame[1] = 0x01;
     updateInternalPedalsState(captured_frame);
-
+    
     TEST_ASSERT_FALSE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be OFF
     TEST_ASSERT_TRUE(aeb_internal_state.brake_pedal);  // Brake pedal should be ON
 }
 
-// Test for the function updateInternalSpeedState
+/**
+ * @brief Test for the function updateInternalSpeedState.
+ */
 void test_updateInternalSpeedState(void) {
     can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0x00, 0x64, 0x00} };
     
@@ -142,45 +160,47 @@ void test_updateInternalSpeedState(void) {
     TEST_ASSERT_FALSE(aeb_internal_state.reverseEnabled); // Reverse should not be enabled
 }
 
-// Test for the function updateInternalObstacleState
+/**
+ * @brief Test for the function updateInternalObstacleState.
+ */
 void test_updateInternalObstacleState(void) {
     can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xD0, 0x07, 0x01} };
     
-    // Caso 1: Obstáculo detectado e distância calculada corretamente
+    // Case 1: Obstacle detected and distance calculated correctly
     updateInternalObstacleState(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);  // Obstacle detected
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Expected distance = 100 * RES_OBSTACLE_S
     
-    // Caso 2: Nenhum obstáculo (0x00 em dataFrame[2])
+    // Case 2: No obstacle (0x00 in dataFrame[2])
     captured_frame.dataFrame[2] = 0x00;
     updateInternalObstacleState(captured_frame);
     TEST_ASSERT_FALSE(aeb_internal_state.has_obstacle);  // No obstacle
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Distance should remain the same
     // Logic problem: if the obstacle is not detected, the distance should be set to 300.0 (max distance).
 
-    // Caso 3: Limpeza de dados com 0xFE, 0xFF
+    // Case 3: Data reset with 0xFE, 0xFF
     captured_frame.dataFrame[0] = 0xFE;
     captured_frame.dataFrame[1] = 0xFF;
     updateInternalObstacleState(captured_frame);
     TEST_ASSERT_FALSE(aeb_internal_state.has_obstacle);  // Obstacle not changed
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 300.0);  // Distance should be set to max value (300.0)
     
-    // Caso 4: Dados não precisam de ação (0xFF, 0xFF)
+    // Case 4: Data doesn't need action (0xFF, 0xFF)
     captured_frame.dataFrame[0] = 0xFF;
     captured_frame.dataFrame[1] = 0xFF;
     updateInternalObstacleState(captured_frame);
     TEST_ASSERT_FALSE(aeb_internal_state.has_obstacle);  // Obstacle not changed
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 0.0);  // Distance should be set to 0.0
     
-    // Caso 5: Distância calculada a partir dos dados CAN
+    // Case 5: Calculated distance from CAN data
     captured_frame.dataFrame[0] = 0xD0;
     captured_frame.dataFrame[1] = 0x07; // Data distance = 0x0201 = 513
-    captured_frame.dataFrame[2] = 0x01; // There is an obstacle
+    captured_frame.dataFrame[2] = 0x01; // Obstacle exists
     updateInternalObstacleState(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);  // Obstacle detected
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Calculated distance
     
-    // Caso 6: Distância máxima é limitada a 300.0
+    // Case 6: Maximum distance capped at 300.0
     captured_frame.dataFrame[0] = 0xFF;
     captured_frame.dataFrame[1] = 0xFD; // Data distance = 0xFFFF = 65535
     updateInternalObstacleState(captured_frame);
@@ -188,34 +208,37 @@ void test_updateInternalObstacleState(void) {
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 300.0);  // Should be capped at 300.0
 }
 
-
-// Test for the function updateInternalCarCState
+/**
+ * @brief Test for the function updateInternalCarCState.
+ */
 void test_updateInternalCarCState(void) {
     can_msg captured_frame = { .identifier = ID_CAR_C, .dataFrame = {0x01} };
 
-    // Caso 1: AEB system ON (dataFrame[0] == 0x01)
+    // Case 1: AEB system ON (dataFrame[0] == 0x01)
     updateInternalCarCState(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.on_off_aeb_system);  // AEB system should be ON
 
-    // Caso 2: AEB system OFF (dataFrame[0] == 0x00)
+    // Case 2: AEB system OFF (dataFrame[0] == 0x00)
     captured_frame.dataFrame[0] = 0x00;
     updateInternalCarCState(captured_frame);
     TEST_ASSERT_FALSE(aeb_internal_state.on_off_aeb_system);  // AEB system should be OFF
 
-    // Caso 3: Verifica que o sistema AEB permanece OFF para qualquer valor diferente de 0x01
-    captured_frame.dataFrame[0] = 0x02;  // Um valor arbitrário, diferente de 0x01
+    // Case 3: Check that AEB system remains OFF for any value other than 0x01
+    captured_frame.dataFrame[0] = 0x02;  // Arbitrary value, different from 0x01
     updateInternalCarCState(captured_frame);
     TEST_ASSERT_FALSE(aeb_internal_state.on_off_aeb_system);  // AEB system should remain OFF
 
-    // Caso 4: Verifica que o sistema AEB volta a ON quando dataFrame[0] for 0x01 novamente
+    // Case 4: Check that AEB system turns back ON when dataFrame[0] is 0x01 again
     captured_frame.dataFrame[0] = 0x01;
     updateInternalCarCState(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.on_off_aeb_system);  // AEB system should be back ON
 }
 
-// Test for the function getAEBState
+/**
+ * @brief Test for the function getAEBState.
+ */
 void test_getAEBState(void) {
-    // Configuração inicial do estado do AEB
+    // Initial setup of AEB state
     aeb_internal_state.relative_velocity = 80.0;
     aeb_internal_state.has_obstacle = true;
     aeb_internal_state.obstacle_distance = 10.0;
@@ -224,95 +247,97 @@ void test_getAEBState(void) {
     aeb_internal_state.on_off_aeb_system = true;  // AEB system is ON
     aeb_internal_state.reverseEnabled = false;   // Reversing is not enabled
 
-    double ttc = 1.9;  // Exemplo de TTC
+    double ttc = 1.9;  // Example of TTC
 
-    // Caso 1: Sistema AEB ativo e TTC indicando estado de alarme
+    // Case 1: AEB system active and TTC indicating alarm state
     aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ALARM);  // Deveria estar no estado ALARM
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ALARM);  // Should be in ALARM state
 
-    // Caso 2: Sistema AEB ativo, mas TTC muito baixo (deve ir para o estado de freio)
+    // Case 2: AEB system active, but TTC too low (should go to brake state)
     ttc = 0.9;
     state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_BRAKE);  // Deveria ir para o estado BRAKE se a velocidade é alta e o TTC baixo
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_BRAKE);  // Should go to BRAKE state if speed is high and TTC low
 
-    // Caso 3: Sistema AEB OFF (on_off_aeb_system == false)
+    // Case 3: AEB system OFF (on_off_aeb_system == false)
     aeb_internal_state.on_off_aeb_system = false;
     state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_STANDBY);  // Deveria estar no estado STANDBY
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_STANDBY);  // Should be in STANDBY state
 
-    // Caso 4: Velocidade abaixo de MIN_SPD_ENABLED e sem reversão habilitada (deve ir para STANDBY)
+    // Case 4: Speed below MIN_SPD_ENABLED and no reverse enabled (should go to STANDBY)
     aeb_internal_state.on_off_aeb_system = true;
     aeb_internal_state.relative_velocity = MIN_SPD_ENABLED - 1;
     state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_STANDBY);  // Deveria ir para o estado STANDBY
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_STANDBY);  // Should go to STANDBY state
 
-    // Caso 5: Velocidade acima de MAX_SPD_ENABLED e sem reversão habilitada (deve ir para STANDBY)
+    // Case 5: Speed above MAX_SPD_ENABLED and no reverse enabled (should go to STANDBY)
     aeb_internal_state.relative_velocity = MAX_SPD_ENABLED + 1;
     state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_STANDBY);  // Deveria ir para o estado STANDBY
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_STANDBY);  // Should go to STANDBY state
 
-    // Caso 6: Pedais desativados (acelerador e freio) com TTC baixo (deve ir para o estado BRAKE)
-    aeb_internal_state.relative_velocity = 60.0;  // Velocidade dentro do intervalo permitido
-    ttc = 0.8;  // TTC menor que o limiar de frenagem
+    // Case 6: Pedals deactivated (accelerator and brake) with low TTC (should go to BRAKE state)
+    aeb_internal_state.relative_velocity = 60.0;  // Speed within allowed range
+    ttc = 0.8;  // TTC lower than the braking threshold
     state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_BRAKE);  // Deveria ir para o estado BRAKE devido ao TTC baixo
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_BRAKE);  // Should go to BRAKE state due to low TTC
 
-    // Caso 7: Pedais desativados (acelerador e freio) com TTC dentro do intervalo de alarme (deve ir para o estado ALARM)
-    ttc = 1.5;  // TTC maior que o limiar de frenagem, mas menor que o limiar de alarme
+    // Case 7: Pedals deactivated with TTC within alarm range (should go to ALARM state)
+    ttc = 1.5;  // TTC greater than the braking threshold but less than the alarm threshold
     state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ALARM);  // Deveria ir para o estado ALARM
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ALARM);  // Should go to ALARM state
 
-    // Caso 8: Pedais desativados (acelerador e freio) com TTC maior que o limiar de alarme (deve ir para o estado ACTIVE)
-    ttc = 2.0;  // TTC maior que o limiar de alarme
+    // Case 8: Pedals deactivated with TTC greater than alarm threshold (should go to ACTIVE state)
+    ttc = 2.0;  // TTC greater than alarm threshold
     state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ACTIVE);  // Deveria ir para o estado ACTIVE
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ACTIVE);  // Should go to ACTIVE state
 
-    // Caso 9: Pedal de freio pressionado (deve ir para o estado ACTIVE)
-    aeb_internal_state.brake_pedal = true;  // Pedal de freio pressionado
+    // Case 9: Brake pedal pressed (should go to ACTIVE state)
+    aeb_internal_state.brake_pedal = true;  // Brake pedal pressed
     state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ACTIVE);  // Deveria ir para o estado ACTIVE independentemente do TTC
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ACTIVE);  // Should go to ACTIVE state regardless of TTC
 
-    // Caso 10: Pedal de acelerador pressionado (deve ir para o estado ACTIVE)
-    aeb_internal_state.accelerator_pedal = true;  // Pedal de acelerador pressionado
+    // Case 10: Accelerator pedal pressed (should go to ACTIVE state)
+    aeb_internal_state.accelerator_pedal = true;  // Accelerator pedal pressed
     state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ACTIVE);  // Deveria ir para o estado ACTIVE independentemente do TTC
+    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ACTIVE);  // Should go to ACTIVE state regardless of TTC
 }
 
-// Test for the function translateAndCallCanMsg
+/**
+ * @brief Test for the function translateAndCallCanMsg.
+ */
 void test_translateAndCallCanMsg(void) {
     can_msg captured_frame = { .identifier = ID_PEDALS, .dataFrame = {0x01, 0x00} };
     
-    // Caso 1: Identificador de pedais (ID_PEDALS) deve chamar updateInternalPedalsState
+    // Case 1: Pedal identifier (ID_PEDALS) should call updateInternalPedalsState
     translateAndCallCanMsg(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be ON
 
-    // Caso 2: Identificador de velocidade (ID_SPEED_S) deve chamar updateInternalSpeedState
+    // Case 2: Speed identifier (ID_SPEED_S) should call updateInternalSpeedState
     captured_frame.identifier = ID_SPEED_S;
     translateAndCallCanMsg(captured_frame);
-    // Aqui, o teste verificaria o comportamento de updateInternalSpeedState.
-    // Não há um estado específico a ser verificado diretamente aqui, pois depende de implementações anteriores.
+    // The test would check behavior of updateInternalSpeedState here.
 
-    // Caso 3: Identificador de obstáculo (ID_OBSTACLE_S) deve chamar updateInternalObstacleState
+    // Case 3: Obstacle identifier (ID_OBSTACLE_S) should call updateInternalObstacleState
     captured_frame.identifier = ID_OBSTACLE_S;
     translateAndCallCanMsg(captured_frame);
-    // Aqui, o teste verificaria o comportamento de updateInternalObstacleState.
-    // Não há um estado específico a ser verificado diretamente aqui, pois depende de implementações anteriores.
+    // The test would check behavior of updateInternalObstacleState here.
 
-    // Caso 4: Identificador de carro (ID_CAR_C) deve chamar updateInternalCarCState
+    // Case 4: Car identifier (ID_CAR_C) should call updateInternalCarCState
     captured_frame.identifier = ID_CAR_C;
     translateAndCallCanMsg(captured_frame);
-    // Aqui, o teste verificaria o comportamento de updateInternalCarCState.
-    // Não há um estado específico a ser verificado diretamente aqui, pois depende de implementações anteriores.
+    // The test would check behavior of updateInternalCarCState here.
 
-    // Caso 5: Identificador desconhecido deve imprimir "CAN Identifier unknown"
-    //captured_frame.identifier = ID_EMPTY; // ID desconhecido
-    // Aqui, o teste pode capturar a saída do printf e verificar a mensagem impressa.
-    // Para simular a captura de saída, você pode usar uma função que capture a saída do printf e compare com a string esperada.
+    // Case 5: Unknown identifier should print "CAN Identifier unknown"
+    //captured_frame.identifier = ID_EMPTY; // Unknown ID
+    // The test could capture the printf output and verify the printed message.
     //translateAndCallCanMsg(captured_frame);
-    //TEST_ASSERT_EQUAL_STRING("CAN Identifier unknown\n", capture_stdout());  // Verifica se a saída padrão foi a esperada
+    //TEST_ASSERT_EQUAL_STRING("CAN Identifier unknown\n", capture_stdout());
 }
 
-// Main function to run the tests
+/**
+ * @brief Main function to run the tests.
+ * 
+ * @return int The result of the test run.
+ */
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_updateInternalPedalsState);
