@@ -304,7 +304,7 @@ void test_getAEBState(void) {
 /**
  * @brief Test for the function translateAndCallCanMsg.
  */
-void test_translateAndCallCanMsg(void) {
+void test_translateAndCallCanMsg_1(void) {
     can_msg captured_frame;
 
     // Case 1: Pedal identifier (ID_PEDALS) should call updateInternalPedalsState
@@ -314,13 +314,24 @@ void test_translateAndCallCanMsg(void) {
     translateAndCallCanMsg(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be ON
     TEST_ASSERT_FALSE(aeb_internal_state.brake_pedal);  // Brake pedal should be OFF
+}
+
+void test_translateAndCallCanMsg_2()
+{
+    can_msg captured_frame;
 
     // Case 2: Pedal identifier (ID_PEDALS) should call updateInternalPedalsState with Brake ON
+    captured_frame.identifier = ID_PEDALS;
     captured_frame.dataFrame[0] = 0x00;  // Accelerator OFF
     captured_frame.dataFrame[1] = 0x01;  // Brake ON
     translateAndCallCanMsg(captured_frame);
     TEST_ASSERT_FALSE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be OFF
     TEST_ASSERT_TRUE(aeb_internal_state.brake_pedal);  // Brake pedal should be ON
+}
+
+void test_translateAndCallCanMsg_3()
+{
+    can_msg captured_frame;
 
     // Case 3: Speed identifier (ID_SPEED_S) should call updateInternalSpeedState
     captured_frame.identifier = ID_SPEED_S;
@@ -329,6 +340,11 @@ void test_translateAndCallCanMsg(void) {
     captured_frame.dataFrame[2] = 0x00;
     translateAndCallCanMsg(captured_frame);
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 100.0);  // Speed should be 100 km/h
+}
+
+void test_translateAndCallCanMsg_4()
+{
+    can_msg captured_frame;
 
     // Case 4: Obstacle identifier (ID_OBSTACLE_S) should call updateInternalObstacleState
     captured_frame.identifier = ID_OBSTACLE_S;
@@ -338,18 +354,35 @@ void test_translateAndCallCanMsg(void) {
     translateAndCallCanMsg(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);  // Obstacle should be detected
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Distance should be 100 meters
+}
+
+void test_translateAndCallCanMsg_5()
+{
+    can_msg captured_frame;
 
     // Case 5: Car identifier (ID_CAR_C) should call updateInternalCarCState
     captured_frame.identifier = ID_CAR_C;
     captured_frame.dataFrame[0] = 0x01;  // AEB system ON
     translateAndCallCanMsg(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.on_off_aeb_system);  // AEB system should be ON
+}
+
+void test_translateAndCallCanMsg_6()
+{
+    can_msg captured_frame;
+
+    TEST_IGNORE_MESSAGE("Test case for unknown identifier");
 
     // Case 6: Unknown identifier should print "CAN Identifier unknown"
-    //captured_frame.identifier = ID_EMPTY; // Unknown ID
+    captured_frame.identifier = ID_EMPTY; // Unknown ID
     // The test could capture the printf output and verify the printed message.
-    //translateAndCallCanMsg(captured_frame);
-    //TEST_ASSERT_EQUAL_STRING("CAN Identifier unknown\n", capture_stdout());
+    translateAndCallCanMsg(captured_frame);
+    // TEST_ASSERT_EQUAL_STRING("CAN Identifier unknown\n", capture_stdout());
+}
+
+void test_translateAndCallCanMsg_7()
+{
+    can_msg captured_frame;
 
     // Case 7: Test reverse flag handling in Speed message
     captured_frame.identifier = ID_SPEED_S;
@@ -358,6 +391,11 @@ void test_translateAndCallCanMsg(void) {
     captured_frame.dataFrame[2] = 0x01;  // Reverse enabled
     translateAndCallCanMsg(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.reverseEnabled);  // Reverse should be enabled
+}
+
+void test_translateAndCallCanMsg_8()
+{
+    can_msg captured_frame;
 
     // Case 8: Test the behavior when receiving clear data for speed
     captured_frame.dataFrame[0] = 0xFE;  // Clear data for speed
@@ -366,6 +404,11 @@ void test_translateAndCallCanMsg(void) {
     translateAndCallCanMsg(captured_frame);
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 0.0);  // Speed should reset to 0
     TEST_ASSERT_FALSE(aeb_internal_state.reverseEnabled);  // Reverse should be disabled
+}
+
+void test_translateAndCallCanMsg_9()
+{
+    can_msg captured_frame;
 
     // Case 9: Test the behavior when receiving invalid data for obstacle
     captured_frame.identifier = ID_OBSTACLE_S;
@@ -375,7 +418,7 @@ void test_translateAndCallCanMsg(void) {
     translateAndCallCanMsg(captured_frame);
     TEST_ASSERT_FALSE(aeb_internal_state.has_obstacle);  // No obstacle detected
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 0.0);  // Distance should be reset to 0
-}
+}    
 
 /**
  * @brief Main function to run the tests.
@@ -389,6 +432,14 @@ int main(void) {
     RUN_TEST(test_updateInternalObstacleState);
     RUN_TEST(test_updateInternalCarCState);
     RUN_TEST(test_getAEBState);
-    RUN_TEST(test_translateAndCallCanMsg);
+    RUN_TEST(test_translateAndCallCanMsg_1);
+    RUN_TEST(test_translateAndCallCanMsg_2);
+    RUN_TEST(test_translateAndCallCanMsg_3);
+    RUN_TEST(test_translateAndCallCanMsg_4);
+    RUN_TEST(test_translateAndCallCanMsg_5);
+    RUN_TEST(test_translateAndCallCanMsg_6);
+    RUN_TEST(test_translateAndCallCanMsg_7);
+    RUN_TEST(test_translateAndCallCanMsg_8);
+    RUN_TEST(test_translateAndCallCanMsg_9);
     return UNITY_END();
 }
