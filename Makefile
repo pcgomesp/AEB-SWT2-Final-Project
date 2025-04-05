@@ -48,9 +48,6 @@ test_all: $(TESTS)
 test/test_mq_utils: test/test_mq_utils.c src/mq_utils.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_mq_utils.c src/mq_utils.c test/unity.c -o test/test_mq_utils -I$(TESTFOLDER)
 
-test/test_ttc: test/test_ttc.c src/ttc_control.c test/unity.c
-	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_ttc.c src/ttc_control.c test/unity.c -o test/test_ttc -I$(TESTFOLDER) -lm
-
 test/test_file_reader: test/test_file_reader.c src/file_reader.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER)
 
@@ -58,68 +55,13 @@ test/test_log_utils: test/test_log_utils.c src/log_utils.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) -Wl,--wrap=fopen -Wl,--wrap=perror test/test_log_utils.c src/log_utils.c test/unity.c -o test/test_log_utils -I$(TESTFOLDER)
 
 test/test_actuators: test/test_actuators.c src/actuators.c test/unity.c
-	$(CC) $(CFLAGS) -DTEST_MODE test/test_actuators.c src/actuators.c test/unity.c -o test/test_actuators -Iinc -Itest -lpthread	
+	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_actuators.c src/actuators.c test/unity.c -o test/test_actuators -Iinc -Itest -lpthread	
 
 test/test_aeb_controller: test/test_aeb_controller.c src/aeb_controller.c src/ttc_control.c test/unity.c
-	$(CC) $(CFLAGS) -DTEST_MODE test/test_aeb_controller.c src/aeb_controller.c src/ttc_control.c test/unity.c -o test/test_aeb_controller -I$(TESTFOLDER) -lm
-
-.SILENT: cov
-cov:
-	if [ -z "$(src_file)" ] || [ -z "$(test_file)" ]; then \
-		echo "Please provide both src_file and test_file as arguments, e.g., 'make cov src_file=example.c test_file=test_example.c'"; \
-	else \
-		echo "Running gcov for source file $(src_file) and test $(test_file)"; \
-		echo ""; \
-		if [ "$(test_file)" = "test_log_utils.c" ]; then \
-			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
-		else \
-			WRAP_FLAGS=""; \
-		fi; \
-		$(CC) $(TESTFLAGS) $(COVFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
-		./$(OBJFOLDER)$(test_file:.c=)_gcov_bin > /dev/null 2>&1; \
-		gcov -b $(SRCFOLDER)$(src_file) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin-$(src_file:.c=.gcda); \
-	fi
-
-test/test_ttc: test/test_ttc.c src/ttc_control.c test/unity.c
-	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_ttc.c src/ttc_control.c test/unity.c -o test/test_ttc -I$(TESTFOLDER) -lm
-
-test/test_file_reader: test/test_file_reader.c src/file_reader.c test/unity.c
-	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER)
-
-test/test_log_utils: test/test_log_utils.c src/log_utils.c test/unity.c
-	$(CC) $(CFLAGS) -Wl,--wrap=fopen -Wl,--wrap=perror test/test_log_utils.c src/log_utils.c test/unity.c -o test/test_log_utils -I$(TESTFOLDER)
+	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_aeb_controller.c src/aeb_controller.c src/ttc_control.c test/unity.c -o test/test_aeb_controller -I$(TESTFOLDER) -lm
 
 test/test_sensors: test/test_sensors.c src/sensors.c test/unity.c
-	$(CC) $(CFLAGS) -DTEST_MODE test/test_sensors.c src/sensors.c test/unity.c -o test/test_sensors -I$(TESTFOLDER) -Itest -lpthread
-
-.SILENT: cov
-cov:
-	if [ -z "$(src_file)" ] || [ -z "$(test_file)" ]; then \
-		echo "Please provide both src_file and test_file as arguments, e.g., 'make cov src_file=example.c test_file=test_example.c'"; \
-	else \
-		echo "Running gcov for source file $(src_file) and test $(test_file)"; \
-		echo ""; \
-		if [ "$(test_file)" = "test_log_utils.c" ]; then \
-			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
-		else \
-			WRAP_FLAGS=""; \
-		fi; \
-		$(CC) $(TESTFLAGS) $(COVFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
-		./$(OBJFOLDER)$(test_file:.c=)_gcov_bin > /dev/null 2>&1; \
-		gcov -b $(SRCFOLDER)$(src_file) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin-$(src_file:.c=.gcda); \
-	fi
-
-test/test_ttc: test/test_ttc.c src/ttc_control.c test/unity.c
-	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_ttc.c src/ttc_control.c test/unity.c -o test/test_ttc -I$(TESTFOLDER) -lm
-
-test/test_file_reader: test/test_file_reader.c src/file_reader.c test/unity.c
-	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER)
-
-test/test_log_utils: test/test_log_utils.c src/log_utils.c test/unity.c
-	$(CC) $(CFLAGS) -Wl,--wrap=fopen -Wl,--wrap=perror test/test_log_utils.c src/log_utils.c test/unity.c -o test/test_log_utils -I$(TESTFOLDER)
-
-test/test_sensors: test/test_sensors.c src/sensors.c test/unity.c
-	$(CC) $(CFLAGS) -DTEST_MODE test/test_sensors.c src/sensors.c test/unity.c -o test/test_sensors -I$(TESTFOLDER) -Itest -lpthread
+	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_sensors.c src/sensors.c test/unity.c -o test/test_sensors -I$(TESTFOLDER) -Itest -lpthread
 
 .SILENT: cov
 cov:
