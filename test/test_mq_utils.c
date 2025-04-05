@@ -23,8 +23,6 @@ void test_get_mq_attr()
     TEST_ASSERT_EQUAL(0, attr.mq_curmsgs);
     TEST_ASSERT_EQUAL(10, attr.mq_maxmsg);
     TEST_ASSERT_EQUAL(12, attr.mq_msgsize);
-    TEST_ASSERT_EQUAL(10, attr.mq_maxmsg);
-    TEST_ASSERT_EQUAL(12, attr.mq_msgsize);
 }
 
 void test_create_and_close_mq()

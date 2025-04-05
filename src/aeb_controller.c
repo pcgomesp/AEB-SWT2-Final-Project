@@ -51,7 +51,8 @@ sensors_input_data aeb_internal_state = {
     .brake_pedal = false,
     .accelerator_pedal = false,
     .on_off_aeb_system = true,
-    .reverseEnabled = false};
+    .reverseEnabled = false,
+    .relative_acceleration = 0.0};
 
 can_msg captured_can_frame = {
     .identifier = ID_CAR_C,
@@ -111,20 +112,9 @@ can_msg empty_msg = { // [SwR-5]
  */
 void *mainWorkingLoop(void *arg)
 {
-    // Main Loop function for our AEB Controller ECU
-    // Step 01: Get CAN frames from the sensors message queue [SwR-9]
-    // Step 02: Translate the recieved CAN frame, according to its id
-    // Step 03: Call the correct Function, based on the new data recieved (o que eh new data recieved? acho que eh a mensagem nova)
-    // Step 04: Reactions from the AEB System: based on the new data, what should the AEB controller do?
-    // 4.1 - Calculate new ttc
-    // 4.2 - Update send_actuators_state
-    // Should we separate more or can we let everything in this single thread?
-    // Will separating things make us need to worry more about synchronization?
-    // Step 05: Simple sleep timer? This will change when new functions to fulfill requirements are added
-    
-    aeb_controller_state state = AEB_STATE_STANDBY;  /**< Initial state is standby */
-    int empty_mq_counter = 0;  /**< Counter for the number of empty message queue iterations */
-    
+    aeb_controller_state state = AEB_STATE_STANDBY;
+
+    int empty_mq_counter = 0;
     while (empty_mq_counter < LOOP_EMPTY_ITERATIONS_MAX)
     {
         if (read_mq(sensors_mq, &captured_can_frame) != -1) // Reads message from sensors [SwR-9]
@@ -133,20 +123,18 @@ void *mainWorkingLoop(void *arg)
 
             translateAndCallCanMsg(captured_can_frame); // Process the received CAN message
 
-            // Calculate the time to collision
-            double ttc = ttc_calc(aeb_internal_state.obstacle_distance, aeb_internal_state.relative_velocity); 
+            double ttc = ttc_calc(aeb_internal_state.obstacle_distance, aeb_internal_state.relative_velocity, 
+                aeb_internal_state.relative_acceleration);
 
-            state = getAEBState(aeb_internal_state, ttc);  // Get the current AEB state
-            printf("Actual state: %d\n", state);  // Print the current state for debugging
+            state = getAEBState(aeb_internal_state, ttc);
 
-            out_can_frame = updateCanMsgOutput(state);  // Prepare the output CAN message based on the current state
-            
+            out_can_frame = updateCanMsgOutput(state);
+
             if (state == AEB_STATE_STANDBY) // [SwR-5]
                 write_mq(actuators_mq, &empty_msg);  // Send empty message when in standby state
             else
                 write_mq(actuators_mq, &out_can_frame);  // Send the appropriate message based on the current state
 
-            print_info();  // Print debug info (can be excluded in production)
         }
         else
             empty_mq_counter++;  // Increment counter if no message is received
@@ -246,6 +234,8 @@ void updateInternalSpeedState(can_msg captured_frame)
 {
     unsigned int data_speed; // used for can frame conversion
     double new_internal_speed = 0.0;
+    unsigned int data_acel; // used for can frame conversion for acceleration
+    double new_internal_acel = 0.0;
 
     // update internal data according to the relative velocity detected by the sensor
     if (captured_frame.dataFrame[0] == 0xFE && captured_frame.dataFrame[1] == 0xFF)
@@ -280,6 +270,41 @@ void updateInternalSpeedState(can_msg captured_frame)
     {
         aeb_internal_state.reverseEnabled = true;
     }
+
+    // update internal data according to the relative acceleration detected by the sensor
+    if (captured_frame.dataFrame[3] == 0xFE && captured_frame.dataFrame[4] == 0xFF)
+    { // DBC: Clear Data
+        new_internal_acel = 0.0;
+    }
+    else if (captured_frame.dataFrame[3] == 0xFF && captured_frame.dataFrame[4] == 0xFF)
+    { // DBC: Do nothing
+        ;
+    }
+    else
+    {
+        // Conversion from CAN data frame, according to dbc in the requirement file 
+        // [SwR-10]
+        data_acel = captured_frame.dataFrame[3] + (captured_frame.dataFrame[4] << 8);
+        new_internal_acel = (data_acel + OFFSET_ACCELERATION_S) * RES_ACCELERATION_S;
+    }
+
+    if(captured_frame.dataFrame[5] == 0x01){
+        new_internal_acel *= -1;
+    } else {
+        ;
+    }
+
+    if (new_internal_acel > MAX_ACCELERATION_S)
+    { // DBC: Max value constraint
+        new_internal_acel = MAX_ACCELERATION_S;
+    } else if(new_internal_acel < MIN_ACCELERATION_S){
+        // DBC: Min value constraint
+        new_internal_acel = MIN_ACCELERATION_S;
+    }
+
+    aeb_internal_state.relative_acceleration = new_internal_acel;
+
+    //printf("acel is: %.3lf\n", aeb_internal_state.relative_acceleration);
 }
 
 /**
@@ -398,8 +423,7 @@ aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double t
 {// Abstraction according to [SwR-12]
     if (aeb_internal_state.on_off_aeb_system == false)
         return AEB_STATE_STANDBY;
-    // Required by [SwR-7][SwR-16]
-    if(aeb_internal_state.relative_velocity < MIN_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) 
+    if (aeb_internal_state.relative_velocity < MIN_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-7][SwR-16]
         return AEB_STATE_STANDBY;
     // Required by [SwR-7][SwR-16]
     if (aeb_internal_state.relative_velocity > MAX_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) 
