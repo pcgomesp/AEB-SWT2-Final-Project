@@ -11,7 +11,7 @@
 
 void *getSensorsData(void *arg);
 can_msg conv2CANCarClusterData(bool on_off_aeb_system);
-can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity);
+can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity, double relative_acceleration);
 can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance);
 can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal);
 
@@ -21,6 +21,7 @@ sensors_input_data sensorsData;
 
 can_msg can_car_cluster, can_velocity_sensor, can_obstacle_sensor, can_pedals_sensor;
 
+#ifndef TEST_MODE 
 int main()
 {
     int sensors_thr;
@@ -41,17 +42,16 @@ int main()
     return 0;
 }
 
-void *getSensorsData(void *arg)
+void* getSensorsData(void *arg)
 {
-    FILE *file = (FILE *)arg; // Recebe o arquivo como argumento
-
+    FILE *file = (FILE *) arg;
     while (1)
     {
         // Read a new line from the file [SwR-9]
         if (read_sensor_data(file, &sensorsData))
         {
             can_car_cluster = conv2CANCarClusterData(sensorsData.on_off_aeb_system);
-            can_velocity_sensor = conv2CANVelocityData(sensorsData.reverseEnabled, sensorsData.relative_velocity); // [SwR-10]
+            can_velocity_sensor = conv2CANVelocityData(sensorsData.reverseEnabled, sensorsData.relative_velocity, sensorsData.relative_acceleration); // [SwR-10]
             can_obstacle_sensor = conv2CANObstacleData(sensorsData.has_obstacle, sensorsData.obstacle_distance);
             can_pedals_sensor = conv2CANPedalsData(sensorsData.brake_pedal, sensorsData.accelerator_pedal);
 
@@ -75,6 +75,7 @@ void *getSensorsData(void *arg)
     fclose(file);
     return NULL;
 }
+#endif
 
 // The location of information in the data frame location, in the following functions,
 // is according to the dbc file in the requirements specification
@@ -96,8 +97,10 @@ can_msg conv2CANCarClusterData(bool on_off_aeb_system)
     return aux;
 }
 
-can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity)
+
+can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity, double relative_acceleration)
 {
+    //printf("Rel acel: %lf\n", relative_acceleration);
     can_msg aux = {.identifier = ID_SPEED_S, .dataFrame = BASE_DATA_FRAME};
 
     // Vehicle direction (forward or reverse) data encapsulation
@@ -119,6 +122,24 @@ can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity)
     // Defines most and least significant bytes, according to the DBC specification
     aux.dataFrame[0] = ls_speed;
     aux.dataFrame[1] = ms_speed;
+
+    // Acceleration data ​​encapsulation
+    double aux_acel = relative_acceleration;
+    if(aux_acel < 0){
+        aux_acel *= -1;
+        aux.dataFrame[5] = 0x01;
+    } else {
+        aux.dataFrame[5] = 0x00;
+    }
+
+    unsigned int data_acel = ((aux_acel * RES_ACCELERATION_DIV_S) - OFFSET_ACCELERATION_S);
+    unsigned char ms_acel, ls_acel;
+    ls_acel = data_acel;
+    ms_acel = data_acel >> 8;
+
+    // Defines most and least significant bytes, according to the DBC specification
+    aux.dataFrame[3] = ls_acel;
+    aux.dataFrame[4] = ms_acel;
 
     return aux;
 }

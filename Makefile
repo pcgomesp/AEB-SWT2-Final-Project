@@ -48,9 +48,6 @@ test_all: $(TESTS)
 test/test_mq_utils: test/test_mq_utils.c src/mq_utils.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_mq_utils.c src/mq_utils.c test/unity.c -o test/test_mq_utils -I$(TESTFOLDER)
 
-test/test_ttc: test/test_ttc.c src/ttc_control.c test/unity.c
-	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_ttc.c src/ttc_control.c test/unity.c -o test/test_ttc -I$(TESTFOLDER) -lm
-
 test/test_file_reader: test/test_file_reader.c src/file_reader.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER)
 
@@ -59,6 +56,15 @@ test/test_log_utils: test/test_log_utils.c src/log_utils.c test/unity.c
 
 test/test_ttc_control: test/test_ttc_control.c src/file_reader.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_ttc_control.c src/ttc_control.c test/unity.c -o test/test_ttc_control -I$(TESTFOLDER) -lm -lrt
+
+test/test_actuators: test/test_actuators.c src/actuators.c test/unity.c
+	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_actuators.c src/actuators.c test/unity.c -o test/test_actuators -Iinc -Itest -lpthread	
+
+test/test_aeb_controller: test/test_aeb_controller.c src/aeb_controller.c src/ttc_control.c test/unity.c
+	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_aeb_controller.c src/aeb_controller.c src/ttc_control.c test/unity.c -o test/test_aeb_controller -I$(TESTFOLDER) -lm
+
+test/test_sensors: test/test_sensors.c src/sensors.c test/unity.c
+	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_sensors.c src/sensors.c test/unity.c -o test/test_sensors -I$(TESTFOLDER) -Itest -lpthread
 
 .SILENT: cov
 cov:

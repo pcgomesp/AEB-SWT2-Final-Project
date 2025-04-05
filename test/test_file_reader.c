@@ -31,7 +31,7 @@ void test_open_file_not_null_and_skip_header()
     it means test_file points to the correct line, skipping
     the header
     */
-    TEST_ASSERT_EQUAL_STRING("60 1 108 0 1 1 0\n", buffer);
+    TEST_ASSERT_EQUAL_STRING("60 1 108 0 1 1 0 0\n", buffer);
     
 }
 

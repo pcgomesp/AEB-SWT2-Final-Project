@@ -11,6 +11,7 @@ typedef struct {
     int accelerator_pedal;
     int on_off_aeb_system;
     int reverseEnabled;
+    double relative_acceleration;
 } sensors_input_data;
 
 
