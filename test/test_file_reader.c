@@ -53,6 +53,7 @@ void test_read_sensor_data_valid_data()
     TEST_ASSERT_EQUAL(1, test_sensor_data.accelerator_pedal);
     TEST_ASSERT_EQUAL(1, test_sensor_data.on_off_aeb_system);
     TEST_ASSERT_EQUAL(0, test_sensor_data.reverseEnabled);
+    TEST_ASSERT_EQUAL_FLOAT(0.0,test_sensor_data.relative_acceleration);
 }
 
 void test_read_sensor_data_eof()
