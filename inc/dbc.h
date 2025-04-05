@@ -15,11 +15,18 @@
 // left most: least significant, right most: most significant
 #define BASE_DATA_FRAME {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
 
-#define MAX_SPEED_S 251
-#define MAX_OBSTACLE_S 150
+#define MAX_SPEED_S 251.0
+#define MAX_OBSTACLE_S 300.0
+#define MAX_ACCELERATION_S 12.5
+#define MIN_ACCELERATION_S -12.5
 
 #define RES_SPEED_S (1.0 / 256.0)
 #define RES_OBSTACLE_S (1.0 / 20.0)
+#define RES_ACCELERATION_S 0.001
+//#define RES_ACCELERATION_S (1.0 / 1000.0)
+#define RES_ACCELERATION_DIV_S 1000
+
+#define OFFSET_ACCELERATION_S -12500
 
 // Struct to simulate a CAN message
 typedef struct

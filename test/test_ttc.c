@@ -61,15 +61,17 @@ void test_ttc_calc() {
     // Testes com distância e velocidade
     double dist = 100.0;  // 100 metros
     double speed = 20.0;  // 20 km/h
-    double ttc = ttc_calc(dist, speed);
+    double acel  = 0.0;  // 20 m/s²
+    double ttc = ttc_calc(dist, speed, acel);
     sleep(2);
-    ttc = ttc_calc(dist, speed + 30.0);
+    ttc = ttc_calc(dist, speed + 30.0, acel);
     printf("Tempo para colisão com distância de %.1f metros e velocidade de %.1f km/h: %0.2f segundos\n", dist, speed, ttc);
 
     // Teste com outra velocidade
     dist = 50.0;  // 50 metros
     speed = 10.0; // 10 km/h
-    ttc = ttc_calc(dist, speed);
+    acel  = 0.0;
+    ttc = ttc_calc(dist, speed, acel);
     if (ttc >= 0) {
         printf("Tempo para colisão com distância de %.1f metros e velocidade de %.1f km/h: %0.2f segundos\n", dist, speed, ttc);
     } else {
@@ -103,17 +105,19 @@ void test_aeb_control() {
     bool lk_doors;
     double spd;
     double dist;
+    double acel;
     double delta_spd;
 
     // Test 1: TTC > 2.0 (no alarm, no braking)
     enable_aeb = true;
     spd = 30.0;  // 30 km/h
     dist = 50.0; // 50 meters
-    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &lk_seatbelt, &lk_doors, &spd, &dist);
+    acel  = 0.0;
+    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &lk_seatbelt, &lk_doors, &spd, &dist, &acel);
     delta_spd = 0.001;
     spd -= delta_spd;
     printf("Velocidade: %.6f km/h\n", spd);
-    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &lk_seatbelt, &lk_doors, &spd, &dist);
+    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &lk_seatbelt, &lk_doors, &spd, &dist, &acel);
     
     // Check if the alarm and braking are not triggered
     printf("Test 1 - TTC > 2.0\n");
@@ -123,7 +127,7 @@ void test_aeb_control() {
     // Test 2: 1.0 < TTC < 2.0 (alarm triggered, no braking)
     dist = 12.5; // 12.5 meters
     spd += delta_spd; // 30.0 km/h
-    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &lk_seatbelt, &lk_doors, &spd, &dist);
+    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &lk_seatbelt, &lk_doors, &spd, &dist, &acel);
 
     // Check if the alarm was triggered, but braking was not
     printf("\nTest 2 - 1.0 < TTC < 2.0\n");
@@ -133,7 +137,7 @@ void test_aeb_control() {
     // Test 3: TTC < 1.0 (alarm and braking triggered)
     dist = 5.0; // 5 meters
     spd += (5*delta_spd); // 30.002 km/h
-    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &lk_seatbelt, &lk_doors, &spd, &dist);
+    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &lk_seatbelt, &lk_doors, &spd, &dist, &acel);
 
     // Check if the alarm and braking were both triggered
     printf("\nTest 3 - TTC < 1.0\n");
@@ -144,7 +148,7 @@ void test_aeb_control() {
     enable_aeb = false;
     dist = 10.0; // 10 meters
     spd = 30.0;  // 30 km/h
-    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &lk_seatbelt, &lk_doors, &spd, &dist);
+    aeb_control(&enable_aeb, &alarm_cluster, &enable_breaking, &lk_seatbelt, &lk_doors, &spd, &dist, &acel);
 
     // Check if the alarm and braking were not triggered because AEB is disabled
     printf("\nTest 4 - AEB Disabled\n");
