@@ -169,7 +169,7 @@ void test_updateInternalObstacleState(void) {
     // Case 1: Obstacle detected and distance calculated correctly
     updateInternalObstacleState(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);  // Obstacle detected
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Expected distance = 100 * RES_OBSTACLE_S
+    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Expected distance =  (0xD0 + (0x07 << 8)) * RES_OBSTACLE = 100.0
     
     // Case 2: No obstacle (0x00 in dataFrame[2])
     captured_frame.dataFrame[2] = 0x00;
