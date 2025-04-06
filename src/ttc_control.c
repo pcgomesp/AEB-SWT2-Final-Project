@@ -64,11 +64,12 @@ double ttc_calc(double dis_rel, double spd_rel, double rel_acel) {
     b = spd_rel / 3.6;
     c = dis_rel;
 
-    if (a == 0) return ttc = c / b;
+    if (a >= 0) return ttc = c / b;
 
     delta = b * b + 2 * a * c;
     
-    if (delta < 0) return -1.0;
+    //if (delta < 0) return -1.0; // When delta is negative, no colision is ahead, right?
+    if (delta < 0) return 99;
 
     else if (delta == 0) return -b / a;
 
