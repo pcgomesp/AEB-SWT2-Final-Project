@@ -42,6 +42,16 @@ int main()
     return 0;
 }
 
+/**
+ * @brief Function that encapsulates data from a file into CAN frames and sends it to the message queue.
+ * 
+ * This function is runned by the thread sensors_thr. It calls the other functions of the program
+ * to read data from the file, encode it into CAN frames and send it to sensors message queue. 
+ * 
+ * @param arg Arguments passed to the thread (in this case it is the file pointer).
+ * @return NULL.
+ * 
+*/
 void* getSensorsData(void *arg)
 {
     FILE *file = (FILE *) arg;
@@ -80,6 +90,14 @@ void* getSensorsData(void *arg)
 // The location of information in the data frame location, in the following functions,
 // is according to the dbc file in the requirements specification
 
+/**
+ * @brief Function that encapsulates data into the Car Cluster CAN frame.
+ * 
+ * @param on_off_aeb_system Argument that refers the power state of the AEB System (ON or OFF).
+ * 
+ * @return structure that contains the CAN message ID and Frame.
+ * 
+*/
 can_msg conv2CANCarClusterData(bool on_off_aeb_system)
 {
     can_msg aux = {.identifier = ID_CAR_C, .dataFrame = BASE_DATA_FRAME};
@@ -98,6 +116,19 @@ can_msg conv2CANCarClusterData(bool on_off_aeb_system)
 }
 
 
+/**
+ * @brief Function that encapsulates data into the Speed CAN frame.
+ * 
+ * This function receives data of the vehicle direction, relative velocity and 
+ * relative acceleration and encapsulates it into the Speed CAN frame.
+ * 
+ * @param vehicle_direction Vehicle direction (forward or reverse).
+ * @param relative_velocity Relative velocity of the vehicle.
+ * @param relative_acceleration Relative acceleration of the vehicle.
+ * 
+ * @return structure that contains the CAN message ID and Frame.
+ * 
+*/
 can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity, double relative_acceleration)
 {
     //printf("Rel acel: %lf\n", relative_acceleration);
@@ -144,6 +175,19 @@ can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity, d
     return aux;
 }
 
+
+/**
+ * @brief Function that encapsulates data into the Obstacle CAN frame.
+ * 
+ * This function encapsulates the data of the presence of an obstacle and it's distance
+ * to the vehicle into the Obstacle CAN frame.
+ * 
+ * @param has_obstacle Argument that refers if an obstacle is present or not.
+ * @param obstacle_distance Distance from the vehicle to the obstacle.
+ * 
+ * @return structure that contains the CAN message ID and Frame.
+ * 
+*/
 can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance)
 {
     can_msg aux = {.identifier = ID_OBSTACLE_S, .dataFrame = BASE_DATA_FRAME};
@@ -171,6 +215,19 @@ can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance)
     return aux;
 }
 
+
+/**
+ * @brief Function that encapsulates data into the Pedals CAN frame.
+ * 
+ * This function encapsulates the data of the brake and accelerator pedals into 
+ * the Pedals CAN frame.
+ * 
+ * @param brake_pedal Argument that refers if the brake is pressed or not.
+ * @param accelerator_pedal Argument that refers if the accelerator is pressed or not.
+ * 
+ * @return structure that contains the CAN message ID and Frame.
+ * 
+*/
 can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal)
 {
     can_msg aux = {.identifier = ID_PEDALS, .dataFrame = BASE_DATA_FRAME};
