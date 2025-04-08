@@ -41,9 +41,6 @@ aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double t
 mqd_t sensors_mq, actuators_mq; /**< Message queues for sensors and actuators */
 pthread_t aeb_controller_id;     /**< Thread ID for the AEB controller */
 
-mqd_t sensors_mq, actuators_mq;
-pthread_t aeb_controller_id;
-
 sensors_input_data aeb_internal_state = {
     .relative_velocity = 0.0,
     .has_obstacle = false,
