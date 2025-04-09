@@ -223,6 +223,8 @@ void test_actuatorsTranslateCanMsg_Unexpected_DataFrame(void) {
  * @brief Verifies if the actuators response loop handles an empty queue correctly
  */
 void test_actuatorsResponseLoop_EmptyQueue(void) {
+    //// Test case ID: TC_AEB_A__009
+
     int initial_empty_mq_counter = 0;
     pthread_t thread;
 
@@ -233,6 +235,7 @@ void test_actuatorsResponseLoop_EmptyQueue(void) {
     sleep((LOOP_EMPTY_ITERATIONS_MAX + 1) * 0.2);
 
     // Checks if the empty iterations counter reached the limit
+
     TEST_ASSERT_EQUAL(LOOP_EMPTY_ITERATIONS_MAX, initial_empty_mq_counter);
 
     // Cancels and joins the thread
@@ -251,7 +254,7 @@ int mock_mq_send(mqd_t mq, const can_msg *msg) {
  * @brief Verifies if the actuators response loop handles unknown messages correctly
  */
 void test_actuatorsResponseLoop_UnknownMessages(void) {
-    //// Test case ID: TC_AEB_A__009
+    //// Test case ID: TC_AEB_A__010
     actuators_state.belt_tightness = false;
     actuators_state.door_lock = true;
     actuators_state.should_activate_abs = false;
@@ -275,7 +278,7 @@ void test_actuatorsResponseLoop_UnknownMessages(void) {
     sleep(1);
 
     // Checks that the actuators' state did NOT change
-    //// Test case ID: TC_AEB_A__010
+    //// Test case ID: TC_AEB_A__011
     TEST_ASSERT_TRUE(actuators_state.belt_tightness);
     TEST_ASSERT_FALSE(actuators_state.door_lock);
     TEST_ASSERT_TRUE(actuators_state.should_activate_abs);
