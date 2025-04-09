@@ -70,7 +70,7 @@ void* getSensorsData(void *arg)
             write_mq(sensors_mq, &can_obstacle_sensor);
             write_mq(sensors_mq, &can_pedals_sensor);
 
-            printf("New line.\n"); // This line is used for see the break of line
+            //printf("New line.\n"); // This line is used for see the break of line
         }
         else
         {

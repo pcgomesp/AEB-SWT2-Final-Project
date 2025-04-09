@@ -14,5 +14,6 @@ typedef struct{
 
 void actuatorsTranslateCanMsg(can_msg captured_frame);
 void updateInternalActuatorsState(can_msg captured_frame);
+void print_info_output();
 
 #endif
