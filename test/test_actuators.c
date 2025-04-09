@@ -61,11 +61,10 @@ void tearDown(void) {
 }
 
 /**
- * @brief Test for the actuatorsTranslateCanMsg function with ID_AEB_S identifier.
+ * @test
+ * @brief Verifies if actuatorsTranslateCanMsg correctly processes a message with ID_AEB_S
  */
-
 void test_actuatorsTranslateCanMsg_AEB_S_Identifier(void) {
-    // Verifies if actuatorsTranslateCanMsg correctly processes a message with ID_AEB_S
     can_msg test_msg = {
         .identifier = ID_AEB_S,
         .dataFrame = {0xFF, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
@@ -82,8 +81,11 @@ void test_actuatorsTranslateCanMsg_AEB_S_Identifier(void) {
     TEST_ASSERT_TRUE(actuators_state.alarm_buzzer);
 }
 
+/**
+ * @test
+ * @brief Verifies if actuatorsTranslateCanMsg handles a message with ID_EMPTY correctly
+ */
 void test_actuatorsTranslateCanMsg_Empty_Identifier(void) {
-    // Verifies if actuatorsTranslateCanMsg handles a message with ID_EMPTY correctly
     can_msg test_msg = {
         .identifier = ID_EMPTY,
         .dataFrame = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}
@@ -100,6 +102,10 @@ void test_actuatorsTranslateCanMsg_Empty_Identifier(void) {
     TEST_ASSERT_FALSE(actuators_state.alarm_buzzer);
 }
 
+/**
+ * @test
+ * @brief Verifies if actuatorsTranslateCanMsg handles a message with ID_EMPTY correctly
+ */
 void test_updateInternalActuatorsState_Correct_State(void) {
     // Verifies if updateInternalActuatorsState correctly updates the actuators' state
     can_msg test_msg = {
@@ -118,8 +124,11 @@ void test_updateInternalActuatorsState_Correct_State(void) {
     TEST_ASSERT_TRUE(actuators_state.alarm_buzzer);
 }
 
+/**
+ * @test
+ * @brief Verifies if actuatorsTranslateCanMsg correctly processes a valid message.
+ */
 void test_actuatorsTranslateCanMsg(void) {
-    // Verifies if actuatorsTranslateCanMsg correctly processes a valid message
     can_msg test_msg = {
         .identifier = ID_AEB_S,
         .dataFrame = {0xFF, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
@@ -136,6 +145,10 @@ void test_actuatorsTranslateCanMsg(void) {
     TEST_ASSERT_TRUE(actuators_state.alarm_buzzer);
 }
 
+/**
+ * @test
+ * @brief Verifies if actuatorsTranslateCanMsg correctly processes a valid message.
+ */
 void test_actuatorsTranslateCanMsg_Unknown_Identifier(void) {
     // Verifies if actuatorsTranslateCanMsg handles an unknown identifier correctly
     can_msg test_msg = {
@@ -205,8 +218,11 @@ void test_actuatorsTranslateCanMsg_Unexpected_DataFrame(void) {
     TEST_ASSERT_FALSE(actuators_state.alarm_buzzer);
 }
 
+/**
+ * @test
+ * @brief Verifies if the actuators response loop handles an empty queue correctly
+ */
 void test_actuatorsResponseLoop_EmptyQueue(void) {
-    // Verifies if the actuators response loop handles an empty queue correctly
     int initial_empty_mq_counter = 0;
     pthread_t thread;
 
@@ -230,8 +246,11 @@ int mock_mq_send(mqd_t mq, const can_msg *msg) {
     return 0; // Simula sucesso no envio da mensagem
 }
 
+/**
+ * @test
+ * @brief Verifies if the actuators response loop handles unknown messages correctly
+ */
 void test_actuatorsResponseLoop_UnknownMessages(void) {
-    // Verifies if the actuators response loop handles unknown messages correctly
     //// Test case ID: TC_AEB_A__009
     actuators_state.belt_tightness = false;
     actuators_state.door_lock = true;
@@ -256,6 +275,7 @@ void test_actuatorsResponseLoop_UnknownMessages(void) {
     sleep(1);
 
     // Checks that the actuators' state did NOT change
+    //// Test case ID: TC_AEB_A__010
     TEST_ASSERT_TRUE(actuators_state.belt_tightness);
     TEST_ASSERT_FALSE(actuators_state.door_lock);
     TEST_ASSERT_TRUE(actuators_state.should_activate_abs);
