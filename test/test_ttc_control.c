@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include "unity.h"
 #include <math.h>
+#include <stdbool.h>
 
 double relspeed_test;
 double distance_test;
@@ -89,8 +90,49 @@ void test_ttc_when_delta_positive(){
     dist[2] = 19.41; vel[2] = 45.3116; acel[2] = -1.29;
     ttc[2] = ttc_calc(dist[2], vel[2], acel[2]);
     TEST_ASSERT_FLOAT_WITHIN(delta, 1.6882, ttc[2]);
+}
 
+void test_aebcontrol_no_actuators_trigger(){
+    bool enable_aeb, alarm_cluster, enable_breaking, lk_seatbelt, lk_doors;
+    double spd, dist, acel;
 
+    // Safe situation: TTC high enough so alarm cluster and auto breaking are disabled
+    enable_aeb = true;
+    dist = 90; spd = 20; acel=0.5;   
+    
+    aeb_control(&enable_aeb,&alarm_cluster,&enable_breaking,&lk_seatbelt,&lk_doors,
+        &spd, &dist, &acel);
+    
+    TEST_ASSERT_FALSE(alarm_cluster);
+    TEST_ASSERT_FALSE(enable_breaking);
+
+    // Unsafe situation, but AEB deactivated by user:
+    enable_aeb = false;
+    dist = 7.5; spd = 60; acel=2.5;   
+    
+    aeb_control(&enable_aeb,&alarm_cluster,&enable_breaking,&lk_seatbelt,&lk_doors,
+        &spd, &dist, &acel);
+    
+    TEST_ASSERT_FALSE(alarm_cluster);
+    TEST_ASSERT_FALSE(enable_breaking);
+}
+
+void test_aeb_worst_situation(){
+    bool enable_aeb, alarm_cluster, enable_breaking, lk_seatbelt, lk_doors;
+    double spd, dist, acel;
+
+    // Worst situation: TTC low enough that even seatbelts and doors must be
+    // accordingly triggered
+
+    enable_aeb = true;
+    dist = 5.5; spd = 58.91; acel=2.5;   
+    aeb_control(&enable_aeb,&alarm_cluster,&enable_breaking,&lk_seatbelt,&lk_doors,
+        &spd, &dist, &acel);
+    
+    TEST_ASSERT_TRUE(alarm_cluster);
+    TEST_ASSERT_TRUE(enable_breaking);
+    TEST_ASSERT_TRUE(lk_seatbelt);
+    TEST_ASSERT_FALSE(lk_doors);
 }
 
 int main(){
@@ -100,6 +142,8 @@ int main(){
     RUN_TEST(test_ttc_when_delta_negative);    
     RUN_TEST(test_ttc_when_delta_zero);
     RUN_TEST(test_ttc_when_delta_positive);    
+    RUN_TEST(test_aebcontrol_no_actuators_trigger);    
+    RUN_TEST(test_aeb_worst_situation);    
     
     return UNITY_END();
 }

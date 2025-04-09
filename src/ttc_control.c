@@ -38,6 +38,8 @@ double ttc_calc(double dis_rel, double spd_rel, double rel_acel) {
     }
 }
 
+// Useful but unused function
+#ifndef aeb_decision
 /**
  * @brief Controls the Autonomous Emergency Braking (AEB) system.
  * 
@@ -86,3 +88,4 @@ void aeb_control(bool *enable_aeb, bool *alarm_cluster, bool *enable_breaking,
         *enable_breaking = false;
     }
 }
+#endif
