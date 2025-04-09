@@ -87,20 +87,22 @@ void tearDown(void) {
 }
 
 /**
- * @brief Test for the function updateInternalPedalsState.
+ * @brief Test for the function updateInternalPedalsState. [SwR-6], [SwR-9], [SwR-11]
  */
 void test_updateInternalPedalsState(void) {
     can_msg captured_frame = { .identifier = ID_PEDALS, .dataFrame = {0x01, 0x00} };
 
     updateInternalPedalsState(captured_frame);
 
-    TEST_ASSERT_TRUE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be ON
+    //// Test Case ID: TC_AEB_CTRL_001
+    TEST_ASSERT_TRUE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be ON  
     TEST_ASSERT_FALSE(aeb_internal_state.brake_pedal);  // Brake pedal should be OFF
     
     captured_frame.dataFrame[0] = 0x01;
     captured_frame.dataFrame[1] = 0x01;
     updateInternalPedalsState(captured_frame);
     
+    //// Test Case ID: TC_AEB_CTRL_002
     TEST_ASSERT_TRUE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be ON
     TEST_ASSERT_TRUE(aeb_internal_state.brake_pedal);  // Brake pedal should be ON
     
@@ -108,6 +110,7 @@ void test_updateInternalPedalsState(void) {
     captured_frame.dataFrame[1] = 0x00;
     updateInternalPedalsState(captured_frame);
     
+    //// Test Case ID: TC_AEB_CTRL_003
     TEST_ASSERT_FALSE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be OFF
     TEST_ASSERT_FALSE(aeb_internal_state.brake_pedal);  // Brake pedal should be OFF
     
@@ -115,20 +118,23 @@ void test_updateInternalPedalsState(void) {
     captured_frame.dataFrame[1] = 0x01;
     updateInternalPedalsState(captured_frame);
     
+    //// Test Case ID: TC_AEB_CTRL_004
     TEST_ASSERT_FALSE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be OFF
     TEST_ASSERT_TRUE(aeb_internal_state.brake_pedal);  // Brake pedal should be ON
 }
 
 /**
- * @brief Test for the function updateInternalSpeedState.
+ * @brief Test for the function updateInternalSpeedState. [SwR-6], [SwR-9], [SwR-11]
  */
 void test_updateInternalSpeedState(void) {
     can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0x00, 0x64, 0x00} };
     
+    //// Test Case ID: TC_AEB_CTRL_005
     // Case 1: Normal case where the speed is updated correctly
     updateInternalSpeedState(captured_frame);
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 100.0); // (0x64 + (0x00 << 8)) * RES_SPEED_S = 100.0 
     
+    //// Test Case ID: TC_AEB_CTRL_006
     // Case 2: Case where the CAN data is set to clear data (0xFE, 0xFF)
     captured_frame.dataFrame[0] = 0xFE;
     captured_frame.dataFrame[1] = 0xFF;
@@ -136,17 +142,20 @@ void test_updateInternalSpeedState(void) {
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 0.0); // Should reset speed to 0.0
     TEST_ASSERT_FALSE(aeb_internal_state.reverseEnabled); // Should also reset reverseEnabled to false
     
+    //// Test Case ID: TC_AEB_CTRL_007
     // Case 3: Case where the CAN data is set to indicate reverse (0x01 in dataFrame[2])
     captured_frame.dataFrame[2] = 0x01;
     updateInternalSpeedState(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.reverseEnabled); // Should enable reverse
 
+    //// Test Case ID: TC_AEB_CTRL_008
     // Case 4: Max speed value constraint (should be capped at 251.0)
     captured_frame.dataFrame[0] = 0xFF; 
     captured_frame.dataFrame[1] = 0xFD; // Maximum possible value
     updateInternalSpeedState(captured_frame);
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 251.0); // Should be capped at 251.0
     
+    //// Test Case ID: TC_AEB_CTRL_009
     // Case 5: Test when the CAN frame data doesn't require any action (0xFF, 0xFF in dataFrame[0] and dataFrame[1])
     captured_frame.dataFrame[0] = 0xFF;
     captured_frame.dataFrame[1] = 0xFF;
@@ -161,16 +170,18 @@ void test_updateInternalSpeedState(void) {
 }
 
 /**
- * @brief Test for the function updateInternalObstacleState.
+ * @brief Test for the function updateInternalObstacleState. [SwR-3], [SwR-6], [SwR-7], [SwR-8], [SwR-9], [SwR-11], [SwR-15]
  */
 void test_updateInternalObstacleState(void) {
     can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xD0, 0x07, 0x01} };
     
+    //// Test Case ID: TC_AEB_CTRL_010
     // Case 1: Obstacle detected and distance calculated correctly
     updateInternalObstacleState(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);  // Obstacle detected
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Expected distance =  (0xD0 + (0x07 << 8)) * RES_OBSTACLE = 100.0
     
+    //// Test Case ID: TC_AEB_CTRL_011
     // Case 2: No obstacle (0x00 in dataFrame[2])
     captured_frame.dataFrame[2] = 0x00;
     updateInternalObstacleState(captured_frame);
@@ -178,6 +189,7 @@ void test_updateInternalObstacleState(void) {
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Distance should remain the same
     // Logic problem: if the obstacle is not detected, the distance should be set to 300.0 (max distance).
 
+    //// Test Case ID: TC_AEB_CTRL_012
     // Case 3: Data reset with 0xFE, 0xFF
     captured_frame.dataFrame[0] = 0xFE;
     captured_frame.dataFrame[1] = 0xFF;
@@ -194,12 +206,13 @@ void test_updateInternalObstacleState(void) {
     
     // Case 5: Calculated distance from CAN data
     captured_frame.dataFrame[0] = 0xD0;
-    captured_frame.dataFrame[1] = 0x07; // Data distance = 0x0201 = 513
+    captured_frame.dataFrame[1] = 0x07; // Data distance = 0x0D07 = 100
     captured_frame.dataFrame[2] = 0x01; // Obstacle exists
     updateInternalObstacleState(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);  // Obstacle detected
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Calculated distance
     
+    //// Test Case ID: TC_AEB_CTRL_013
     // Case 6: Maximum distance capped at 300.0
     captured_frame.dataFrame[0] = 0xFF;
     captured_frame.dataFrame[1] = 0xFD; // Data distance = 0xFFFF = 65535
@@ -209,15 +222,17 @@ void test_updateInternalObstacleState(void) {
 }
 
 /**
- * @brief Test for the function updateInternalCarCState.
+ * @brief Test for the function updateInternalCarCState. [SwR-2], [SwR-3], [SwR-7], [SwR-8], [SwR-11], [SwR-12], [SwR-16]
  */
 void test_updateInternalCarCState(void) {
     can_msg captured_frame = { .identifier = ID_CAR_C, .dataFrame = {0x01} };
 
+    //// Test Case ID: TC_AEB_CTRL_014
     // Case 1: AEB system ON (dataFrame[0] == 0x01)
     updateInternalCarCState(captured_frame);
     TEST_ASSERT_TRUE(aeb_internal_state.on_off_aeb_system);  // AEB system should be ON
 
+    //// Test Case ID: TC_AEB_CTRL_015
     // Case 2: AEB system OFF (dataFrame[0] == 0x00)
     captured_frame.dataFrame[0] = 0x00;
     updateInternalCarCState(captured_frame);
@@ -235,7 +250,7 @@ void test_updateInternalCarCState(void) {
 }
 
 /**
- * @brief Test for the function getAEBState.
+ * @brief Test for the function getAEBState. [SwR-2], [SwR-3], [SwR-6], [SwR-7], [SwR-8], [SwR-9], [SwR-11], [SwR-12], [SwR-15],[SwR-16]. 
  */
 void test_getAEBState(void) {
     // Initial setup of AEB state
@@ -274,27 +289,32 @@ void test_getAEBState(void) {
     state = getAEBState(aeb_internal_state, ttc);
     TEST_ASSERT_EQUAL_INT(state, AEB_STATE_STANDBY);  // Should go to STANDBY state
 
+    //// Test Case ID: TC_AEB_CTRL_016
     // Case 6: Pedals deactivated (accelerator and brake) with low TTC (should go to BRAKE state)
     aeb_internal_state.relative_velocity = 60.0;  // Speed within allowed range
     ttc = 0.8;  // TTC lower than the braking threshold
     state = getAEBState(aeb_internal_state, ttc);
     TEST_ASSERT_EQUAL_INT(state, AEB_STATE_BRAKE);  // Should go to BRAKE state due to low TTC
 
+    //// Test Case ID: TC_AEB_CTRL_017
     // Case 7: Pedals deactivated with TTC within alarm range (should go to ALARM state)
     ttc = 1.5;  // TTC greater than the braking threshold but less than the alarm threshold
     state = getAEBState(aeb_internal_state, ttc);
     TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ALARM);  // Should go to ALARM state
 
+    //// Test Case ID: TC_AEB_CTRL_018
     // Case 8: Pedals deactivated with TTC greater than alarm threshold (should go to ACTIVE state)
     ttc = 2.0;  // TTC greater than alarm threshold
     state = getAEBState(aeb_internal_state, ttc);
     TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ACTIVE);  // Should go to ACTIVE state
 
+    //// Test Case ID: TC_AEB_CTRL_019
     // Case 9: Brake pedal pressed (should go to ACTIVE state)
     aeb_internal_state.brake_pedal = true;  // Brake pedal pressed
     state = getAEBState(aeb_internal_state, ttc);
     TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ACTIVE);  // Should go to ACTIVE state regardless of TTC
 
+    //// Test Case ID: TC_AEB_CTRL_020
     // Case 10: Accelerator pedal pressed (should go to ACTIVE state)
     aeb_internal_state.accelerator_pedal = true;  // Accelerator pedal pressed
     state = getAEBState(aeb_internal_state, ttc);
@@ -302,11 +322,12 @@ void test_getAEBState(void) {
 }
 
 /**
- * @brief Test for the function translateAndCallCanMsg.
+ * @brief Series of tests for the function translateAndCallCanMsg. [SwR-9] 
  */
 void test_translateAndCallCanMsg_1(void) {
     can_msg captured_frame;
 
+    ///// Test Case ID: TC_AEB_CTRL_021
     // Case 1: Pedal identifier (ID_PEDALS) should call updateInternalPedalsState
     captured_frame.identifier = ID_PEDALS;
     captured_frame.dataFrame[0] = 0x01;  // Accelerator ON
@@ -333,6 +354,7 @@ void test_translateAndCallCanMsg_3()
 {
     can_msg captured_frame;
 
+    //// Test Case ID: TC_AEB_CTRL_022
     // Case 3: Speed identifier (ID_SPEED_S) should call updateInternalSpeedState
     captured_frame.identifier = ID_SPEED_S;
     captured_frame.dataFrame[0] = 0x00;
@@ -346,6 +368,7 @@ void test_translateAndCallCanMsg_4()
 {
     can_msg captured_frame;
 
+    //// Test Case ID: TC_AEB_CTRL_023
     // Case 4: Obstacle identifier (ID_OBSTACLE_S) should call updateInternalObstacleState
     captured_frame.identifier = ID_OBSTACLE_S;
     captured_frame.dataFrame[0] = 0xD0;  // Distance part 1
@@ -360,6 +383,7 @@ void test_translateAndCallCanMsg_5()
 {
     can_msg captured_frame;
 
+    //// Test Case ID: TC_AEB_CTRL_024
     // Case 5: Car identifier (ID_CAR_C) should call updateInternalCarCState
     captured_frame.identifier = ID_CAR_C;
     captured_frame.dataFrame[0] = 0x01;  // AEB system ON
