@@ -10,7 +10,7 @@ double relspeed_test;
 double distance_test;
 //struct timespec wait_time = {0, 1000000}; // 0.001s
 
-#define delta 0.001 // margin of error
+#define delta 0.0001 // margin of error
 
 void mywait(){
     // struct timespec wait_time = {1, 000000000};
@@ -63,21 +63,43 @@ void test_ttc_when_delta_negative(){
     TEST_ASSERT_FLOAT_WITHIN(delta, 99, ttc[2]);
 }
 
-// void test_accel_calc_negative_accel() {
-//     accel_calc(60.0);
-//     mywait();
-//     TEST_ASSERT_FLOAT_WITHIN(delta, -2.777, accel_calc(50.0)); // Aceleração esperada: ~-2.777 m/s²
-// }
+void test_ttc_when_delta_zero(){
+    double dist[3], vel[3], acel[3], ttc[3];
 
-// ttc_calc//
+    dist[0] = 10.0; vel[0] = 18.0; acel[0] = -1.25;
+    ttc[0] = ttc_calc(dist[0], vel[0], acel[0]);
+    TEST_ASSERT_FLOAT_WITHIN(delta, 4, ttc[0]);
+
+    dist[1] = 60.0; vel[1] = 54.0; acel[1] = -1.875;
+    ttc[1] = ttc_calc(dist[1], vel[1], acel[1]);
+    TEST_ASSERT_FLOAT_WITHIN(delta, 8, ttc[1]);
+}
+
+void test_ttc_when_delta_positive(){
+    double dist[3], vel[3], acel[3], ttc[3];
+
+    dist[0] = 20; vel[0] = 59.5; acel[0] = -3;
+    ttc[0] = ttc_calc(dist[0], vel[0], acel[0]);
+    TEST_ASSERT_FLOAT_WITHIN(delta, 1.3839, ttc[0]);
+
+    dist[1] = 60.0; vel[1] = 56; acel[1] = -2;
+    ttc[1] = ttc_calc(dist[1], vel[1], acel[1]);
+    TEST_ASSERT_FLOAT_WITHIN(delta, 7.075, ttc[1]);
+
+    dist[2] = 19.41; vel[2] = 45.3116; acel[2] = -1.29;
+    ttc[2] = ttc_calc(dist[2], vel[2], acel[2]);
+    TEST_ASSERT_FLOAT_WITHIN(delta, 1.6882, ttc[2]);
+
+
+}
 
 int main(){
     UNITY_BEGIN();
-    //RUN_TEST();
-
+    
     RUN_TEST(test_ttc_when_acel_zero);    
     RUN_TEST(test_ttc_when_delta_negative);    
-
-    // changes here
+    RUN_TEST(test_ttc_when_delta_zero);
+    RUN_TEST(test_ttc_when_delta_positive);    
+    
     return UNITY_END();
 }
