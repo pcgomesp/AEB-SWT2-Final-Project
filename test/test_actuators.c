@@ -3,6 +3,7 @@
 #include "dbc.h"
 #include "constants.h"
 #include "mq_utils.h"
+#include <unistd.h>
 
 // Declare the actuatorsResponseLoop function if it's defined elsewhere
 void *actuatorsResponseLoop(void *arg);
