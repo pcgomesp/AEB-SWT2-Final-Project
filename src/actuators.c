@@ -86,14 +86,6 @@ void *actuatorsResponseLoop(void *arg)
     return NULL;
 }
 
-void print_info_output(){
-    printf("belt_tightness: %s\n", actuators_state.belt_tightness ? "true" : "false");
-    printf("door_lock: %s\n", actuators_state.door_lock ? "true" : "false");
-    printf("should_activate_abs: %s\n", actuators_state.should_activate_abs ? "true" : "false");
-    printf("alarm_led: %s\n", actuators_state.alarm_led ? "true" : "false");
-    printf("alarm_buzzer: %s\n", actuators_state.alarm_buzzer ? "true" : "false");
-}
-
 void actuatorsTranslateCanMsg(can_msg captured_frame)
 {
     switch (captured_frame.identifier)
