@@ -108,8 +108,8 @@ lcov:
 		fi; \
 		$(CC) $(TESTFLAGS) $(COVFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) -lm -lrt $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_lcov_bin; \
 		./$(OBJFOLDER)$(test_file:.c=)_lcov_bin > /dev/null 2>&1; \
-		lcov --capture --directory . --output-file $(COVFOLDER)$(src_file:.c=.info) --no-external; \
-		genhtml $(COVFOLDER)$(src_file:.c=.info) --output-directory $(COVFOLDER)$(src_file:.c=)_report; \
+		lcov --rc lcov_branch_coverage=1 --capture --directory . --output-file $(COVFOLDER)$(src_file:.c=.info) --no-external; \
+		genhtml --branch-coverage $(COVFOLDER)$(src_file:.c=.info) --output-directory $(COVFOLDER)$(src_file:.c=)_report; \
 		echo "LCOV report generated at $(COVFOLDER)$(src_file:.c=)_report/index.html"; \
 	fi
 
@@ -120,7 +120,7 @@ full-cov: clean-cov
 		$(eval test_file := $(word 1,$(subst :, ,$(pair)))) \
 		$(eval src_file := $(word 2,$(subst :, ,$(pair)))) \
 		echo "\nProcessing $(test_file) for $(src_file)"; \
-		if [ "$(test_file)" = "test_log_utils.c"  ] || [ "$(test_file)" = "test_file_reader.c"  ]; then \
+		if [ "$(test_file)" = "test_log_utils.c" ]; then \
 			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
 		else \
 			WRAP_FLAGS=""; \
@@ -130,8 +130,8 @@ full-cov: clean-cov
 		gcov -b $(SRCFOLDER)$(src_file) -o $(OBJFOLDER)$(test_file:.c=)_cov_bin-$(src_file:.c=.gcda); \
 	)
 	@echo "\nGenerating combined LCOV report..."
-	@lcov --capture --directory . --output-file $(COVFOLDER)combined.info --no-external
-	@genhtml $(COVFOLDER)combined.info --output-directory $(COVFOLDER)full_report
+	@lcov --rc lcov_branch_coverage=1 --capture --directory . --output-file $(COVFOLDER)combined.info --no-external
+	@genhtml --branch-coverage $(COVFOLDER)combined.info --output-directory $(COVFOLDER)full_report
 	@echo "\nFull coverage analysis complete!"
 	@echo "Individual GCOV reports generated in the source directory"
 	@echo "Combined LCOV report available at $(COVFOLDER)full_report/index.html"
