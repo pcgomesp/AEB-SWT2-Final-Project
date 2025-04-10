@@ -19,17 +19,26 @@ double test_relative_velocity = 108.0;
 double test_obstacle_distance = 60;
 double test_relative_acceleration; 
 
-
+/**
+ * @brief setUp function to initialize AEB input state before each test.
+ */
 void setUp()
 {
     // empty setUp
 }
 
+/**
+ * @brief tearDown function to clean up after each test.
+ */
 void tearDown()
 {
     // empty tearDown
 }
 
+/** 
+ * @test
+ * @brief Tests for the function conv2CANCarClusterData on sensors.c 
+*/
 void test_conv2CANCarClusterData_AEB_on()
 {
     test_on_off_aeb_system = true;
@@ -50,6 +59,10 @@ void test_conv2CANCarClusterData_AEB_off()
     
 }
 
+/** 
+ * @test
+ * @brief Tests for the function conv2CANVelocityData on sensors.c 
+*/
 void test_conv2CANVelocityData_Forward() 
 {
     test_vehicle_direction = true;
@@ -95,6 +108,10 @@ void test_conv2CANVelocityData_Reverse()
     TEST_ASSERT_EQUAL_UINT8(0x01, result.dataFrame[5]); // Acceleration is negative
 }
 
+/** 
+ * @test
+ * @brief Tests for the function conv2CANObstacleData on sensors.c 
+*/
 void test_conv2CANObstacleData_Present() 
 {
     test_has_obstacle = true;
@@ -121,6 +138,10 @@ void test_conv2CANObstacleData_NotPresent()
     TEST_ASSERT_EQUAL_UINT8((expected_distance >> 8) & 0xFF, result.dataFrame[1]); // most significant byte
 }
 
+/** 
+ * @test
+ * @brief Tests for the function conv2CANPedalsData on sensors.c 
+*/
 void test_conv2CANPedalsData_BrakeAndAccelerator() 
 {
     test_brake_pedal = true;
