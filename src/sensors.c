@@ -28,7 +28,7 @@ int main()
 
     sensors_mq = create_mq(SENSORS_MQ);
 
-    const char *filename = "cts/cenario.txt";
+    const char *filename = "tcs/cenario.txt";
     FILE *file = open_file(filename); // uses the modularized function to open the file
 
     sensors_thr = pthread_create(&sensors_id, NULL, getSensorsData, file); // Changed the argument from null to file(the last argument)

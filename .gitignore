@@ -33,3 +33,8 @@ test/*
 *.pdb      # Debugging files on Windows
 *.class    # Java bytecode files
 *.jar      # Java JAR files
+
+# Ignore generated documentation files
+docs/html/*
+docs/latex/*
+docs/rtf/*

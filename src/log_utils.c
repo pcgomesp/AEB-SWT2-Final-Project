@@ -29,6 +29,14 @@ void log_event(const char *id_aeb, uint32_t event_id, actuators_abstraction actu
         return;
     }
 
+    //Check if the file is empty
+    fseek(log_file, 0, SEEK_END);
+    if (ftell(log_file) == 0) {
+        // If the file is empty, write the header
+        fprintf(log_file, "ID_AEB | EVENT_ID | TIMESTAMP | MESSAGE | BELT_TIGHTNESS | DOOR_LOCK | ABS_ACTIVATION | ALARM_LED | ALARM_BUZZER\n");
+    }
+    fseek(log_file, 0, SEEK_END); // Move the file pointer to the end of the file
+
     // Getting the timestamp instead just the date, because it's more useful (miliseconds)
     struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
@@ -39,7 +47,7 @@ void log_event(const char *id_aeb, uint32_t event_id, actuators_abstraction actu
     snprintf(event_id_str, sizeof(event_id_str), "%08X", event_id);
 
     // Write in file in desired format
-    fprintf(log_file, "[%s][%s][T:%07ld] WARNING | %d | %d | %d | %d | %d\n",
+    fprintf(log_file, "%s | %s | %07ld | WARNING | %d | %d | %d | %d | %d\n",
             id_aeb,
             event_id_str,
             timestamp_ms,

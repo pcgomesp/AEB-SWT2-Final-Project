@@ -2,7 +2,7 @@
 #include "file_reader.h"
 #include <sys/stat.h>
 
-const char *test_filename = "cts/cenario.txt";
+const char *test_filename = "tcs/cenario.txt";
 FILE *test_file;
 
 void setUp()
