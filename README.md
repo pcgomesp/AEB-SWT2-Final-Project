@@ -59,6 +59,7 @@ To build and run the project, follow the steps below:
 1. **Prerequisites**:
    - A POSIX-compliant operating system.
    - A C compiler (e.g., GCC) installed on your system.
+   - LCOV package installed on the system.
 
 2. **Building the Project**:
    - Navigate to the project's root directory.
