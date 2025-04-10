@@ -78,17 +78,20 @@ void *actuatorsResponseLoop(void *arg)
 
         log_event("AEB1", event_id, actuators_state); // [SwR-4]
 
-        printf("belt_tightness: %s\n", actuators_state.belt_tightness ? "true" : "false");
-        printf("door_lock: %s\n", actuators_state.door_lock ? "true" : "false");
-        printf("should_activate_abs: %s\n", actuators_state.should_activate_abs ? "true" : "false");
-        printf("alarm_led: %s\n", actuators_state.alarm_led ? "true" : "false");
-        printf("alarm_buzzer: %s\n", actuators_state.alarm_buzzer ? "true" : "false");
 
         usleep(200000); // Deprected, change for function other later
     }
 
     printf("Actuators: empty_mq_counter reached the limit, exiting\n");
     return NULL;
+}
+
+void print_info_output(){
+    printf("belt_tightness: %s\n", actuators_state.belt_tightness ? "true" : "false");
+    printf("door_lock: %s\n", actuators_state.door_lock ? "true" : "false");
+    printf("should_activate_abs: %s\n", actuators_state.should_activate_abs ? "true" : "false");
+    printf("alarm_led: %s\n", actuators_state.alarm_led ? "true" : "false");
+    printf("alarm_buzzer: %s\n", actuators_state.alarm_buzzer ? "true" : "false");
 }
 
 void actuatorsTranslateCanMsg(can_msg captured_frame)
@@ -99,7 +102,7 @@ void actuatorsTranslateCanMsg(can_msg captured_frame)
         updateInternalActuatorsState(captured_frame);
         break;
     case ID_EMPTY:
-        printf("Actuators: Empty message received\n");
+        //printf("Actuators: Empty message received\n");
         break;
     default:
         printf("Actuators: CAN Identifier unknown\n");

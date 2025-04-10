@@ -3,17 +3,13 @@
 #include "dbc.h"
 #include "constants.h"
 #include "mq_utils.h"
+#include <unistd.h>
 
 // Declare the actuatorsResponseLoop function if it's defined elsewhere
 void *actuatorsResponseLoop(void *arg);
 #include <pthread.h>
 
 #define LOOP_EMPTY_ITERATIONS_MAX 11
-
-
-
-
-
 
 
 // Mock to open_mq function
@@ -39,6 +35,8 @@ int read_mq(mqd_t mq, can_msg *msg) {
     return -1; // EMpty queue
 }
 
+
+
 // Mock to log_event
 void log_event(const char *id_aeb, uint32_t event_id, actuators_abstraction actuators) {
     printf("[MOCK LOG] ID: %s, Event: 0x%X, BELT: %d, DOOR: %d, ABS: %d, LED: %d, BUZZ: %d\n",
@@ -59,11 +57,15 @@ void setUp(void) {
 }
 
 void tearDown(void) {
-    // Nada a fazer após cada teste
+    // Nothing to do here
+    // This function is called after each test
 }
 
+/**
+ * @test
+ * @brief Verifies if actuatorsTranslateCanMsg correctly processes a message with ID_AEB_S
+ */
 void test_actuatorsTranslateCanMsg_AEB_S_Identifier(void) {
-    // Verifies if actuatorsTranslateCanMsg correctly processes a message with ID_AEB_S
     can_msg test_msg = {
         .identifier = ID_AEB_S,
         .dataFrame = {0xFF, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
@@ -72,6 +74,7 @@ void test_actuatorsTranslateCanMsg_AEB_S_Identifier(void) {
     actuatorsTranslateCanMsg(test_msg);
 
     // Checks if the actuators' state was updated correctly
+    //// Test case ID: TC_AEB_A__001
     TEST_ASSERT_TRUE(actuators_state.belt_tightness);
     TEST_ASSERT_FALSE(actuators_state.door_lock);
     TEST_ASSERT_TRUE(actuators_state.should_activate_abs);
@@ -79,8 +82,11 @@ void test_actuatorsTranslateCanMsg_AEB_S_Identifier(void) {
     TEST_ASSERT_TRUE(actuators_state.alarm_buzzer);
 }
 
+/**
+ * @test
+ * @brief Verifies if actuatorsTranslateCanMsg handles a message with ID_EMPTY correctly
+ */
 void test_actuatorsTranslateCanMsg_Empty_Identifier(void) {
-    // Verifies if actuatorsTranslateCanMsg handles a message with ID_EMPTY correctly
     can_msg test_msg = {
         .identifier = ID_EMPTY,
         .dataFrame = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01}
@@ -89,6 +95,7 @@ void test_actuatorsTranslateCanMsg_Empty_Identifier(void) {
     actuatorsTranslateCanMsg(test_msg);
 
     // Checks that the actuators' state remains unchanged
+    //// Test case ID: TC_AEB_A__002
     TEST_ASSERT_FALSE(actuators_state.belt_tightness);
     TEST_ASSERT_FALSE(actuators_state.door_lock);
     TEST_ASSERT_FALSE(actuators_state.should_activate_abs);
@@ -96,6 +103,10 @@ void test_actuatorsTranslateCanMsg_Empty_Identifier(void) {
     TEST_ASSERT_FALSE(actuators_state.alarm_buzzer);
 }
 
+/**
+ * @test
+ * @brief Verifies if actuatorsTranslateCanMsg handles a message with ID_EMPTY correctly
+ */
 void test_updateInternalActuatorsState_Correct_State(void) {
     // Verifies if updateInternalActuatorsState correctly updates the actuators' state
     can_msg test_msg = {
@@ -106,6 +117,7 @@ void test_updateInternalActuatorsState_Correct_State(void) {
     updateInternalActuatorsState(test_msg);
 
     // Checks the expected state of the actuators
+    //// Test case ID: TC_AEB_A__003
     TEST_ASSERT_TRUE(actuators_state.belt_tightness);
     TEST_ASSERT_FALSE(actuators_state.door_lock);
     TEST_ASSERT_TRUE(actuators_state.should_activate_abs);
@@ -113,9 +125,11 @@ void test_updateInternalActuatorsState_Correct_State(void) {
     TEST_ASSERT_TRUE(actuators_state.alarm_buzzer);
 }
 
-// Teste simples para a função actuatorsTranslateCanMsg
+/**
+ * @test
+ * @brief Verifies if actuatorsTranslateCanMsg correctly processes a valid message.
+ */
 void test_actuatorsTranslateCanMsg(void) {
-    // Verifies if actuatorsTranslateCanMsg correctly processes a valid message
     can_msg test_msg = {
         .identifier = ID_AEB_S,
         .dataFrame = {0xFF, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
@@ -124,6 +138,7 @@ void test_actuatorsTranslateCanMsg(void) {
     actuatorsTranslateCanMsg(test_msg);
 
     // Checks if the state was updated correctly
+        //// Test case ID: TC_AEB_A__004
     TEST_ASSERT_TRUE(actuators_state.belt_tightness);
     TEST_ASSERT_FALSE(actuators_state.door_lock);
     TEST_ASSERT_TRUE(actuators_state.should_activate_abs);
@@ -131,6 +146,10 @@ void test_actuatorsTranslateCanMsg(void) {
     TEST_ASSERT_TRUE(actuators_state.alarm_buzzer);
 }
 
+/**
+ * @test
+ * @brief Verifies if actuatorsTranslateCanMsg correctly processes a valid message.
+ */
 void test_actuatorsTranslateCanMsg_Unknown_Identifier(void) {
     // Verifies if actuatorsTranslateCanMsg handles an unknown identifier correctly
     can_msg test_msg = {
@@ -141,6 +160,7 @@ void test_actuatorsTranslateCanMsg_Unknown_Identifier(void) {
     actuatorsTranslateCanMsg(test_msg);
 
     // Checks that the actuators' state remains unchanged
+    //// Test case ID: TC_AEB_A__005
     TEST_ASSERT_FALSE(actuators_state.belt_tightness);
     TEST_ASSERT_FALSE(actuators_state.door_lock);
     TEST_ASSERT_FALSE(actuators_state.should_activate_abs);
@@ -158,6 +178,7 @@ void test_updateInternalActuatorsState_DataFrame0_Active(void) {
     updateInternalActuatorsState(test_msg);
 
     // Checks the expected state of the actuators
+    //// Test case ID: TC_AEB_A__006
     TEST_ASSERT_FALSE(actuators_state.belt_tightness);
     TEST_ASSERT_TRUE(actuators_state.door_lock);
     TEST_ASSERT_FALSE(actuators_state.should_activate_abs);
@@ -172,6 +193,7 @@ void test_updateInternalActuatorsState_DataFrame0_Active(void) {
 
 void test_InitialActuatorsState(void) {
     // Verifies that the initial state of the actuators is zero
+    //// Test case ID: TC_AEB_A__007
     TEST_ASSERT_FALSE(actuators_state.belt_tightness);
     TEST_ASSERT_FALSE(actuators_state.door_lock);
     TEST_ASSERT_FALSE(actuators_state.should_activate_abs);
@@ -189,6 +211,7 @@ void test_actuatorsTranslateCanMsg_Unexpected_DataFrame(void) {
     actuatorsTranslateCanMsg(test_msg);
 
     // Expected state: should follow the general rule of the `updateInternalActuatorsState` function
+    //// Test case ID: TC_AEB_A__008
     TEST_ASSERT_FALSE(actuators_state.belt_tightness);
     TEST_ASSERT_TRUE(actuators_state.door_lock);
     TEST_ASSERT_FALSE(actuators_state.should_activate_abs);
@@ -196,8 +219,13 @@ void test_actuatorsTranslateCanMsg_Unexpected_DataFrame(void) {
     TEST_ASSERT_FALSE(actuators_state.alarm_buzzer);
 }
 
+/**
+ * @test
+ * @brief Verifies if the actuators response loop handles an empty queue correctly
+ */
 void test_actuatorsResponseLoop_EmptyQueue(void) {
-    // Verifies if the actuators response loop handles an empty queue correctly
+    //// Test case ID: TC_AEB_A__009
+
     int initial_empty_mq_counter = 0;
     pthread_t thread;
 
@@ -208,6 +236,7 @@ void test_actuatorsResponseLoop_EmptyQueue(void) {
     sleep((LOOP_EMPTY_ITERATIONS_MAX + 1) * 0.2);
 
     // Checks if the empty iterations counter reached the limit
+
     TEST_ASSERT_EQUAL(LOOP_EMPTY_ITERATIONS_MAX, initial_empty_mq_counter);
 
     // Cancels and joins the thread
@@ -221,8 +250,12 @@ int mock_mq_send(mqd_t mq, const can_msg *msg) {
     return 0; // Simula sucesso no envio da mensagem
 }
 
+/**
+ * @test
+ * @brief Verifies if the actuators response loop handles unknown messages correctly
+ */
 void test_actuatorsResponseLoop_UnknownMessages(void) {
-    // Verifies if the actuators response loop handles unknown messages correctly
+    //// Test case ID: TC_AEB_A__010
     actuators_state.belt_tightness = false;
     actuators_state.door_lock = true;
     actuators_state.should_activate_abs = false;
@@ -246,6 +279,7 @@ void test_actuatorsResponseLoop_UnknownMessages(void) {
     sleep(1);
 
     // Checks that the actuators' state did NOT change
+    //// Test case ID: TC_AEB_A__011
     TEST_ASSERT_TRUE(actuators_state.belt_tightness);
     TEST_ASSERT_FALSE(actuators_state.door_lock);
     TEST_ASSERT_TRUE(actuators_state.should_activate_abs);
