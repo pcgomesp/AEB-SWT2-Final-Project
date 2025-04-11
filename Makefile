@@ -8,7 +8,7 @@ COVFOLDER := cov/
 CC := gcc
 CFLAGS := -Wall -lpthread -lm -lrt -I$(INCFOLDER)
 TESTFLAGS := -DUNITY_OUTPUT_COLOR -DTEST_MODE -DUNITY_INCLUDE_DOUBLE
-COVFLAGS := -fprofile-arcs -ftest-coverage
+COVFLAGS := -fprofile-arcs -ftest-coverage -fcondition-coverage
 
 SRCFILES := $(wildcard $(SRCFOLDER)*.c)
 
@@ -108,8 +108,8 @@ lcov:
 		fi; \
 		$(CC) $(TESTFLAGS) $(COVFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) -lm -lrt $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_lcov_bin; \
 		./$(OBJFOLDER)$(test_file:.c=)_lcov_bin > /dev/null 2>&1; \
-		lcov --rc lcov_branch_coverage=1 --capture --directory . --output-file $(COVFOLDER)$(src_file:.c=.info) --no-external; \
-		genhtml --branch-coverage $(COVFOLDER)$(src_file:.c=.info) --output-directory $(COVFOLDER)$(src_file:.c=)_report; \
+		lcov --mcdc-coverage --rc lcov_branch_coverage=1 --capture --directory . --output-file $(COVFOLDER)$(src_file:.c=.info) --no-external; \
+		genhtml --mcdc-coverage --branch-coverage $(COVFOLDER)$(src_file:.c=.info) --output-directory $(COVFOLDER)$(src_file:.c=)_report; \
 		echo "LCOV report generated at $(COVFOLDER)$(src_file:.c=)_report/index.html"; \
 	fi
 
@@ -130,8 +130,8 @@ full-cov: clean-cov
 		gcov -b $(SRCFOLDER)$(src_file) -o $(OBJFOLDER)$(test_file:.c=)_cov_bin-$(src_file:.c=.gcda); \
 	)
 	@echo "\nGenerating combined LCOV report..."
-	@lcov --rc lcov_branch_coverage=1 --capture --directory . --output-file $(COVFOLDER)combined.info --no-external
-	@genhtml --branch-coverage $(COVFOLDER)combined.info --output-directory $(COVFOLDER)full_report
+	@lcov --mcdc-coverage --rc lcov_branch_coverage=1 --capture --directory . --output-file $(COVFOLDER)combined.info --no-external
+	@genhtml --mcdc-coverage --branch-coverage $(COVFOLDER)combined.info --output-directory $(COVFOLDER)full_report
 	@echo "\nFull coverage analysis complete!"
 	@echo "Individual GCOV reports generated in the source directory"
 	@echo "Combined LCOV report available at $(COVFOLDER)full_report/index.html"
