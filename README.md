@@ -83,7 +83,7 @@ To build and run the project, follow the steps below:
 7. **Cleaning generated files**:
    - To clean the main files, use `make clean`.
    - To clean the tests files, use `make clean` and `make clean-cov`.
-   - To clean the doxygen files, use `make docs`.
+   - To clean the doxygen files, use `make clean-docs`.
 
 ## Contribution
 
