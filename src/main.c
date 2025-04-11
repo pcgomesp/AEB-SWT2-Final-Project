@@ -21,7 +21,6 @@ void wait_terminate_execution()
     close_mq(sensors_mq, SENSORS_MQ);
     close_mq(actuators_mq, ACTUATORS_MQ);
 
-    exit(0);
 }
 
 void terminate_execution(int sig)
@@ -85,6 +84,8 @@ int main()
     signal(SIGINT, terminate_execution);
 
     wait_terminate_execution();
+
+    printf("Execution finished, check out log/log.txt for info!\n");
 
     return EXIT_SUCCESS;
 }

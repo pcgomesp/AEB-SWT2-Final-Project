@@ -30,6 +30,17 @@ can_msg captured_can_frame = {
     .identifier = 0x0CFFB027,
     .dataFrame = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
 
+
+//Workaround to avoid the main function in this file
+// Write just the main function in the test file
+//Put the #ifndef TEST_MODE in the test file, as bellow
+//After the last line of main, put #endif
+
+//The next step is put the flag TEST_MODE in the Makefile
+//See the example:
+// 	$(CC) $(CFLAGS) -DTEST_MODE test/test_actuators.c src/actuators.c test/unity.c -o test/test_actuators -Iinc -Itest -lpthread
+//Put the flag TEST_MODE in the Makefile: -DTEST_MODE
+#ifndef TEST_MODE 
 int main()
 {
     actuators_mq = open_mq(ACTUATORS_MQ);
@@ -45,16 +56,11 @@ int main()
 
     return 0;
 }
+#endif 
+
 
 void *actuatorsResponseLoop(void *arg)
 {
-    // Step 01: Recieve message from Message Queue, with new data sent by AEB
-    // Step 02: Convert data from the AEB can_msg to actuators_state memory
-    // Step 03: Do the right activation from the actuator ->
-    // i.e., in our project, writing the correct expected output in a txt ou csv, since this is an abstraction
-    // Step 04: sleep, waiting the next message -> loop
-    // we must define a Stop criteria btw
-
     int empty_mq_counter = 0;
     while (empty_mq_counter < LOOP_EMPTY_ITERATIONS_MAX)
     {
@@ -68,17 +74,10 @@ void *actuatorsResponseLoop(void *arg)
             empty_mq_counter++;
         }
 
-        uint32_t event_id = 0x63A5D2E1; // A simple event_id for testing purposes
+        uint32_t event_id = captured_can_frame.identifier; 
 
-        // write in file here
-        // The condition below is for test porpuse, should be changed to a ttc value
         log_event("AEB1", event_id, actuators_state); // [SwR-4]
 
-        printf("belt_tightness: %s\n", actuators_state.belt_tightness ? "true" : "false");
-        printf("door_lock: %s\n", actuators_state.door_lock ? "true" : "false");
-        printf("should_activate_abs: %s\n", actuators_state.should_activate_abs ? "true" : "false");
-        printf("alarm_led: %s\n", actuators_state.alarm_led ? "true" : "false");
-        printf("alarm_buzzer: %s\n", actuators_state.alarm_buzzer ? "true" : "false");
 
         usleep(200000); // Deprected, change for function other later
     }
@@ -95,7 +94,7 @@ void actuatorsTranslateCanMsg(can_msg captured_frame)
         updateInternalActuatorsState(captured_frame);
         break;
     case ID_EMPTY:
-        printf("Actuators: Empty message received\n");
+        //printf("Actuators: Empty message received\n");
         break;
     default:
         printf("Actuators: CAN Identifier unknown\n");

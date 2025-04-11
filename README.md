@@ -1,3 +1,5 @@
+### AUTO EMERGENCY BREAKING - SWT2
+
 ## Project Description
 
 **AEB** is an advanced active safety system that assists drivers in avoiding or mitigating collisions with other vehicles or obstacles. It detects potential frontal collisions and automatically engages the vehicle's braking system to reduce speed or come to a complete stop, aiming to prevent or minimize impact.
@@ -58,7 +60,9 @@ To build and run the project, follow the steps below:
 
 1. **Prerequisites**:
    - A POSIX-compliant operating system.
-   - A C compiler (e.g., GCC) installed on your system.
+   - GCC 14.2 or newer installed on the system.
+   - LCOV 2.3 or newer package installed on the system.
+   - Doxygen Package installed.
 
 2. **Building the Project**:
    - Navigate to the project's root directory.
@@ -69,6 +73,17 @@ To build and run the project, follow the steps below:
 
 4. **Running Tests**:
    - To execute unit tests, use `make test`.
+  
+5. **Run tests, generating HTML file with branch and MC/DC coverage**:
+   - To execute coverage tests and generate HTML, use `make full-cov`.
+
+6. **Generating docs**:
+   - To generate docs according to doxygen specification, use `make docs`.
+
+7. **Cleaning generated files**:
+   - To clean the main files, use `make clean`.
+   - To clean the tests files, use `make clean` and `make clean-cov`.
+   - To clean the doxygen files, use `make clean-docs`.
 
 ## Contribution
 
