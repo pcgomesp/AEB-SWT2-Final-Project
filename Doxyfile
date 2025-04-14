@@ -867,7 +867,8 @@ WARN_LOGFILE           =
 INPUT                  = README.md \
                             src/ \ 
                             inc/ \ 
-                            test/
+                            test/ \
+                            docs/requirements.dox
                          
 
 # This tag can be used to specify the character encoding of the source files

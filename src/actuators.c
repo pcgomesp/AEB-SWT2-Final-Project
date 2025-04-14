@@ -59,6 +59,27 @@ int main()
 #endif 
 
 
+/**
+ * @brief Main loop for processing actuator messages.
+ *
+ * This function runs in a separate thread and continuously reads messages from the actuators message queue.
+ * It processes each message to update the internal state of the actuators and logs the event.
+ * If the message queue is empty for a specified number of iterations (`LOOP_EMPTY_ITERATIONS_MAX`), 
+ * the loop exits, signaling that no more messages are expected.
+ *
+ * @param arg Unused parameter (can be NULL).
+ * @return NULL
+ *
+ * @details
+ * - Reads messages from the `actuators_mq` message queue using `read_mq`.
+ * - If a message is successfully read, it resets the `empty_mq_counter` and processes the message using `actuatorsTranslateCanMsg`.
+ * - If the queue is empty, increments the `empty_mq_counter`.
+ * - Logs each processed message using `log_event`, including the current state of the actuators.
+ * - Waits for 200 milliseconds between iterations using `usleep`.
+ * - Exits the loop and prints a message when the `empty_mq_counter` reaches `LOOP_EMPTY_ITERATIONS_MAX`.
+ *
+ * Implements [SwR-4](@ref SwR-4)
+ */
 void *actuatorsResponseLoop(void *arg)
 {
     int empty_mq_counter = 0;
