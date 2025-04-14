@@ -45,7 +45,7 @@ void test_conv2CANCarClusterData_AEB_on()
     test_on_off_aeb_system = true;
     can_msg result = conv2CANCarClusterData(test_on_off_aeb_system);
     
-    // Test Case ID: TC_SENSORS001
+    // Test Case ID: TC_SENSORS_001
     TEST_ASSERT_EQUAL_INT(ID_CAR_C, result.identifier);
     TEST_ASSERT_EQUAL_UINT8(0x01, result.dataFrame[0]); // Check if AEB is on
 
@@ -56,7 +56,7 @@ void test_conv2CANCarClusterData_AEB_off()
     test_on_off_aeb_system = false;
     can_msg result = conv2CANCarClusterData(test_on_off_aeb_system);
     
-    // Test Case ID: TC_SENSORS002
+    // Test Case ID: TC_SENSORS_002
     TEST_ASSERT_EQUAL_INT(ID_CAR_C, result.identifier);
     TEST_ASSERT_EQUAL_UINT8(0x00, result.dataFrame[0]); // Check if AEB is off
     
@@ -73,7 +73,7 @@ void test_conv2CANVelocityData_Forward()
     test_relative_acceleration = 9.1234;
     can_msg result = conv2CANVelocityData(test_vehicle_direction, test_relative_velocity, test_relative_acceleration);
     
-    // Test Case ID: TC_SENSORS003
+    // Test Case ID: TC_SENSORS_003
 
     // vehicle direction data
     TEST_ASSERT_EQUAL_INT(ID_SPEED_S, result.identifier);
@@ -97,7 +97,7 @@ void test_conv2CANVelocityData_Reverse()
     test_relative_acceleration = -1.1234;
     can_msg result = conv2CANVelocityData(test_vehicle_direction, test_relative_velocity, test_relative_acceleration);
     
-    // Test Case ID: TC_SENSORS004
+    // Test Case ID: TC_SENSORS_004
 
     // vehicle direction data
     TEST_ASSERT_EQUAL_INT(ID_SPEED_S, result.identifier);
@@ -126,7 +126,7 @@ void test_conv2CANObstacleData_Present()
     test_has_obstacle = true;
     can_msg result = conv2CANObstacleData(test_has_obstacle, test_obstacle_distance);
     
-    // Test Case ID: TC_SENSORS005
+    // Test Case ID: TC_SENSORS_005
 
     TEST_ASSERT_EQUAL_INT(ID_OBSTACLE_S, result.identifier);
     TEST_ASSERT_EQUAL_UINT8(0x01, result.dataFrame[2]); // Check if obstacle is present
@@ -141,7 +141,7 @@ void test_conv2CANObstacleData_NotPresent()
     test_has_obstacle = false;
     can_msg result = conv2CANObstacleData(test_has_obstacle, test_obstacle_distance);
     
-    // Test Case ID: TC_SENSORS006
+    // Test Case ID: TC_SENSORS_006
 
     TEST_ASSERT_EQUAL_INT(ID_OBSTACLE_S, result.identifier);
     TEST_ASSERT_EQUAL_UINT8(0x00, result.dataFrame[2]); // Check if obstacle is not present
@@ -162,7 +162,7 @@ void test_conv2CANPedalsData_BrakeAndAccelerator()
     test_accelerator_pedal = true;
     can_msg result = conv2CANPedalsData(test_brake_pedal, test_accelerator_pedal);
     
-    // Test Case ID: TC_SENSORS007
+    // Test Case ID: TC_SENSORS_007
 
     TEST_ASSERT_EQUAL_INT(ID_PEDALS, result.identifier);
     TEST_ASSERT_EQUAL_UINT8(0x01, result.dataFrame[0]); // Accelerator pedal active
@@ -175,7 +175,7 @@ void test_conv2CANPedalsData_BrakeOnly()
     test_accelerator_pedal = false;
     can_msg result = conv2CANPedalsData(test_brake_pedal, test_accelerator_pedal);
     
-    // Test Case ID: TC_SENSORS008
+    // Test Case ID: TC_SENSORS_008
 
     TEST_ASSERT_EQUAL_INT(ID_PEDALS, result.identifier);
     TEST_ASSERT_EQUAL_UINT8(0x00, result.dataFrame[0]); // Accelerator pedal inactive
@@ -188,7 +188,7 @@ void test_conv2CANPedalsData_AcceleratorOnly()
     test_accelerator_pedal = true;
     can_msg result = conv2CANPedalsData(test_brake_pedal, test_accelerator_pedal);
     
-    // Test Case ID: TC_SENSORS009
+    // Test Case ID: TC_SENSORS_009
 
     TEST_ASSERT_EQUAL_INT(ID_PEDALS, result.identifier);
     TEST_ASSERT_EQUAL_UINT8(0x01, result.dataFrame[0]); // Accelerator pedal active
@@ -201,7 +201,7 @@ void test_conv2CANPedalsData_NoneActive()
     test_accelerator_pedal = false;
     can_msg result = conv2CANPedalsData(test_brake_pedal, test_accelerator_pedal);
     
-    // Test Case ID: TC_SENSORS010
+    // Test Case ID: TC_SENSORS_010
 
     TEST_ASSERT_EQUAL_INT(ID_PEDALS, result.identifier);
     TEST_ASSERT_EQUAL_UINT8(0x00, result.dataFrame[0]); // Accelerator pedal inactive
