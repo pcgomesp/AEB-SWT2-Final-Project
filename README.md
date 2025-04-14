@@ -1,4 +1,4 @@
-### AUTO EMERGENCY BREAKING - SWT2
+# AUTO EMERGENCY BRAKING - SWT2
 
 ## Project Description
 
