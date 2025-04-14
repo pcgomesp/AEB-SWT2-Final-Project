@@ -87,40 +87,62 @@ void tearDown(void) {
 }
 
 /**
- * @brief Test for the function updateInternalPedalsState. [SwR-6], [SwR-9], [SwR-11]
+ * @brief Helper function to check the pedal state.
+ * 
+ * @param expected_accelerator Expected state of the accelerator pedal.
+ * @param expected_brake Expected state of the brake pedal.
  */
-void test_updateInternalPedalsState(void) {
+void checkPedalState(bool expected_accelerator, bool expected_brake) {
+    TEST_ASSERT_EQUAL(expected_accelerator, aeb_internal_state.accelerator_pedal);
+    TEST_ASSERT_EQUAL(expected_brake, aeb_internal_state.brake_pedal);
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_001: Accelerator pedal ON, Brake pedal OFF.
+ */
+void test_TC_AEB_CTRL_001(void) {
     can_msg captured_frame = { .identifier = ID_PEDALS, .dataFrame = {0x01, 0x00} };
 
     updateInternalPedalsState(captured_frame);
 
-    //// Test Case ID: TC_AEB_CTRL_001
-    TEST_ASSERT_TRUE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be ON  
-    TEST_ASSERT_FALSE(aeb_internal_state.brake_pedal);  // Brake pedal should be OFF
-    
-    captured_frame.dataFrame[0] = 0x01;
-    captured_frame.dataFrame[1] = 0x01;
+    // Test: Accelerator pedal should be ON, Brake pedal should be OFF
+    checkPedalState(true, false);
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_002: Accelerator pedal ON, Brake pedal ON.
+ */
+void test_TC_AEB_CTRL_002(void) {
+    can_msg captured_frame = { .identifier = ID_PEDALS, .dataFrame = {0x01, 0x01} };
+
     updateInternalPedalsState(captured_frame);
-    
-    //// Test Case ID: TC_AEB_CTRL_002
-    TEST_ASSERT_TRUE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be ON
-    TEST_ASSERT_TRUE(aeb_internal_state.brake_pedal);  // Brake pedal should be ON
-    
-    captured_frame.dataFrame[0] = 0x00;
-    captured_frame.dataFrame[1] = 0x00;
+
+    // Test: Accelerator pedal should be ON, Brake pedal should be ON
+    checkPedalState(true, true);
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_003: Accelerator pedal OFF, Brake pedal OFF.
+ */
+void test_TC_AEB_CTRL_003(void) {
+    can_msg captured_frame = { .identifier = ID_PEDALS, .dataFrame = {0x00, 0x00} };
+
     updateInternalPedalsState(captured_frame);
-    
-    //// Test Case ID: TC_AEB_CTRL_003
-    TEST_ASSERT_FALSE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be OFF
-    TEST_ASSERT_FALSE(aeb_internal_state.brake_pedal);  // Brake pedal should be OFF
-    
-    captured_frame.dataFrame[0] = 0x00;
-    captured_frame.dataFrame[1] = 0x01;
+
+    // Test: Accelerator pedal should be OFF, Brake pedal should be OFF
+    checkPedalState(false, false);
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_004: Accelerator pedal OFF, Brake pedal ON.
+ */
+void test_TC_AEB_CTRL_004(void) {
+    can_msg captured_frame = { .identifier = ID_PEDALS, .dataFrame = {0x00, 0x01} };
+
     updateInternalPedalsState(captured_frame);
-    
-    //// Test Case ID: TC_AEB_CTRL_004
-    TEST_ASSERT_FALSE(aeb_internal_state.accelerator_pedal);  // Accelerator pedal should be OFF
-    TEST_ASSERT_TRUE(aeb_internal_state.brake_pedal);  // Brake pedal should be ON
+
+    // Test: Accelerator pedal should be OFF, Brake pedal should be ON
+    checkPedalState(false, true);
 }
 
 /**
@@ -451,7 +473,10 @@ void test_translateAndCallCanMsg_9()
  */
 int main(void) {
     UNITY_BEGIN();
-    RUN_TEST(test_updateInternalPedalsState);
+    RUN_TEST(test_TC_AEB_CTRL_001);
+    RUN_TEST(test_TC_AEB_CTRL_002);
+    RUN_TEST(test_TC_AEB_CTRL_003);
+    RUN_TEST(test_TC_AEB_CTRL_004);
     RUN_TEST(test_updateInternalSpeedState);
     RUN_TEST(test_updateInternalObstacleState);
     RUN_TEST(test_updateInternalCarCState);
