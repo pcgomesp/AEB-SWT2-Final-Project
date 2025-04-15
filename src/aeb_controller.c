@@ -363,13 +363,10 @@ void updateInternalObstacleState(can_msg captured_frame)
  */
 void updateInternalCarCState(can_msg captured_frame)
 {
-    if (captured_frame.dataFrame[0] == 0x00)
-    {
-        aeb_internal_state.on_off_aeb_system = false;
-    }
-    else if (captured_frame.dataFrame[0] == 0x01)
-    {
+    if (captured_frame.dataFrame[0] == 0x01) {
         aeb_internal_state.on_off_aeb_system = true;
+    } else {
+        aeb_internal_state.on_off_aeb_system = false; // off state or invalid state
     }
 }
 
