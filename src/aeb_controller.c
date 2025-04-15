@@ -259,15 +259,12 @@ void updateInternalSpeedState(can_msg captured_frame)
     aeb_internal_state.relative_velocity = new_internal_speed;
 
     // update internal data according to the movement direction reported by the sensor
-    if (captured_frame.dataFrame[2] == 0x00)
-    {
+    if (captured_frame.dataFrame[2] == 0x01) {
+        aeb_internal_state.reverseEnabled = true;
+    } else {
         aeb_internal_state.reverseEnabled = false;
     }
-    else if (captured_frame.dataFrame[2] == 0x01)
-    {
-        aeb_internal_state.reverseEnabled = true;
-    }
-
+    
     // update internal data according to the relative acceleration detected by the sensor
     if (captured_frame.dataFrame[3] == 0xFE && captured_frame.dataFrame[4] == 0xFF)
     { // DBC: Clear Data
