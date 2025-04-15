@@ -316,19 +316,22 @@ void updateInternalObstacleState(can_msg captured_frame)
     unsigned int data_distance; // used for can frame conversion
     double new_internal_distance = 0.0;
 
+    // Check if there is an obstacle
     if (captured_frame.dataFrame[2] == 0x00)
     {
         aeb_internal_state.has_obstacle = false;
+        aeb_internal_state.obstacle_distance = 300.0; // Set max distance when no obstacle is detected
+        return;
     }
     else if (captured_frame.dataFrame[2] == 0x01)
     {
         aeb_internal_state.has_obstacle = true;
     }
 
+    // Handle special cases for clearing data or doing nothing
     if (captured_frame.dataFrame[1] == 0xFF && captured_frame.dataFrame[0] == 0xFE)
     { // DBC: Clear Data
-        // Defined to max distance, to avoid problems with TTC calculation
-        new_internal_distance = 300.0;
+        new_internal_distance = 300.0; // Set to max distance
     }
     else if (captured_frame.dataFrame[1] == 0xFF && captured_frame.dataFrame[0] == 0xFF)
     { // DBC: Do nothing
@@ -341,11 +344,13 @@ void updateInternalObstacleState(can_msg captured_frame)
         new_internal_distance = data_distance * RES_OBSTACLE_S;
     }
 
+    // Apply the max distance constraint
     if (new_internal_distance > 300.0)
     { // DBC: Max value constraint
         new_internal_distance = 300.0;
     }
 
+    // Update internal state with calculated or reset distance
     aeb_internal_state.obstacle_distance = new_internal_distance;
 }
 
