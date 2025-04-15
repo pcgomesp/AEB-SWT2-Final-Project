@@ -233,7 +233,7 @@ void test_TC_AEB_CTRL_009(void) {
 /**
  * @brief Test Case: Ensure that reverseEnabled remains false for non-reverse signals.
  */
-void test_TC_reverseEnabled_false(void) {
+void test_TC_AEB_CTRL_X01(void) {
     can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0x00, 0x64, 0x00} };
 
     updateInternalSpeedState(captured_frame);
@@ -330,31 +330,64 @@ void test_TC_AEB_CTRL_015(void) {
 }
 
 /**
- * @brief Test for the function updateInternalCarCState. 
+ * @brief Helper function to check the AEB system state.
+ * 
+ * @param expected_state Expected state of the AEB system (ON/OFF).
  */
-void test_updateInternalCarCState(void) {
+void checkAEBSystemState(bool expected_state) {
+    if (expected_state){
+        TEST_ASSERT_TRUE(aeb_internal_state.on_off_aeb_system);
+    } else {
+        TEST_ASSERT_FALSE(aeb_internal_state.on_off_aeb_system);
+    }
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_016: AEB system ON (dataFrame[0] == 0x01).
+ */
+void test_TC_AEB_CTRL_016(void) {
     can_msg captured_frame = { .identifier = ID_CAR_C, .dataFrame = {0x01} };
 
-    //// Test Case ID: TC_AEB_CTRL_014
-    // Case 1: AEB system ON (dataFrame[0] == 0x01)
     updateInternalCarCState(captured_frame);
-    TEST_ASSERT_TRUE(aeb_internal_state.on_off_aeb_system);  // AEB system should be ON
 
-    //// Test Case ID: TC_AEB_CTRL_015
-    // Case 2: AEB system OFF (dataFrame[0] == 0x00)
-    captured_frame.dataFrame[0] = 0x00;
-    updateInternalCarCState(captured_frame);
-    TEST_ASSERT_FALSE(aeb_internal_state.on_off_aeb_system);  // AEB system should be OFF
+    // Test: AEB system should be ON when dataFrame[0] is 0x01
+    checkAEBSystemState(true);
+}
 
-    // Case 3: Check that AEB system remains OFF for any value other than 0x01
-    captured_frame.dataFrame[0] = 0x02;  // Arbitrary value, different from 0x01
-    updateInternalCarCState(captured_frame);
-    TEST_ASSERT_FALSE(aeb_internal_state.on_off_aeb_system);  // AEB system should remain OFF
+/**
+ * @brief Test Case TC_AEB_CTRL_017: AEB system OFF (dataFrame[0] == 0x00).
+ */
+void test_TC_AEB_CTRL_017(void) {
+    can_msg captured_frame = { .identifier = ID_CAR_C, .dataFrame = {0x00} };
 
-    // Case 4: Check that AEB system turns back ON when dataFrame[0] is 0x01 again
-    captured_frame.dataFrame[0] = 0x01;
     updateInternalCarCState(captured_frame);
-    TEST_ASSERT_TRUE(aeb_internal_state.on_off_aeb_system);  // AEB system should be back ON
+
+    // Test: AEB system should be OFF when dataFrame[0] is 0x00
+    checkAEBSystemState(false);
+}
+
+/**
+ * @brief Test Case: AEB system remains OFF for any value other than 0x01.
+ */
+void test_TC_AEB_CTRL_X02(void) {
+    can_msg captured_frame = { .identifier = ID_CAR_C, .dataFrame = {0x02} };  // Arbitrary value different from 0x01
+
+    updateInternalCarCState(captured_frame);
+
+    // Test: AEB system should remain OFF for any value other than 0x01
+    checkAEBSystemState(false);
+}
+
+/**
+ * @brief Test Case: AEB system turns back ON when dataFrame[0] is 0x01 again.
+ */
+void test_TC_AEB_CTRL_X03(void) {
+    can_msg captured_frame = { .identifier = ID_CAR_C, .dataFrame = {0x01} };
+
+    updateInternalCarCState(captured_frame);
+
+    // Test: AEB system should be back ON when dataFrame[0] is 0x01 again
+    checkAEBSystemState(true);
 }
 
 /**
@@ -571,7 +604,7 @@ int main(void) {
     RUN_TEST(test_TC_AEB_CTRL_007);
     RUN_TEST(test_TC_AEB_CTRL_008);
     RUN_TEST(test_TC_AEB_CTRL_009);
-    RUN_TEST(test_TC_reverseEnabled_false);
+    RUN_TEST(test_TC_AEB_CTRL_X01);
     
     // The following tests comply with [SwR-3], [SwR-6], [SwR-7], [SwR-8], [SwR-9], [SwR-11] and [SwR-15]
     RUN_TEST(test_TC_AEB_CTRL_010);
@@ -582,7 +615,10 @@ int main(void) {
     RUN_TEST(test_TC_AEB_CTRL_015);
 
     // The following tests comply with [SwR-2], [SwR-3], [SwR-7], [SwR-8], [SwR-11], [SwR-12] and [SwR-16]
-    RUN_TEST(test_updateInternalCarCState);
+    RUN_TEST(test_TC_AEB_CTRL_016);
+    RUN_TEST(test_TC_AEB_CTRL_017);
+    RUN_TEST(test_TC_AEB_CTRL_X02);
+    RUN_TEST(test_TC_AEB_CTRL_X03);
     
     // The following tests comply with [SwR-2], [SwR-3], [SwR-6], [SwR-7], [SwR-8], [SwR-9], [SwR-11], 
     // [SwR-12], [SwR-15] and [SwR-16].
