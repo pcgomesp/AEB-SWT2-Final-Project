@@ -146,53 +146,91 @@ void test_TC_AEB_CTRL_004(void) {
 }
 
 /**
- * @brief Test for the function updateInternalSpeedState. [SwR-6], [SwR-9], [SwR-11]
+ * @brief Helper function to check the relative velocity and reverseEnabled state.
+ * 
+ * @param expected_velocity Expected relative velocity.
+ * @param expected_reverse_enabled Expected state of reverseEnabled.
  */
-void test_updateInternalSpeedState(void) {
-    can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0x00, 0x64, 0x00} };
-    
-    //// Test Case ID: TC_AEB_CTRL_005
-    // Case 1: Normal case where the speed is updated correctly
-    updateInternalSpeedState(captured_frame);
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 100.0); // (0x64 + (0x00 << 8)) * RES_SPEED_S = 100.0 
-    
-    //// Test Case ID: TC_AEB_CTRL_006
-    // Case 2: Case where the CAN data is set to clear data (0xFE, 0xFF)
-    captured_frame.dataFrame[0] = 0xFE;
-    captured_frame.dataFrame[1] = 0xFF;
-    updateInternalSpeedState(captured_frame);
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 0.0); // Should reset speed to 0.0
-    TEST_ASSERT_FALSE(aeb_internal_state.reverseEnabled); // Should also reset reverseEnabled to false
-    
-    //// Test Case ID: TC_AEB_CTRL_007
-    // Case 3: Case where the CAN data is set to indicate reverse (0x01 in dataFrame[2])
-    captured_frame.dataFrame[2] = 0x01;
-    updateInternalSpeedState(captured_frame);
-    TEST_ASSERT_TRUE(aeb_internal_state.reverseEnabled); // Should enable reverse
-
-    //// Test Case ID: TC_AEB_CTRL_008
-    // Case 4: Max speed value constraint (should be capped at 251.0)
-    captured_frame.dataFrame[0] = 0xFF; 
-    captured_frame.dataFrame[1] = 0xFD; // Maximum possible value
-    updateInternalSpeedState(captured_frame);
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 251.0); // Should be capped at 251.0
-    
-    //// Test Case ID: TC_AEB_CTRL_009
-    // Case 5: Test when the CAN frame data doesn't require any action (0xFF, 0xFF in dataFrame[0] and dataFrame[1])
-    captured_frame.dataFrame[0] = 0xFF;
-    captured_frame.dataFrame[1] = 0xFF;
-    updateInternalSpeedState(captured_frame);
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 0.0); // Should set speed to 0.0
-    TEST_ASSERT_TRUE(aeb_internal_state.reverseEnabled); // Should remain in the reverseDisabled state
-
-    // Case 6: Ensure that reverseEnabled remains false for non-reverse signals
-    captured_frame.dataFrame[2] = 0x00; // Non-reverse case
-    updateInternalSpeedState(captured_frame);
-    TEST_ASSERT_FALSE(aeb_internal_state.reverseEnabled); // Reverse should not be enabled
+void checkSpeedState(float expected_velocity, bool expected_reverse_enabled) {
+    TEST_ASSERT_EQUAL_FLOAT(expected_velocity, aeb_internal_state.relative_velocity);
+    TEST_ASSERT_EQUAL(expected_reverse_enabled, aeb_internal_state.reverseEnabled);
 }
 
 /**
- * @brief Test for the function updateInternalObstacleState. [SwR-3], [SwR-6], [SwR-7], [SwR-8], [SwR-9], [SwR-11], [SwR-15]
+ * @brief Test Case TC_AEB_CTRL_005: Normal case where the speed is updated correctly.
+ */
+void test_TC_AEB_CTRL_005(void) {
+    can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0x00, 0x64, 0x00} };
+
+    updateInternalSpeedState(captured_frame);
+
+    // Test: Speed should be updated correctly
+    checkSpeedState(100.0, false);
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_006: Case where the CAN data is set to clear data (0xFE, 0xFF).
+ */
+void test_TC_AEB_CTRL_006(void) {
+    can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0xFE, 0xFF, 0x00} };
+
+    updateInternalSpeedState(captured_frame);
+
+    // Test: Speed should reset to 0.0, and reverseEnabled should be false
+    checkSpeedState(0.0, false);
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_007: Case where the CAN data is set to indicate reverse.
+ */
+void test_TC_AEB_CTRL_007(void) {
+    can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0x00, 0x64, 0x01} };
+
+    updateInternalSpeedState(captured_frame);
+
+    // Test: Reverse should be enabled
+    checkSpeedState(100.0, true);
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_008: Max speed value constraint (should be capped at 251.0).
+ */
+void test_TC_AEB_CTRL_008(void) {
+    can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0xFF, 0xFD, 0x00} };
+
+    updateInternalSpeedState(captured_frame);
+
+    // Test: Speed should be capped at 251.0
+    checkSpeedState(251.0, false);
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_009: Test when the CAN frame data doesn't require any 
+ * action (0xFF, 0xFF in dataFrame[0] and dataFrame[1]).
+ */
+void test_TC_AEB_CTRL_009(void) {
+    can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0xFF, 0xFF, 0x00} };
+
+    updateInternalSpeedState(captured_frame);
+
+    // Test: Speed should be 0.0, reverseEnabled should remain false
+    checkSpeedState(0.0, false);
+}
+
+/**
+ * @brief Test Case: Ensure that reverseEnabled remains false for non-reverse signals.
+ */
+void test_TC_reverseEnabled_false(void) {
+    can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0x00, 0x64, 0x00} };
+
+    updateInternalSpeedState(captured_frame);
+
+    // Test: Reverse should not be enabled for non-reverse signals
+    checkSpeedState(100.0, false);
+}
+
+/**
+ * @brief Test for the function updateInternalObstacleState. 
  */
 void test_updateInternalObstacleState(void) {
     can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xD0, 0x07, 0x01} };
@@ -244,7 +282,7 @@ void test_updateInternalObstacleState(void) {
 }
 
 /**
- * @brief Test for the function updateInternalCarCState. [SwR-2], [SwR-3], [SwR-7], [SwR-8], [SwR-11], [SwR-12], [SwR-16]
+ * @brief Test for the function updateInternalCarCState. 
  */
 void test_updateInternalCarCState(void) {
     can_msg captured_frame = { .identifier = ID_CAR_C, .dataFrame = {0x01} };
@@ -272,7 +310,7 @@ void test_updateInternalCarCState(void) {
 }
 
 /**
- * @brief Test for the function getAEBState. [SwR-2], [SwR-3], [SwR-6], [SwR-7], [SwR-8], [SwR-9], [SwR-11], [SwR-12], [SwR-15],[SwR-16]. 
+ * @brief Test for the function getAEBState.  
  */
 void test_getAEBState(void) {
     // Initial setup of AEB state
@@ -344,7 +382,7 @@ void test_getAEBState(void) {
 }
 
 /**
- * @brief Series of tests for the function translateAndCallCanMsg. [SwR-9] 
+ * @brief Series of tests for the function translateAndCallCanMsg.  
  */
 void test_translateAndCallCanMsg_1(void) {
     can_msg captured_frame;
@@ -473,14 +511,31 @@ void test_translateAndCallCanMsg_9()
  */
 int main(void) {
     UNITY_BEGIN();
+    // The following tests comply with [SwR-6], [SwR-9] and [SwR-11].
     RUN_TEST(test_TC_AEB_CTRL_001);
     RUN_TEST(test_TC_AEB_CTRL_002);
     RUN_TEST(test_TC_AEB_CTRL_003);
     RUN_TEST(test_TC_AEB_CTRL_004);
-    RUN_TEST(test_updateInternalSpeedState);
+    
+    // The following tests comply with [SwR-6], [SwR-9] and [SwR-11].
+    RUN_TEST(test_TC_AEB_CTRL_005);
+    RUN_TEST(test_TC_AEB_CTRL_006);
+    RUN_TEST(test_TC_AEB_CTRL_007);
+    RUN_TEST(test_TC_AEB_CTRL_008);
+    RUN_TEST(test_TC_AEB_CTRL_009);
+    RUN_TEST(test_TC_reverseEnabled_false);
+    
+    // The following tests comply with [SwR-3], [SwR-6], [SwR-7], [SwR-8], [SwR-9], [SwR-11] and [SwR-15]
     RUN_TEST(test_updateInternalObstacleState);
+
+    // The following tests comply with [SwR-2], [SwR-3], [SwR-7], [SwR-8], [SwR-11], [SwR-12] and [SwR-16]
     RUN_TEST(test_updateInternalCarCState);
+    
+    // The following tests comply with [SwR-2], [SwR-3], [SwR-6], [SwR-7], [SwR-8], [SwR-9], [SwR-11], 
+    // [SwR-12], [SwR-15] and [SwR-16].
     RUN_TEST(test_getAEBState);
+
+    // The following tests comply with [SwR-9].
     RUN_TEST(test_translateAndCallCanMsg_1);
     RUN_TEST(test_translateAndCallCanMsg_2);
     RUN_TEST(test_translateAndCallCanMsg_3);
