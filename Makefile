@@ -55,7 +55,7 @@ test_all: $(TESTS)
 	done
 
 test/test_mq_utils: test/test_mq_utils.c src/mq_utils.c test/unity.c
-	$(CC) $(CFLAGS) $(TESTFLAGS) -Wl,--wrap=mq_open -Wl,--wrap=perror test/test_mq_utils.c src/mq_utils.c test/unity.c -o test/test_mq_utils -I$(TESTFOLDER)
+	$(CC) $(CFLAGS) $(TESTFLAGS) -Wl,--wrap=mq_open -Wl,--wrap=perror -Wl,--wrap=mq_unlink test/test_mq_utils.c src/mq_utils.c test/unity.c -o test/test_mq_utils -I$(TESTFOLDER)
 
 test/test_file_reader: test/test_file_reader.c src/file_reader.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER)
@@ -88,7 +88,7 @@ cov:
 			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
 		else \
 			if [ "$(test_file)" = "test_mq_utils.c" ]; then \
-				WRAP_FLAGS="-Wl,--wrap=mq_open -Wl,--wrap=perror"; \
+				WRAP_FLAGS="-Wl,--wrap=mq_open -Wl,--wrap=perror -Wl,--wrap=mq_unlink"; \
 			else \
 				WRAP_FLAGS=""; \
 			fi; \
@@ -109,7 +109,7 @@ lcov:
 			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
 		else \
 			if [ "$(test_file)" = "test_mq_utils.c" ]; then \
-				WRAP_FLAGS="-Wl,--wrap=mq_open -Wl,--wrap=perror"; \
+				WRAP_FLAGS="-Wl,--wrap=mq_open -Wl,--wrap=perror -Wl,--wrap=mq_unlink"; \
 			else \
 				WRAP_FLAGS=""; \
 			fi; \
@@ -132,7 +132,7 @@ full-cov: clean
 			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
 		else \
 			if [ "$(test_file)" = "test_mq_utils.c" ]; then \
-				WRAP_FLAGS="-Wl,--wrap=mq_open -Wl,--wrap=perror"; \
+				WRAP_FLAGS="-Wl,--wrap=mq_open -Wl,--wrap=perror -Wl,--wrap=mq_unlink"; \
 			else \
 				WRAP_FLAGS=""; \
 			fi; \
