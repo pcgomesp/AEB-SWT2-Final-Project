@@ -170,7 +170,7 @@ void test_updateInternalSpeedState(void) {
 }
 
 /**
- * @brief Test for the function updateInternalObstacleState. [SwR-3], [SwR-6], [SwR-7], [SwR-8], [SwR-9], [SwR-11], [SwR-15]
+ * @brief Test for the function updateInternalObstacleState. [SwR-3] (@ref SwR-3), [SwR-6], [SwR-7], [SwR-8], [SwR-9], [SwR-11], [SwR-15]
  */
 void test_updateInternalObstacleState(void) {
     can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xD0, 0x07, 0x01} };
@@ -222,7 +222,7 @@ void test_updateInternalObstacleState(void) {
 }
 
 /**
- * @brief Test for the function updateInternalCarCState. [SwR-2], [SwR-3], [SwR-7], [SwR-8], [SwR-11], [SwR-12], [SwR-16]
+ * @brief Test for the function updateInternalCarCState. [SwR-2] (@ref SwR-2), [SwR-3] (@ref SwR-3), [SwR-7], [SwR-8], [SwR-11], [SwR-12], [SwR-16]
  */
 void test_updateInternalCarCState(void) {
     can_msg captured_frame = { .identifier = ID_CAR_C, .dataFrame = {0x01} };
@@ -250,7 +250,7 @@ void test_updateInternalCarCState(void) {
 }
 
 /**
- * @brief Test for the function getAEBState. [SwR-2], [SwR-3], [SwR-6], [SwR-7], [SwR-8], [SwR-9], [SwR-11], [SwR-12], [SwR-15],[SwR-16]. 
+ * @brief Test for the function getAEBState. [SwR-2] (@ref SwR-2), [SwR-3] (@ref SwR-3), [SwR-6], [SwR-7], [SwR-8], [SwR-9], [SwR-11], [SwR-12], [SwR-15],[SwR-16]. 
  */
 void test_getAEBState(void) {
     // Initial setup of AEB state

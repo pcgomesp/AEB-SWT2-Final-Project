@@ -56,14 +56,14 @@ double ttc_calc(double dis_rel, double spd_rel, double rel_acel) {
  * The AEB system and the alarm are only triggered if the `enable_aeb` flag is set to true.
  * 
  * @param enable_aeb A pointer to a boolean flag that enables or disables the AEB system. [SwR-5]
- * @param alarm_cluster A pointer to a boolean flag that triggers the alarm in the cluster. [SwR-2]
- * @param enable_breaking A pointer to a boolean flag that enables or disables the braking system. [SwR-3]
+ * @param alarm_cluster A pointer to a boolean flag that triggers the alarm in the cluster. [SwR-2] (@ref SwR-2)
+ * @param enable_breaking A pointer to a boolean flag that enables or disables the braking system. [SwR-3] (@ref SwR-3)
  * @param lk_seatbelt A pointer to a boolean flag that locks the seatbelt in case of emergency. [Sys-F-14]
  * @param lk_doors A pointer to a boolean flag that locks or unlocks the doors in an emergency. [Sys-F-14]
  * @param spd A pointer to the current speed of the vehicle (in km/h).
  * @param dist A pointer to the current distance to the obstacle (in meters).
  * 
- * @note The function complies with the requirements (SwR-2, SwR-3, SwR-5,
+ * @note The function complies with the requirements ([SwR-2] (@ref SwR-2), [SwR-3](@ref SwR-3)), SwR-5,
  *       SwR-11, SwR-14, SwR-15, Sys-F-8, Sys-F-9, Sys-F-14).
  */
 void aeb_control(bool *enable_aeb, bool *alarm_cluster, bool *enable_breaking,
