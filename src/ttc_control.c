@@ -8,7 +8,7 @@
  * This function calculates the time to collision using the Uniformly Variable Motion (UVM) model. 
  * It uses a quadratic equation to calculate the time to collision (TTC) between two objects 
  * based on their relative distance and speed. If the relative acceleration is zero, the function 
- * simply calculates the time by dividing the relative distance by the relative speed [SwR-1], [SwR-10], [SwR-11]. 
+ * simply calculates the time by dividing the relative distance by the relative speed [SwR-1] (@ref SwR-1), [SwR-10], [SwR-11]. 
  *
  * @param dis_rel The relative distance between the objects in meters.
  * @param spd_rel The relative speed between the objects in km/h.
