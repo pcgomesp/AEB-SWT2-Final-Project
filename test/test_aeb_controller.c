@@ -93,8 +93,17 @@ void tearDown(void) {
  * @param expected_brake Expected state of the brake pedal.
  */
 void checkPedalState(bool expected_accelerator, bool expected_brake) {
-    TEST_ASSERT_EQUAL(expected_accelerator, aeb_internal_state.accelerator_pedal);
-    TEST_ASSERT_EQUAL(expected_brake, aeb_internal_state.brake_pedal);
+    if (expected_accelerator){
+        TEST_ASSERT_TRUE(aeb_internal_state.accelerator_pedal);
+    } else {
+        TEST_ASSERT_FALSE(aeb_internal_state.accelerator_pedal);
+    }
+    
+    if (expected_brake){
+        TEST_ASSERT_TRUE(aeb_internal_state.brake_pedal);
+    } else {
+        TEST_ASSERT_FALSE(aeb_internal_state.brake_pedal);
+    }
 }
 
 /**
@@ -152,8 +161,12 @@ void test_TC_AEB_CTRL_004(void) {
  * @param expected_reverse_enabled Expected state of reverseEnabled.
  */
 void checkSpeedState(float expected_velocity, bool expected_reverse_enabled) {
+    if (expected_reverse_enabled){
+        TEST_ASSERT_TRUE(aeb_internal_state.reverseEnabled);
+    } else{
+        TEST_ASSERT_FALSE(aeb_internal_state.reverseEnabled);
+    }
     TEST_ASSERT_EQUAL_FLOAT(expected_velocity, aeb_internal_state.relative_velocity);
-    TEST_ASSERT_EQUAL(expected_reverse_enabled, aeb_internal_state.reverseEnabled);
 }
 
 /**
@@ -230,55 +243,90 @@ void test_TC_reverseEnabled_false(void) {
 }
 
 /**
- * @brief Test for the function updateInternalObstacleState. 
+ * @brief Helper function to check obstacle state.
+ * 
+ * @param expected_has_obstacle Expected state of has_obstacle.
+ * @param expected_distance Expected obstacle distance.
  */
-void test_updateInternalObstacleState(void) {
-    can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xD0, 0x07, 0x01} };
-    
-    //// Test Case ID: TC_AEB_CTRL_010
-    // Case 1: Obstacle detected and distance calculated correctly
-    updateInternalObstacleState(captured_frame);
-    TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);  // Obstacle detected
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Expected distance =  (0xD0 + (0x07 << 8)) * RES_OBSTACLE = 100.0
-    
-    //// Test Case ID: TC_AEB_CTRL_011
-    // Case 2: No obstacle (0x00 in dataFrame[2])
-    captured_frame.dataFrame[2] = 0x00;
-    updateInternalObstacleState(captured_frame);
-    TEST_ASSERT_FALSE(aeb_internal_state.has_obstacle);  // No obstacle
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Distance should remain the same
-    // Logic problem: if the obstacle is not detected, the distance should be set to 300.0 (max distance).
+void checkObstacleState(bool expected_has_obstacle, float expected_distance) {
+    if (expected_has_obstacle){
+        TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);
+    } else {
+        TEST_ASSERT_FALSE(aeb_internal_state.has_obstacle);
+    }
+    TEST_ASSERT_EQUAL_FLOAT(expected_distance, aeb_internal_state.obstacle_distance);
+}
 
-    //// Test Case ID: TC_AEB_CTRL_012
-    // Case 3: Data reset with 0xFE, 0xFF
-    captured_frame.dataFrame[0] = 0xFE;
-    captured_frame.dataFrame[1] = 0xFF;
+/**
+ * @brief Test Case TC_AEB_CTRL_010: Obstacle detected and distance calculated correctly.
+ */
+void test_TC_AEB_CTRL_010(void) {
+    can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xD0, 0x07, 0x01} };
+
     updateInternalObstacleState(captured_frame);
-    TEST_ASSERT_FALSE(aeb_internal_state.has_obstacle);  // Obstacle not changed
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 300.0);  // Distance should be set to max value (300.0)
-    
-    // Case 4: Data doesn't need action (0xFF, 0xFF)
-    captured_frame.dataFrame[0] = 0xFF;
-    captured_frame.dataFrame[1] = 0xFF;
+
+    // Test: Expected distance = (0xD0 + (0x07 << 8)) * RES_OBSTACLE = 100.0
+    checkObstacleState(true, 100.0);
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_011: No obstacle (0x00 in dataFrame[2]).
+ */
+void test_TC_AEB_CTRL_011(void) {
+    can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xD0, 0x07, 0x00} };
+
     updateInternalObstacleState(captured_frame);
-    TEST_ASSERT_FALSE(aeb_internal_state.has_obstacle);  // Obstacle not changed
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 0.0);  // Distance should be set to 0.0
-    
-    // Case 5: Calculated distance from CAN data
-    captured_frame.dataFrame[0] = 0xD0;
-    captured_frame.dataFrame[1] = 0x07; // Data distance = 0x0D07 = 100
-    captured_frame.dataFrame[2] = 0x01; // Obstacle exists
+
+    // Test: No obstacle detected, distance should remain the same (max distance)
+    checkObstacleState(false, 300.0); // Max distance when no obstacle is detected
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_012: Data reset with 0xFE, 0xFF.
+ */
+void test_TC_AEB_CTRL_012(void) {
+    can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xFE, 0xFF, 0x00} };
+
     updateInternalObstacleState(captured_frame);
-    TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);  // Obstacle detected
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Calculated distance
-    
-    //// Test Case ID: TC_AEB_CTRL_013
-    // Case 6: Maximum distance capped at 300.0
-    captured_frame.dataFrame[0] = 0xFF;
-    captured_frame.dataFrame[1] = 0xFD; // Data distance = 0xFFFF = 65535
+
+    // Test: Obstacle not detected, reset distance to max value (300.0)
+    checkObstacleState(false, 300.0);
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_013: Case where data doesn't need action (0xFF, 0xFF).
+ */
+void test_TC_AEB_CTRL_013(void) {
+    can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xFF, 0xFF, 0x00} };
+
     updateInternalObstacleState(captured_frame);
-    TEST_ASSERT_TRUE(aeb_internal_state.has_obstacle);  // Obstacle detected
-    TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 300.0);  // Should be capped at 300.0
+
+    // Test: Obstacle not detected, distance should be reset to 300.0
+    checkObstacleState(false, 300.0);
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_014: Calculated distance from CAN data.
+ */
+void test_TC_AEB_CTRL_014(void) {
+    can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xD0, 0x07, 0x01} };
+
+    updateInternalObstacleState(captured_frame);
+
+    // Test: Obstacle detected, distance should be correctly calculated
+    checkObstacleState(true, 100.0);
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_015: Maximum distance capped at 300.0.
+ */
+void test_TC_AEB_CTRL_015(void) {
+    can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xFF, 0xFD, 0x00} };
+
+    updateInternalObstacleState(captured_frame);
+
+    // Test: Distance should be capped at 300.0 when CAN data exceeds max
+    checkObstacleState(false, 300.0);
 }
 
 /**
@@ -526,7 +574,12 @@ int main(void) {
     RUN_TEST(test_TC_reverseEnabled_false);
     
     // The following tests comply with [SwR-3], [SwR-6], [SwR-7], [SwR-8], [SwR-9], [SwR-11] and [SwR-15]
-    RUN_TEST(test_updateInternalObstacleState);
+    RUN_TEST(test_TC_AEB_CTRL_010);
+    RUN_TEST(test_TC_AEB_CTRL_011);
+    RUN_TEST(test_TC_AEB_CTRL_012);
+    RUN_TEST(test_TC_AEB_CTRL_013);
+    RUN_TEST(test_TC_AEB_CTRL_014);
+    RUN_TEST(test_TC_AEB_CTRL_015);
 
     // The following tests comply with [SwR-2], [SwR-3], [SwR-7], [SwR-8], [SwR-11], [SwR-12] and [SwR-16]
     RUN_TEST(test_updateInternalCarCState);
