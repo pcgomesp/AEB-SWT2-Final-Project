@@ -1,14 +1,34 @@
 #include <sys/stat.h>
+#include <stdbool.h>
 #include "unity.h"
 #include "mq_utils.h"
+
+static bool wrap_mq_open_fail = false;
+static bool wrap_perror_called = false;
 
 char *mq_name = "/test_mq"; // this could be any name
 int mq_max_messages = 10;
 mqd_t mqd;
 
+mqd_t __real_mq_open(const char *name, int oflag, ...);
+mqd_t __wrap_mq_open(const char *name, int oflag, ...)
+{
+    if (wrap_mq_open_fail)
+        return (mqd_t)-1;
+    return __real_mq_open(name, oflag);
+}
+
+void __real_perror(const char *s);
+void __wrap_perror(const char *s)
+{
+    wrap_perror_called = true;
+    __real_perror(s);
+}
+
 void setUp()
 {
-    // set stuff up here
+    wrap_mq_open_fail = false;
+    wrap_perror_called = false;
 }
 
 void tearDown()
@@ -44,6 +64,28 @@ void test_create_and_close_mq()
     TEST_ASSERT_EQUAL_MESSAGE(-1, exists, "Queue exists but should have been deleted");
 }
 
+void test_create_mq_fail()
+{
+    wrap_mq_open_fail = true;
+    wrap_perror_called = false;
+
+    mqd_t mqd = create_mq(mq_name);
+    TEST_ASSERT_EQUAL((mqd_t)-1, mqd);
+    TEST_ASSERT_TRUE(wrap_perror_called);
+}
+
+void test_close_unopened_mq_fail()
+{
+    mqd_t mqd = (mqd_t)-1; // Uninitialized mqd
+    struct stat buffer;
+
+    int exists = stat("/dev/mqueue/test_mq", &buffer);
+    TEST_ASSERT_EQUAL_MESSAGE(-1, exists, "Queue exists but should not");
+
+    close_mq(mqd, mq_name);
+    TEST_ASSERT_TRUE(wrap_perror_called);
+}
+
 void test_open_mq()
 {
     mqd = create_mq(mq_name);
@@ -54,7 +96,12 @@ void test_open_mq()
 
 void test_open_mq_fail()
 {
-    TEST_IGNORE_MESSAGE("Not possible to test exit() function at the moment");
+    wrap_mq_open_fail = true;
+    wrap_perror_called = false;
+
+    mqd_t mq_test = open_mq(mq_name);
+    TEST_ASSERT_EQUAL((mqd_t)-1, mq_test);
+    TEST_ASSERT_TRUE(wrap_perror_called);
 }
 
 void test_read_mq_empty_queue()
@@ -116,6 +163,8 @@ int main()
     UNITY_BEGIN();
     RUN_TEST(test_get_mq_attr);
     RUN_TEST(test_create_and_close_mq);
+    RUN_TEST(test_create_mq_fail);
+    RUN_TEST(test_close_unopened_mq_fail);
     RUN_TEST(test_open_mq);
     RUN_TEST(test_open_mq_fail);
     RUN_TEST(test_read_mq_empty_queue);

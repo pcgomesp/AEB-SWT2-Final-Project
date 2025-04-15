@@ -55,7 +55,7 @@ test_all: $(TESTS)
 	done
 
 test/test_mq_utils: test/test_mq_utils.c src/mq_utils.c test/unity.c
-	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_mq_utils.c src/mq_utils.c test/unity.c -o test/test_mq_utils -I$(TESTFOLDER)
+	$(CC) $(CFLAGS) $(TESTFLAGS) -Wl,--wrap=mq_open -Wl,--wrap=perror test/test_mq_utils.c src/mq_utils.c test/unity.c -o test/test_mq_utils -I$(TESTFOLDER)
 
 test/test_file_reader: test/test_file_reader.c src/file_reader.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER)
@@ -76,7 +76,7 @@ test/test_sensors: test/test_sensors.c src/sensors.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_sensors.c src/sensors.c test/unity.c -o test/test_sensors -I$(TESTFOLDER) -Itest -lpthread
 
 # Coverage targets
-.PHONY: cov lcov full-cov clean-cov
+.PHONY: cov lcov full-cov
 
 cov:
 	if [ -z "$(src_file)" ] || [ -z "$(test_file)" ]; then \
@@ -87,7 +87,11 @@ cov:
 		if [ "$(test_file)" = "test_log_utils.c" ]; then \
 			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
 		else \
-			WRAP_FLAGS=""; \
+			if [ "$(test_file)" = "test_mq_utils.c" ]; then \
+				WRAP_FLAGS="-Wl,--wrap=mq_open -Wl,--wrap=perror"; \
+			else \
+				WRAP_FLAGS=""; \
+			fi; \
 		fi; \
 		$(CC) $(TESTFLAGS) $(COVFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) -lm -lrt $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
 		./$(OBJFOLDER)$(test_file:.c=)_gcov_bin > /dev/null 2>&1; \
@@ -104,7 +108,11 @@ lcov:
 		if [ "$(test_file)" = "test_log_utils.c" ]; then \
 			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
 		else \
-			WRAP_FLAGS=""; \
+			if [ "$(test_file)" = "test_mq_utils.c" ]; then \
+				WRAP_FLAGS="-Wl,--wrap=mq_open -Wl,--wrap=perror"; \
+			else \
+				WRAP_FLAGS=""; \
+			fi; \
 		fi; \
 		$(CC) $(TESTFLAGS) $(COVFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) -lm -lrt $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_lcov_bin; \
 		./$(OBJFOLDER)$(test_file:.c=)_lcov_bin > /dev/null 2>&1; \
@@ -113,7 +121,7 @@ lcov:
 		echo "LCOV report generated at $(COVFOLDER)$(src_file:.c=)_report/index.html"; \
 	fi
 
-full-cov: clean-cov
+full-cov: clean
 	@echo "Running full coverage analysis for all tests..."
 	@mkdir -p $(COVFOLDER)
 	@$(foreach pair, $(TEST_SRC_MAP), \
@@ -123,7 +131,11 @@ full-cov: clean-cov
 		if [ "$(test_file)" = "test_log_utils.c" ]; then \
 			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
 		else \
-			WRAP_FLAGS=""; \
+			if [ "$(test_file)" = "test_mq_utils.c" ]; then \
+				WRAP_FLAGS="-Wl,--wrap=mq_open -Wl,--wrap=perror"; \
+			else \
+				WRAP_FLAGS=""; \
+			fi; \
 		fi; \
 		$(CC) $(TESTFLAGS) $(COVFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) -lm -lrt $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_cov_bin; \
 		./$(OBJFOLDER)$(test_file:.c=)_cov_bin > /dev/null 2>&1; \
@@ -135,6 +147,7 @@ full-cov: clean-cov
 	@echo "\nFull coverage analysis complete!"
 	@echo "Individual GCOV reports generated in the source directory"
 	@echo "Combined LCOV report available at $(COVFOLDER)full_report/index.html"
+	@open $(COVFOLDER)full_report/src/mq_utils.c.gcov.html
 
 cppcheck:
 	cppcheck --addon=misra -I ./inc --force --library=posix $(SRCFOLDER) $(INCFOLDER)
@@ -149,7 +162,7 @@ clean-docs:
 	rm -rf docs/latex
 	rm -rf docs/rtf
 
-.PHONY: clean clean-cov
+.PHONY: clean
 clean:
 	rm -rf obj/*
 	rm -rf bin/*
@@ -157,7 +170,5 @@ clean:
 	rm -f *.gcov
 	rm -f *.gcda
 	rm -f *.gcno
-
-clean-cov:
 	rm -rf $(COVFOLDER)*
 	rm -f *.info
