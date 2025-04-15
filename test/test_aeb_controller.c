@@ -177,7 +177,7 @@ void test_TC_AEB_CTRL_005(void) {
 
     updateInternalSpeedState(captured_frame);
 
-    // Test: Speed should be updated correctly
+    // Test: Speed should be updated correctly (0x64 + (0x00 << 8)) * RES_SPEED_S = 100.0
     checkSpeedState(100.0, false);
 }
 
@@ -194,15 +194,16 @@ void test_TC_AEB_CTRL_006(void) {
 }
 
 /**
- * @brief Test Case TC_AEB_CTRL_007: Case where the CAN data is set to indicate reverse.
+ * @brief Test Case TC_AEB_CTRL_007: Case where the CAN data is set to indicate 
+ * reverse (0x01 in dataFrame[2]).
  */
 void test_TC_AEB_CTRL_007(void) {
-    can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0x00, 0x64, 0x01} };
+    can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0x00, 0x14, 0x01} };
 
     updateInternalSpeedState(captured_frame);
 
-    // Test: Reverse should be enabled
-    checkSpeedState(100.0, true);
+    // Test: Reverse should be enabled (0x00 + (0x14 << 8)) * RES_SPEED_S = 20.0
+    checkSpeedState(20.0, true);
 }
 
 /**
@@ -234,7 +235,7 @@ void test_TC_AEB_CTRL_009(void) {
  * @brief Test Case: Ensure that reverseEnabled remains false for non-reverse signals.
  */
 void test_TC_AEB_CTRL_X01(void) {
-    can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0x00, 0x64, 0x00} };
+    can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0x00, 0x64, 0x03} };
 
     updateInternalSpeedState(captured_frame);
 
@@ -294,9 +295,9 @@ void test_TC_AEB_CTRL_012(void) {
 }
 
 /**
- * @brief Test Case TC_AEB_CTRL_013: Case where data doesn't need action (0xFF, 0xFF).
+ * @brief Test Case: Case where data doesn't need action (0xFF, 0xFF).
  */
-void test_TC_AEB_CTRL_013(void) {
+void test_TC_AEB_CTRL_X02(void) {
     can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xFF, 0xFF, 0x00} };
 
     updateInternalObstacleState(captured_frame);
@@ -306,9 +307,9 @@ void test_TC_AEB_CTRL_013(void) {
 }
 
 /**
- * @brief Test Case TC_AEB_CTRL_014: Calculated distance from CAN data.
+ * @brief Test Case: Calculated distance from CAN data.
  */
-void test_TC_AEB_CTRL_014(void) {
+void test_TC_AEB_CTRL_X03(void) {
     can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xD0, 0x07, 0x01} };
 
     updateInternalObstacleState(captured_frame);
@@ -318,9 +319,9 @@ void test_TC_AEB_CTRL_014(void) {
 }
 
 /**
- * @brief Test Case TC_AEB_CTRL_015: Maximum distance capped at 300.0.
+ * @brief Test Case TC_AEB_CTRL_013: Maximum distance capped at 300.0.
  */
-void test_TC_AEB_CTRL_015(void) {
+void test_TC_AEB_CTRL_013(void) {
     can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xFF, 0xFD, 0x00} };
 
     updateInternalObstacleState(captured_frame);
@@ -343,9 +344,9 @@ void checkAEBSystemState(bool expected_state) {
 }
 
 /**
- * @brief Test Case TC_AEB_CTRL_016: AEB system ON (dataFrame[0] == 0x01).
+ * @brief Test Case TC_AEB_CTRL_014: AEB system ON (dataFrame[0] == 0x01).
  */
-void test_TC_AEB_CTRL_016(void) {
+void test_TC_AEB_CTRL_014(void) {
     can_msg captured_frame = { .identifier = ID_CAR_C, .dataFrame = {0x01} };
 
     updateInternalCarCState(captured_frame);
@@ -355,9 +356,9 @@ void test_TC_AEB_CTRL_016(void) {
 }
 
 /**
- * @brief Test Case TC_AEB_CTRL_017: AEB system OFF (dataFrame[0] == 0x00).
+ * @brief Test Case TC_AEB_CTRL_015: AEB system OFF (dataFrame[0] == 0x00).
  */
-void test_TC_AEB_CTRL_017(void) {
+void test_TC_AEB_CTRL_015(void) {
     can_msg captured_frame = { .identifier = ID_CAR_C, .dataFrame = {0x00} };
 
     updateInternalCarCState(captured_frame);
@@ -369,7 +370,7 @@ void test_TC_AEB_CTRL_017(void) {
 /**
  * @brief Test Case: AEB system remains OFF for any value other than 0x01.
  */
-void test_TC_AEB_CTRL_X02(void) {
+void test_TC_AEB_CTRL_X04(void) {
     can_msg captured_frame = { .identifier = ID_CAR_C, .dataFrame = {0x02} };  // Arbitrary value different from 0x01
 
     updateInternalCarCState(captured_frame);
@@ -381,7 +382,7 @@ void test_TC_AEB_CTRL_X02(void) {
 /**
  * @brief Test Case: AEB system turns back ON when dataFrame[0] is 0x01 again.
  */
-void test_TC_AEB_CTRL_X03(void) {
+void test_TC_AEB_CTRL_X05(void) {
     can_msg captured_frame = { .identifier = ID_CAR_C, .dataFrame = {0x01} };
 
     updateInternalCarCState(captured_frame);
@@ -391,75 +392,193 @@ void test_TC_AEB_CTRL_X03(void) {
 }
 
 /**
- * @brief Test for the function getAEBState.  
+ * @brief Helper function to check the AEB state.
+ * 
+ * @param expected_state The expected state of the AEB system.
+ * @param state The actual state returned by getAEBState.
  */
-void test_getAEBState(void) {
-    // Initial setup of AEB state
+void checkAEBState(aeb_controller_state expected_state, aeb_controller_state state) {
+    TEST_ASSERT_EQUAL_INT(expected_state, state);
+}
+
+/**
+ * @brief Test Case: AEB system active and TTC indicating alarm state.
+ */
+void test_TC_AEB_CTRL_X06(void) {
+    aeb_internal_state.relative_velocity = MAX_SPD_ENABLED;
+    aeb_internal_state.has_obstacle = true;
+    aeb_internal_state.obstacle_distance = 10.0;
+    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.reverseEnabled = false;
+
+    double ttc = 1.9;
+    aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
+
+    // Test: AEB system should be in ALARM state
+    checkAEBState(AEB_STATE_ALARM, state);
+}
+
+/**
+ * @brief Test Case: AEB system active, but TTC too low (should go to brake state).
+ */
+void test_TC_AEB_CTRL_X07(void) {
+    aeb_internal_state.relative_velocity = MAX_SPD_ENABLED;
+    aeb_internal_state.has_obstacle = true;
+    aeb_internal_state.obstacle_distance = 10.0;
+    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.reverseEnabled = false;
+
+    double ttc = 0.9;
+    aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
+
+    // Test: AEB system should go to BRAKE state if speed is high and TTC low
+    checkAEBState(AEB_STATE_BRAKE, state);
+}
+
+/**
+ * @brief Test Case: AEB system OFF (on_off_aeb_system == false, high speed).
+ */
+void test_TC_AEB_CTRL_X08(void) {
     aeb_internal_state.relative_velocity = 80.0;
     aeb_internal_state.has_obstacle = true;
     aeb_internal_state.obstacle_distance = 10.0;
-    aeb_internal_state.brake_pedal = false;
-    aeb_internal_state.accelerator_pedal = false;
-    aeb_internal_state.on_off_aeb_system = true;  // AEB system is ON
-    aeb_internal_state.reverseEnabled = false;   // Reversing is not enabled
-
-    double ttc = 1.9;  // Example of TTC
-
-    // Case 1: AEB system active and TTC indicating alarm state
-    aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ALARM);  // Should be in ALARM state
-
-    // Case 2: AEB system active, but TTC too low (should go to brake state)
-    ttc = 0.9;
-    state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_BRAKE);  // Should go to BRAKE state if speed is high and TTC low
-
-    // Case 3: AEB system OFF (on_off_aeb_system == false)
     aeb_internal_state.on_off_aeb_system = false;
-    state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_STANDBY);  // Should be in STANDBY state
+    aeb_internal_state.reverseEnabled = false;
 
-    // Case 4: Speed below MIN_SPD_ENABLED and no reverse enabled (should go to STANDBY)
-    aeb_internal_state.on_off_aeb_system = true;
+    double ttc = 1.9;
+    aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
+
+    // Test: AEB system should be in STANDBY state
+    checkAEBState(AEB_STATE_STANDBY, state);
+}
+
+/**
+ * @brief Test Case: Speed below MIN_SPD_ENABLED and no reverse enabled (should go to STANDBY).
+ */
+void test_TC_AEB_CTRL_X09(void) {
     aeb_internal_state.relative_velocity = MIN_SPD_ENABLED - 1;
-    state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_STANDBY);  // Should go to STANDBY state
+    aeb_internal_state.has_obstacle = true;
+    aeb_internal_state.obstacle_distance = 10.0;
+    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.reverseEnabled = false;
 
-    // Case 5: Speed above MAX_SPD_ENABLED and no reverse enabled (should go to STANDBY)
+    double ttc = 1.9;
+    aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
+
+    // Test: AEB system should go to STANDBY state
+    checkAEBState(AEB_STATE_STANDBY, state);
+}
+
+/**
+ * @brief Test Case: Speed above MAX_SPD_ENABLED and no reverse enabled (should go to STANDBY).
+ */
+void test_TC_AEB_CTRL_X10(void) {
     aeb_internal_state.relative_velocity = MAX_SPD_ENABLED + 1;
-    state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_STANDBY);  // Should go to STANDBY state
+    aeb_internal_state.has_obstacle = true;
+    aeb_internal_state.obstacle_distance = 10.0;
+    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.reverseEnabled = false;
 
-    //// Test Case ID: TC_AEB_CTRL_016
-    // Case 6: Pedals deactivated (accelerator and brake) with low TTC (should go to BRAKE state)
-    aeb_internal_state.relative_velocity = 60.0;  // Speed within allowed range
-    ttc = 0.8;  // TTC lower than the braking threshold
-    state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_BRAKE);  // Should go to BRAKE state due to low TTC
+    double ttc = 1.9;
+    aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
 
-    //// Test Case ID: TC_AEB_CTRL_017
-    // Case 7: Pedals deactivated with TTC within alarm range (should go to ALARM state)
-    ttc = 1.5;  // TTC greater than the braking threshold but less than the alarm threshold
-    state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ALARM);  // Should go to ALARM state
+    // Test: AEB system should go to STANDBY state
+    checkAEBState(AEB_STATE_STANDBY, state);
+}
 
-    //// Test Case ID: TC_AEB_CTRL_018
-    // Case 8: Pedals deactivated with TTC greater than alarm threshold (should go to ACTIVE state)
-    ttc = 2.0;  // TTC greater than alarm threshold
-    state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ACTIVE);  // Should go to ACTIVE state
+/**
+ * @brief Test Case TC_AEB_CTRL_016: Pedals deactivated with low TTC (should go to BRAKE state).
+ */
+void test_TC_AEB_CTRL_016(void) {
+    aeb_internal_state.relative_velocity = 60.0;
+    aeb_internal_state.has_obstacle = true;
+    aeb_internal_state.obstacle_distance = 10.0;
+    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.reverseEnabled = false;
+    aeb_internal_state.accelerator_pedal = false;
+    aeb_internal_state.brake_pedal = false;
 
-    //// Test Case ID: TC_AEB_CTRL_019
-    // Case 9: Brake pedal pressed (should go to ACTIVE state)
+    double ttc = 0.8;  // TTC lower than the braking threshold
+    aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
+
+    // Test: AEB system should go to BRAKE state due to low TTC
+    checkAEBState(AEB_STATE_BRAKE, state);
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_017: Pedals deactivated with TTC within alarm range (should go to ALARM state).
+ */
+void test_TC_AEB_CTRL_017(void) {
+    aeb_internal_state.relative_velocity = 60.0;
+    aeb_internal_state.has_obstacle = true;
+    aeb_internal_state.obstacle_distance = 10.0;
+    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.reverseEnabled = false;
+    aeb_internal_state.accelerator_pedal = false;
+    aeb_internal_state.brake_pedal = false;
+
+    double ttc = 1.5;  // TTC greater than the braking threshold but less than the alarm threshold
+    aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
+
+    // Test: AEB system should go to ALARM state
+    checkAEBState(AEB_STATE_ALARM, state);
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_018: Pedals deactivated with TTC greater than alarm threshold (should go to ACTIVE state).
+ */
+void test_TC_AEB_CTRL_018(void) {
+    aeb_internal_state.relative_velocity = 60.0;
+    aeb_internal_state.has_obstacle = true;
+    aeb_internal_state.obstacle_distance = 10.0;
+    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.reverseEnabled = false;
+    aeb_internal_state.accelerator_pedal = false;
+    aeb_internal_state.brake_pedal = false;
+
+    double ttc = THRESHOLD_ALARM + 0.1;  // TTC greater than alarm threshold
+    aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
+
+    // Test: AEB system should go to ACTIVE state
+    checkAEBState(AEB_STATE_ACTIVE, state);
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_019: Brake pedal pressed (should go to ACTIVE state).
+ */
+void test_TC_AEB_CTRL_019(void) {
+    aeb_internal_state.relative_velocity = 60.0;
+    aeb_internal_state.has_obstacle = true;
+    aeb_internal_state.obstacle_distance = 10.0;
+    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.reverseEnabled = false;
+    aeb_internal_state.accelerator_pedal = false;
     aeb_internal_state.brake_pedal = true;  // Brake pedal pressed
-    state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ACTIVE);  // Should go to ACTIVE state regardless of TTC
 
-    //// Test Case ID: TC_AEB_CTRL_020
-    // Case 10: Accelerator pedal pressed (should go to ACTIVE state)
+    double ttc = 1.5;
+    aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
+
+    // Test: AEB system should go to ACTIVE state regardless of TTC
+    checkAEBState(AEB_STATE_ACTIVE, state);
+}
+
+/**
+ * @brief Test Case TC_AEB_CTRL_020: Accelerator pedal pressed (should go to ACTIVE state).
+ */
+void test_TC_AEB_CTRL_020(void) {
+    aeb_internal_state.relative_velocity = 60.0;
+    aeb_internal_state.has_obstacle = true;
+    aeb_internal_state.obstacle_distance = 10.0;
+    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.reverseEnabled = false;
     aeb_internal_state.accelerator_pedal = true;  // Accelerator pedal pressed
-    state = getAEBState(aeb_internal_state, ttc);
-    TEST_ASSERT_EQUAL_INT(state, AEB_STATE_ACTIVE);  // Should go to ACTIVE state regardless of TTC
+    aeb_internal_state.brake_pedal = false;
+
+    double ttc = 1.5;
+    aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
+
+    // Test: AEB system should go to ACTIVE state regardless of TTC
+    checkAEBState(AEB_STATE_ACTIVE, state);
 }
 
 /**
@@ -610,19 +729,28 @@ int main(void) {
     RUN_TEST(test_TC_AEB_CTRL_010);
     RUN_TEST(test_TC_AEB_CTRL_011);
     RUN_TEST(test_TC_AEB_CTRL_012);
-    RUN_TEST(test_TC_AEB_CTRL_013);
-    RUN_TEST(test_TC_AEB_CTRL_014);
-    RUN_TEST(test_TC_AEB_CTRL_015);
-
-    // The following tests comply with [SwR-2], [SwR-3], [SwR-7], [SwR-8], [SwR-11], [SwR-12] and [SwR-16]
-    RUN_TEST(test_TC_AEB_CTRL_016);
-    RUN_TEST(test_TC_AEB_CTRL_017);
     RUN_TEST(test_TC_AEB_CTRL_X02);
     RUN_TEST(test_TC_AEB_CTRL_X03);
+    RUN_TEST(test_TC_AEB_CTRL_013);
+
+    // The following tests comply with [SwR-2], [SwR-3], [SwR-7], [SwR-8], [SwR-11], [SwR-12] and [SwR-16]
+    RUN_TEST(test_TC_AEB_CTRL_014);
+    RUN_TEST(test_TC_AEB_CTRL_015);
+    RUN_TEST(test_TC_AEB_CTRL_X04);
+    RUN_TEST(test_TC_AEB_CTRL_X05);
     
     // The following tests comply with [SwR-2], [SwR-3], [SwR-6], [SwR-7], [SwR-8], [SwR-9], [SwR-11], 
     // [SwR-12], [SwR-15] and [SwR-16].
-    RUN_TEST(test_getAEBState);
+    RUN_TEST(test_TC_AEB_CTRL_X06);
+    RUN_TEST(test_TC_AEB_CTRL_X07);
+    RUN_TEST(test_TC_AEB_CTRL_X08);
+    RUN_TEST(test_TC_AEB_CTRL_X09);
+    RUN_TEST(test_TC_AEB_CTRL_X10);
+    RUN_TEST(test_TC_AEB_CTRL_016);
+    RUN_TEST(test_TC_AEB_CTRL_017);
+    RUN_TEST(test_TC_AEB_CTRL_018);
+    RUN_TEST(test_TC_AEB_CTRL_019);
+    RUN_TEST(test_TC_AEB_CTRL_020);
 
     // The following tests comply with [SwR-9].
     RUN_TEST(test_translateAndCallCanMsg_1);
