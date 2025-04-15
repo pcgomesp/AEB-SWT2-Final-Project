@@ -31,17 +31,17 @@ void test_create_and_close_mq()
     struct stat buffer;
 
     int exists = stat("/dev/mqueue/test_mq", &buffer);
-    TEST_ASSERT_EQUAL(-1, exists);
+    TEST_ASSERT_EQUAL_MESSAGE(-1, exists, "Queue exists but should not");
 
     mqd_t mqd = create_mq(mq_name);
 
     exists = stat("/dev/mqueue/test_mq", &buffer);
-    TEST_ASSERT_EQUAL(0, exists);
+    TEST_ASSERT_EQUAL_MESSAGE(0, exists, "Queue does not exist but should");
     TEST_ASSERT_NOT_EQUAL((mqd_t)-1, mqd);
 
     close_mq(mqd, mq_name);
     exists = stat("/dev/mqueue/test_mq", &buffer);
-    TEST_ASSERT_EQUAL(-1, exists);
+    TEST_ASSERT_EQUAL_MESSAGE(-1, exists, "Queue exists but should have been deleted");
 }
 
 void test_open_mq()
