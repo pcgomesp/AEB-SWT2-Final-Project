@@ -1,10 +1,18 @@
 /**
  * @page traceability Traceability
  *
- * Esta página descreve os testes unitários existentes, seus identificadores únicos e os requisitos que validam.
+ * This page describes the existing unit tests, their unique identifiers, and the requirements they validate.
  *
- * | Teste ID  | Nome do Teste            | Requisitos Validados         | Função Testada         | Resultado Esperado         |
+ * | Test ID  | Test Name           | Validated Requirements         | Tested Function         | Expected Outcome        |
  * |-----------|--------------------------|-------------------------------|-------------------------|-----------------------------|
- * | \anchor TEST-001 **TEST-001** | [test_calc_velocidade()](@ref test_calc_velocidade) | [REQ-001](@ref SwR-1) [REQ-002](@ref REQ-002)| [calc_velocidade()](@ref calc_velocidade) | Velocidade correta |
- * | \anchor TEST-002 **TEST-002** | [test_verifica_tempo_zero()](@ref test_verifica_tempo_zero) | [REQ-002](@ref REQ-002) | [verifica_tempo()](@ref verifica_tempo) | Gera alerta corretamente |
+ * | \anchor TC_AEB_A__001 **TC_AEB_A__001** | [test_actuatorsTranslateCanMsg_AEB_S_Identifier()](@ref test_actuatorsTranslateCanMsg_AEB_S_Identifier) | [SwR-4](@ref SwR-4) | [actuatorsTranslateCanMsg()](@ref actuatorsTranslateCanMsg) | belt_tightness = true, door_lock = false, should_activate_abs = true, alarm_led = true, alarm_buzzer = true |
+ * | \anchor TC_AEB_A__002 **TC_AEB_A__002** | [test_actuatorsTranslateCanMsg_Empty_Identifier()](@ref test_actuatorsTranslateCanMsg_Empty_Identifier) | [SwR-4](@ref SwR-4) | [actuatorsTranslateCanMsg()](@ref actuatorsTranslateCanMsg) | All actuators state fields remain false |
+ * | \anchor TC_AEB_A__003 **TC_AEB_A__003** | [test_updateInternalActuatorsState_Correct_State()](@ref test_updateInternalActuatorsState_Correct_State) | [SwR-4](@ref SwR-4) | [updateInternalActuatorsState()](@ref updateInternalActuatorsState) | belt_tightness = true, door_lock = false, should_activate_abs = true, alarm_led = true, alarm_buzzer = true |
+ * | \anchor TC_AEB_A__004 **TC_AEB_A__004** | [test_actuatorsTranslateCanMsg()](@ref test_actuatorsTranslateCanMsg) | [SwR-4](@ref SwR-4) | [actuatorsTranslateCanMsg()](@ref actuatorsTranslateCanMsg) | Same expected output as TC_AEB_A__001	 |
+ * | \anchor TC_AEB_A__005 **TC_AEB_A__005** | [test_actuatorsTranslateCanMsg_Unknown_Identifier()](@ref test_actuatorsTranslateCanMsg_Unknown_Identifier) | [SwR-4](@ref SwR-4) | [actuatorsTranslateCanMsg()](@ref actuatorsTranslateCanMsg) | All actuators state fields remain false		 |
+ * | \anchor TC_AEB_A__006 **TC_AEB_A__006** | [test_updateInternalActuatorsState_DataFrame0_Active()](@ref test_updateInternalActuatorsState_DataFrame0_Active) | [SwR-4](@ref SwR-4) | [updateInternalActuatorsState()](@ref updateInternalActuatorsState) | belt_tightness = false, door_lock = true, should_activate_abs = false, alarm_led = true, alarm_buzzer = true		 |
+ * | \anchor TC_AEB_A__007 **TC_AEB_A__007** | [test_InitialActuatorsState()](@ref test_InitialActuatorsState) | [SwR-4](@ref SwR-4) | [actuatorsTranslateCanMsg()](@ref actuatorsTranslateCanMsg) | All actuators state fields remain false		 |
+ * | \anchor TC_AEB_A__008 **TC_AEB_A__008** | [test_actuatorsTranslateCanMsg_Unexpected_DataFrame()](@ref test_actuatorsTranslateCanMsg_Unexpected_DataFrame) | [SwR-4](@ref SwR-4) | [actuatorsTranslateCanMsg()](@ref actuatorsTranslateCanMsg) | belt_tightness = false, door_lock = true, should_activate_abs = false, alarm_led = false, alarm_buzzer = false		 |
+ * | \anchor TC_AEB_A__009 **TC_AEB_A__009** | [test_actuatorsResponseLoop_EmptyQueue()](@ref test_actuatorsResponseLoop_EmptyQueue) | [SwR-4](@ref SwR-4) | [actuatorsResponseLoop()](@ref actuatorsResponseLoop) | After max iterations with empty queue, it should stop or behave as expected		 |
+ * | \anchor TC_AEB_A__010 **TC_AEB_A__010** | [test_actuatorsResponseLoop_UnknownMessages()](@ref test_actuatorsResponseLoop_UnknownMessages) | [SwR-4](@ref SwR-4) | [actuatorsResponseLoop()](@ref actuatorsResponseLoop) | The state must be updated or not depending on internal logic. In this case: belt_tightness = true, door_lock = false, should_activate_abs = true, etc.		 |
  */
