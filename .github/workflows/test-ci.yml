@@ -5,6 +5,7 @@ on:
     branches:
       - develop
       - bugfix/fix_test_action
+      - bugfix/fix_mq_utils_tests
   pull_request:
     branches: [ "develop" ]
 
@@ -24,4 +25,4 @@ jobs:
       run: make
 
     - name: Run Tests
-      run: make test
+      run: sudo make test
