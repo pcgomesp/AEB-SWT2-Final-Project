@@ -225,6 +225,22 @@ void test_TC_AEB_CTRL_004(void) {
     checkPedalState(false, true);
 }
 
+void test_TC_AEB_CTRL_005x(void) {
+    can_msg captured_frame = { .identifier = ID_PEDALS, .dataFrame = {0x01, 0x01} };
+
+    updateInternalPedalsState(captured_frame);
+
+    // Test: Accelerator pedal should be ON, Brake pedal should be ON
+    checkPedalState(true, true);
+
+    captured_frame.dataFrame[0] = 0x02;
+    captured_frame.dataFrame[1] = 0x02;
+    updateInternalPedalsState(captured_frame);
+
+    // Test: Accelerator and Brake Pedal should be on yet, since this dataFrame isn't valid
+    checkPedalState(true, true);
+}
+
 /**
  * @brief Helper function to check the relative velocity and reverseEnabled state.
  * 
@@ -1543,6 +1559,7 @@ int main(void) {
     RUN_TEST(test_TC_AEB_CTRL_002);
     RUN_TEST(test_TC_AEB_CTRL_003);
     RUN_TEST(test_TC_AEB_CTRL_004);
+    RUN_TEST(test_TC_AEB_CTRL_005x);
     
     // The following tests comply with [SwR-6], [SwR-9] and [SwR-11].
     RUN_TEST(test_TC_AEB_CTRL_005);
