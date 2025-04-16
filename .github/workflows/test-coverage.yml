@@ -29,10 +29,10 @@ jobs:
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 60
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 60
 
-      - name: Install gcov 14
-        run: |
-          sudo apt-get install -y gcov-14
-          sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-14 60
+      # - name: Install gcov 14
+      #   run: |
+      #     sudo apt-get install -y gcov-14
+      #     sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-14 60
 
       - name: Install lcov 2.3.1
         run: |
