@@ -1,8 +1,0 @@
-<map id="src/file_reader.c" name="src/file_reader.c">
-<area shape="rect" id="node1" title="Module responsible for handling input file operations related to sensor data." alt="" coords="91,5,215,32"/>
-<area shape="rect" id="node2" href="$file__reader_8h.html" title=" " alt="" coords="47,80,150,107"/>
-<area shape="rect" id="node6" title=" " alt="" coords="174,80,245,107"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,155,72,181"/>
-<area shape="rect" id="node4" href="$sensors__input_8h.html" title="Defines the data structure for sensor inputs to the AEB system." alt="" coords="97,155,221,181"/>
-<area shape="rect" id="node5" title=" " alt="" coords="117,229,200,256"/>
-</map>
