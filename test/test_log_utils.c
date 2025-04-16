@@ -114,9 +114,26 @@ void test_log_event_check_writing_no1(){
     TEST_ASSERT_EQUAL(actuators_test.alarm_buzzer, actuators_try.alarm_buzzer);
 }
 
+void test_log_event_file_already_exists(){
+    wrap_fopen_fail = false;
+    // First call, file created
+    log_event("Check_Writing", can_frame_test.identifier, actuators_test);
+    // Second call, file created before
+    log_event("Check_Writing", can_frame_test.identifier, actuators_test);
+
+    // The same as the previous test 
+    actuators_try = read_line_test();
+    TEST_ASSERT_EQUAL(actuators_test.belt_tightness, actuators_try.belt_tightness);
+    TEST_ASSERT_EQUAL(actuators_test.door_lock, actuators_try.door_lock);
+    TEST_ASSERT_EQUAL(actuators_test.should_activate_abs, actuators_try.should_activate_abs);
+    TEST_ASSERT_EQUAL(actuators_test.alarm_led, actuators_try.alarm_led);
+    TEST_ASSERT_EQUAL(actuators_test.alarm_buzzer, actuators_try.alarm_buzzer);
+}
+
 int main(){
     UNITY_BEGIN();
     RUN_TEST(test_log_event_fopen_fail);
     RUN_TEST(test_log_event_check_writing_no1);
+    RUN_TEST(test_log_event_file_already_exists);
     return UNITY_END();
 }
