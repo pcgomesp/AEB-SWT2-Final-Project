@@ -71,7 +71,7 @@ jobs:
           echo "Checking individual coverage entries..."
           while read -r value; do
             echo "Found coverage: $value%"
-            if (( $(echo "$value < 58.5" | bc -l) )); then
+            if (( $(echo "$value < 80.0" | bc -l) )); then
               echo "❌ Coverage $value% is below the 80% threshold"
               failed=1
             fi
