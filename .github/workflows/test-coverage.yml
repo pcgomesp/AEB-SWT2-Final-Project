@@ -38,10 +38,18 @@ jobs:
           sudo make install
           cd ..
           rm -rf lcov
+      
+      - name: Check gcc and gcov versions
+        run: |
+          gcc --version
+          gcov --version
+          lcov --version
+          gcc-14 --version
+          gcov-14 --version
 
       - name: Run lcov
         run: |
-          make full-cov GCOV=gcov-14
+          make full-cov CC=gcc-14 GCOV=gcov-14
 
       - name: Check coverage in HTML report
         run: |
