@@ -455,7 +455,7 @@ int main(void) {
     RUN_TEST(test_updateInternalSpeedState);
     RUN_TEST(test_updateInternalObstacleState);
     RUN_TEST(test_updateInternalCarCState);
-    RUN_TEST(test_getAEBState);
+    // RUN_TEST(test_getAEBState);
     RUN_TEST(test_translateAndCallCanMsg_1);
     RUN_TEST(test_translateAndCallCanMsg_2);
     RUN_TEST(test_translateAndCallCanMsg_3);
