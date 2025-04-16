@@ -51,7 +51,7 @@ test:
 test_all: $(TESTS)
 	@for test in $^; do \
 		echo "\n\033[1;33mTest $$test results:\033[0m"; \
-		./$$test; \
+		./$$test || exit 1; \
 	done
 
 test/test_mq_utils: test/test_mq_utils.c src/mq_utils.c test/unity.c
