@@ -86,6 +86,20 @@ void tearDown(void) {
     // No cleanup required for now
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * @note The naming convention for test cases is as follows:
+ * test_<test_case_name><number_suffix>
+ * 
+ * Where: 
+ * <test_case_name> is the name of the test case
+ * 
+ * <number_suffix> is a number suffix to differentiate between test cases, if begin with an "X",
+ * it means that the test case is not a part of the sheet test built for check the
+ * compliance with software requirements and is used for increase the coverage.
+ */
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * @brief Helper function to check the pedal state.
  * 
