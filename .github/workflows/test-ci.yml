@@ -2,7 +2,9 @@ name: Test CI
 
 on:
   push:
-    branches: [ "develop" ]
+    branches:
+      - develop
+      - bugfix/fix_test_action
   pull_request:
     branches: [ "develop" ]
 
