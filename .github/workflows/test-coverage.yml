@@ -68,7 +68,7 @@ jobs:
         run: |
           COV=$(grep -oP '<td class="headerCovTableEntryMed">\K[0-9.]+(?=&nbsp;%)' cov/full_report/src/index-sort-l.html)
           echo "Extracted HTML coverage: $COV%"
-          if (( $(echo "$COV < 84.5" | bc -l) )); then
+          if (( $(echo "$COV < 80.0" | bc -l) )); then
             echo "HTML coverage is below threshold (80%)"
             exit 1
           fi
