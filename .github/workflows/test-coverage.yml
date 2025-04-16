@@ -30,10 +30,11 @@ jobs:
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 60
           sudo ln -s /usr/bin/gcov-14 /usr/local/bin/gcov-14
 
-      - name: Install cpanminus and Capture::Tiny
+      - name: Install required Perl modules
         run: |
           sudo apt-get install -y cpanminus
           sudo cpanm Capture::Tiny
+          sudo cpanm Capture::Tiny DateTime
 
       - name: Install lcov 2.3.1
         run: |
@@ -46,11 +47,9 @@ jobs:
       
       - name: Check gcc and gcov versions
         run: |
-          gcc --version
-          gcov --version
-          lcov --version
           gcc-14 --version
           gcov-14 --version
+          lcov --version
 
       - name: Run lcov
         run: |
