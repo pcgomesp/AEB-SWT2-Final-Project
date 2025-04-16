@@ -30,6 +30,11 @@ jobs:
           sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 60
           sudo ln -s /usr/bin/gcov-14 /usr/local/bin/gcov-14
 
+      - name: Install cpanminus and Capture::Tiny
+        run: |
+          sudo apt-get install -y cpanminus
+          sudo cpanm Capture::Tiny
+
       - name: Install lcov 2.3.1
         run: |
           git clone https://github.com/linux-test-project/lcov.git
