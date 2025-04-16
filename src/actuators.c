@@ -1,3 +1,12 @@
+/**
+ * @file controller.c
+ * @brief Controller module responsible for managing actuator logic through message queue handling.
+ * 
+ * This module handles the reception and processing of CAN messages related to actuators via POSIX
+ * message queues. It spawns a separate thread to continuously read incoming messages, update the 
+ * internal state of the actuators accordingly, and log each event for traceability and diagnostics.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

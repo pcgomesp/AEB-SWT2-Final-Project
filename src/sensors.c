@@ -1,3 +1,13 @@
+/**
+ * @file sensors.c
+ * @brief Sensor module responsible for reading scenario data and converting it into CAN messages.
+ * 
+ * This module reads sensor data from a predefined scenario text file and encodes the information
+ * into CAN frames. The resulting frames are sent via a POSIX message queue to other modules. 
+ * The data includes vehicle velocity, direction, AEB system  status, obstacle presence, and 
+ * pedal activation.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

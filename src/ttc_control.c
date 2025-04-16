@@ -1,3 +1,17 @@
+/**
+ * @file ttc_control.c
+ * @brief TTC (Time to Collision) and AEB (Autonomous Emergency Braking) control logic module.
+ * 
+ * This module provides core logic for calculating the time to collision (TTC) between a vehicle 
+ * and an obstacle using a uniformly variable motion model. Based on the TTC and vehicle conditions, 
+ * it optionally enables the Autonomous Emergency Braking (AEB) system and other related safety features.
+ * 
+ * The main functionalities include:
+ * - Calculation of TTC based on relative speed, distance, and acceleration.
+ * - Decision-making logic for enabling the AEB system, triggering alarms, locking seatbelts, and 
+ *   unlocking doors in critical situations.
+ */
+
 #include "ttc_control.h"
 #include "constants.h"
 #include <stdio.h>
@@ -8,7 +22,8 @@
  * This function calculates the time to collision using the Uniformly Variable Motion (UVM) model. 
  * It uses a quadratic equation to calculate the time to collision (TTC) between two objects 
  * based on their relative distance and speed. If the relative acceleration is zero, the function 
- * simply calculates the time by dividing the relative distance by the relative speed [SwR-1] (@ref SwR-1), [SwR-10], [SwR-11]. 
+ * simply calculates the time by dividing the relative distance by the relative speed [SwR-1] (@ref SwR-1), [SwR-10] 
+ * (@ref SwR-10), [SwR-11] (@ref SwR-11). 
  *
  * @param dis_rel The relative distance between the objects in meters.
  * @param spd_rel The relative speed between the objects in km/h.
@@ -58,13 +73,13 @@ double ttc_calc(double dis_rel, double spd_rel, double rel_acel) {
  * @param enable_aeb A pointer to a boolean flag that enables or disables the AEB system. [SwR-5] (@ref SwR-5)
  * @param alarm_cluster A pointer to a boolean flag that triggers the alarm in the cluster. [SwR-2] (@ref SwR-2)
  * @param enable_breaking A pointer to a boolean flag that enables or disables the braking system. [SwR-3] (@ref SwR-3)
- * @param lk_seatbelt A pointer to a boolean flag that locks the seatbelt in case of emergency. [Sys-F-14]
+ * @param lk_seatbelt A pointer to a boolean flag that locks the seatbelt in case of emergency. [Sys-F-14] 
  * @param lk_doors A pointer to a boolean flag that locks or unlocks the doors in an emergency. [Sys-F-14]
  * @param spd A pointer to the current speed of the vehicle (in km/h).
  * @param dist A pointer to the current distance to the obstacle (in meters).
  * 
  * @note The function complies with the requirements ([SwR-2] (@ref SwR-2), [SwR-3](@ref SwR-3), [SwR-5] (@ref SwR-5),
- *       SwR-11, SwR-14, SwR-15, Sys-F-8, Sys-F-9, Sys-F-14).
+ *       SwR-11 (@ref SwR-11), SwR-14 (@ref SwR-14), SwR-15 (@ref SwR-15), Sys-F-8, Sys-F-9, Sys-F-14).
  */
 void aeb_control(bool *enable_aeb, bool *alarm_cluster, bool *enable_breaking,
                  bool *lk_seatbelt, bool *lk_doors, double *spd, double *dist, double *acel) {

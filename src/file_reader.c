@@ -1,4 +1,13 @@
-#include "../inc/file_reader.h"
+/**
+ * @file file_reader.c
+ * @brief Module responsible for handling input file operations related to sensor data.
+ * 
+ * This module provides functions to open a file containing sensor input values and read its 
+ * contents into a structured format. It skips the header line and parses sensor data values 
+ * for later use in simulation or testing environments.
+ */
+
+#include "file_reader.h"
 #include <stdlib.h>
 
 /**
