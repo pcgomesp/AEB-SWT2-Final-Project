@@ -1,40 +1,102 @@
 #include "unity.h"
 #include "file_reader.h"
 #include <sys/stat.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
+#include <setjmp.h>
 
-const char *test_filename = "tcs/cenario.txt";
+
+static bool wrap_fopen_fail = false;
+static bool wrap_perror_called = false;
+static bool wrap_exit_called = false;
+static int wrap_exit_status = 0;
+
 FILE *test_file;
+jmp_buf exit_env;
 
-/**
- * @brief setUp function to initialize AEB input state before each test.
- * It opens the file pointed by test_filename.
- */
-void setUp()
+// ---- WRAPS ------
+
+/** @brief fopen function mock */
+FILE *__real_fopen(const char *path, const char *mode);
+FILE *__wrap_fopen(const char *path, const char *mode) 
 {
-    test_file = open_file(test_filename);
+    if(wrap_fopen_fail)
+        return NULL;
+    return __real_fopen(path, mode);
+}
+
+/** @brief perror function mock */
+void __real_perror(const char *s);
+void __wrap_perror(const char *s) 
+{
+    wrap_perror_called = true;
+    __real_perror(s);
+}
+
+/** @brief exit function mock */
+void __wrap_exit(int status) 
+{
+    wrap_exit_called = true;
+    wrap_exit_status = status;
+    longjmp(exit_env, 1);
 }
 
 /**
- * @brief tearDown function to clean up after each test.
- * If test_filename pointer is not NULL, the function closes 
- * the file and assign test_filename to NULL.
+ * @brief setUp function
+ */
+void setUp()
+{
+    wrap_fopen_fail = false;
+    wrap_perror_called = false;
+    wrap_exit_called = false;
+    wrap_exit_status = 0; 
+}
+
+/**
+ * @brief tearDown function
  */
 void tearDown()
 {
-    if(test_file)
+    if (test_file) 
     {
         fclose(test_file);
         test_file = NULL;
     }
+    
 }
 
 /** 
  * @test
- * @brief Test for the function open_file on file_reader.c [SwR-9], [SwR-11]
+ * @brief Test open_file() when fopen fails
+ */
+void test_open_file_fopen_fail_should_exit() 
+{
+    wrap_fopen_fail = true;
+   
+    // Test Case ID: TC_FILE_READER_001
+    
+    if (setjmp(exit_env) == 0) {
+        open_file("invalid/path.txt");  // Vai cair no longjmp da wrap_exit
+        TEST_FAIL_MESSAGE("exit() was not called as expected");
+    }
+
+    TEST_ASSERT_TRUE(wrap_perror_called);
+    TEST_ASSERT_TRUE(wrap_exit_called);
+    TEST_ASSERT_EQUAL(EXIT_FAILURE, wrap_exit_status);
+}
+
+/** 
+ * @test
+ * @brief Test for the function open_file on file_reader.c [SwR-9] (@ref SwR-9), [SwR-11] (@ref SwR-11)
 */
 void test_open_file_not_null_and_skip_header()
 {
-    // Test Case ID: TC_FILE_READER_001
+    const char *test_filename = "tcs/cenario.txt";
+    test_file = open_file(test_filename);
+
+    // Test Case ID: TC_FILE_READER_002
 
     // Checks if test_file pointer is not null
     TEST_ASSERT_NOT_NULL(test_file);
@@ -47,24 +109,25 @@ void test_open_file_not_null_and_skip_header()
     the header
     */
     TEST_ASSERT_EQUAL_STRING("60 1 108 0 1 1 0 0\n", buffer);
-    
+   
 }
 
 /** 
  * @test
- * @brief Tests for the function read_sensor_data on file_reader.c [SwR-9], [SwR-11]
+ * @brief Tests for the function read_sensor_data on file_reader.c [SwR-9] (@ref SwR-9), [SwR-11] (@ref SwR-11)
 */
 void test_read_sensor_data_valid_data()
 {
     sensors_input_data test_sensor_data;
+    const char *test_filename = "tcs/cenario.txt";
+    test_file = open_file(test_filename);
 
-    // Test Case ID: TC_FILE_READER_002
+    // Test Case ID: TC_FILE_READER_003
     /* Checks if the function successfully reads
     all the data from second line
     */
     TEST_ASSERT_EQUAL(1, read_sensor_data(test_file, &test_sensor_data));
 
-    /* --- REVIEW --- */
     // Checks if values match expected ones from second line
     TEST_ASSERT_EQUAL_FLOAT(60.0, test_sensor_data.obstacle_distance);
     TEST_ASSERT_EQUAL(1, test_sensor_data.has_obstacle);
@@ -74,22 +137,29 @@ void test_read_sensor_data_valid_data()
     TEST_ASSERT_EQUAL(1, test_sensor_data.on_off_aeb_system);
     TEST_ASSERT_EQUAL(0, test_sensor_data.reverseEnabled);
     TEST_ASSERT_EQUAL_FLOAT(0.0,test_sensor_data.relative_acceleration);
+
 }
 
+/**  @test */
 void test_read_sensor_data_eof()
 {
     sensors_input_data test_sensor_data;
-    
-    // Test Case ID: TC_FILE_READER_003
+    const char *test_filename = "tcs/cenario.txt";
+    test_file = open_file(test_filename);
+
+    // Test Case ID: TC_FILE_READER_004
     while (read_sensor_data(test_file, &test_sensor_data) == 1);
   
     TEST_ASSERT_EQUAL(0, read_sensor_data(test_file, &test_sensor_data));
-
 }
+
+
+
 
 int main()
 {
     UNITY_BEGIN();
+    RUN_TEST(test_open_file_fopen_fail_should_exit);
     RUN_TEST(test_open_file_not_null_and_skip_header);
     RUN_TEST(test_read_sensor_data_valid_data);
     RUN_TEST(test_read_sensor_data_eof);

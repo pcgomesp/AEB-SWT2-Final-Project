@@ -1,9 +1,23 @@
+/**
+ * @file dbc.h
+ * @brief Defines CAN message identifiers, calibration values, and resolution factors based on the DBC specification.
+ *
+ * This file provides identifiers and calibration parameters derived from the DBC file,
+ * used for interpreting and composing CAN messages in the AEB system. It includes resolution,
+ * offset, and physical limits for decoding signals from various vehicle modules.
+ *
+ * @details
+ * - Contains CAN message identifiers mapped from the requirements specification. [SwR-13] (@ref SwR-13)
+ * - Defines default data frame and associated value ranges.
+ * - Specifies resolution and offset values for converting raw signal data.
+ * - Includes data structures and utility functions for CAN message handling.
+ */
+
 #ifndef DBC_H
 #define DBC_H
 
 #include <stdint.h>
 
-// Calibration values [SwR-13]
 // Identifiers, according to the dbc file in the requirements specification
 #define ID_PEDALS 0x18FEF100
 #define ID_SPEED_S 0x18FFFD64

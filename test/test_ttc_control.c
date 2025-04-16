@@ -27,6 +27,7 @@ void tearDown(){
     // clean stuff up here//
 }
 
+/** @test */
 void test_ttc_when_acel_zero(){
     double dist[3], vel[3], acel[3], ttc[3];
 
@@ -44,6 +45,7 @@ void test_ttc_when_acel_zero(){
     TEST_ASSERT_FLOAT_WITHIN(delta, 2.46, ttc[2]);
 }
 
+/** @test */
 void test_ttc_when_delta_negative(){ 
     // Negative delta -> no real root -> Colision impossible? 
     // Verify this
@@ -64,6 +66,7 @@ void test_ttc_when_delta_negative(){
     TEST_ASSERT_FLOAT_WITHIN(delta, 99, ttc[2]);
 }
 
+/** @test */
 void test_ttc_when_delta_zero(){
     double dist[3], vel[3], acel[3], ttc[3];
 
@@ -76,6 +79,7 @@ void test_ttc_when_delta_zero(){
     TEST_ASSERT_FLOAT_WITHIN(delta, 8, ttc[1]);
 }
 
+/** @test */
 void test_ttc_when_delta_positive(){
     double dist[3], vel[3], acel[3], ttc[3];
 
@@ -92,6 +96,7 @@ void test_ttc_when_delta_positive(){
     TEST_ASSERT_FLOAT_WITHIN(delta, 1.6882, ttc[2]);
 }
 
+/** @test */
 void test_aebcontrol_no_actuators_trigger(){
     bool enable_aeb, alarm_cluster, enable_breaking, lk_seatbelt, lk_doors;
     double spd, dist, acel;
@@ -117,6 +122,7 @@ void test_aebcontrol_no_actuators_trigger(){
     TEST_ASSERT_FALSE(enable_breaking);
 }
 
+/** @test */
 void test_aeb_worst_situation(){
     bool enable_aeb, alarm_cluster, enable_breaking, lk_seatbelt, lk_doors;
     double spd, dist, acel;
@@ -135,6 +141,62 @@ void test_aeb_worst_situation(){
     TEST_ASSERT_FALSE(lk_doors);
 }
 
+void test_aeb_generic_break_situations(){
+    bool enable_aeb, alarm_cluster, enable_breaking, lk_seatbelt, lk_doors;
+    double spd, dist, acel;
+
+    enable_aeb = true;
+    enable_breaking = false;
+    dist = 9.99; spd = 36; acel=0.3;   
+    aeb_control(&enable_aeb,&alarm_cluster,&enable_breaking,&lk_seatbelt,&lk_doors,
+        &spd, &dist, &acel);
+    TEST_ASSERT_TRUE(alarm_cluster);
+    TEST_ASSERT_TRUE(enable_breaking);
+
+    enable_aeb = true;
+    enable_breaking = true;
+    dist = 9.99; spd = 36; acel=0.3;   
+    aeb_control(&enable_aeb,&alarm_cluster,&enable_breaking,&lk_seatbelt,&lk_doors,
+        &spd, &dist, &acel);
+    TEST_ASSERT_TRUE(alarm_cluster);
+    TEST_ASSERT_TRUE(enable_breaking);
+}
+
+void test_aeb_alarm_situation(){
+    bool enable_aeb, alarm_cluster, enable_breaking, lk_seatbelt, lk_doors;
+    double spd, dist, acel;
+
+    // Alarm situation: TTC low enought that the alarm state is activated;
+    // But the breaking isn't yet
+
+    enable_aeb = true;
+    enable_breaking = false;
+    dist = 19.99; spd = 36; acel=0.3;   
+    aeb_control(&enable_aeb,&alarm_cluster,&enable_breaking,&lk_seatbelt,&lk_doors,
+        &spd, &dist, &acel);
+    TEST_ASSERT_TRUE(alarm_cluster);
+    TEST_ASSERT_FALSE(enable_breaking);
+
+    // Sensitizes expression 2, line 78 from original file
+    enable_aeb = true;
+    enable_breaking = false;
+    dist = 0.9; spd = 180; acel=0.3;   
+    aeb_control(&enable_aeb,&alarm_cluster,&enable_breaking,&lk_seatbelt,&lk_doors,
+        &spd, &dist, &acel);
+    TEST_ASSERT_TRUE(alarm_cluster);
+    TEST_ASSERT_FALSE(enable_breaking);
+
+    // Sensitizes expression 3, line 78 from original file
+    enable_aeb = true;
+    enable_breaking = false;
+    dist = 0.1; spd = 0.5; acel=0.3;   
+    aeb_control(&enable_aeb,&alarm_cluster,&enable_breaking,&lk_seatbelt,&lk_doors,
+        &spd, &dist, &acel);
+    TEST_ASSERT_TRUE(alarm_cluster);
+    TEST_ASSERT_FALSE(enable_breaking);
+
+}
+
 int main(){
     UNITY_BEGIN();
     
@@ -143,7 +205,9 @@ int main(){
     RUN_TEST(test_ttc_when_delta_zero);
     RUN_TEST(test_ttc_when_delta_positive);    
     RUN_TEST(test_aebcontrol_no_actuators_trigger);    
-    RUN_TEST(test_aeb_worst_situation);    
+    RUN_TEST(test_aeb_worst_situation);
+    RUN_TEST(test_aeb_generic_break_situations);
+    RUN_TEST(test_aeb_alarm_situation);
     
     return UNITY_END();
 }

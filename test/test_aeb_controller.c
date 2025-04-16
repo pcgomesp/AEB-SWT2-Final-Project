@@ -87,7 +87,8 @@ void tearDown(void) {
 }
 
 /**
- * @brief Test for the function updateInternalPedalsState. [SwR-6], [SwR-9], [SwR-11]
+ * @test
+ * @brief Test for the function updateInternalPedalsState. [SwR-6] (@ref SwR-6), [SwR-9] (@ref SwR-9), [SwR-11] (@ref SwR-11)
  */
 void test_updateInternalPedalsState(void) {
     can_msg captured_frame = { .identifier = ID_PEDALS, .dataFrame = {0x01, 0x00} };
@@ -124,7 +125,8 @@ void test_updateInternalPedalsState(void) {
 }
 
 /**
- * @brief Test for the function updateInternalSpeedState. [SwR-6], [SwR-9], [SwR-11]
+ * @test
+ * @brief Test for the function updateInternalSpeedState. [SwR-6] (@ref SwR-6), [SwR-9] (@ref SwR-9), [SwR-11] (@ref SwR-11)
  */
 void test_updateInternalSpeedState(void) {
     can_msg captured_frame = { .identifier = ID_SPEED_S, .dataFrame = {0x00, 0x64, 0x00} };
@@ -170,7 +172,9 @@ void test_updateInternalSpeedState(void) {
 }
 
 /**
- * @brief Test for the function updateInternalObstacleState. [SwR-3], [SwR-6], [SwR-7], [SwR-8], [SwR-9], [SwR-11], [SwR-15]
+ * @test
+ * @brief Test for the function updateInternalObstacleState. [SwR-3] (@ref SwR-3), [SwR-6] (@ref SwR-6), [SwR-7] (@ref SwR-7), 
+ * [SwR-8] (@ref SwR-8), [SwR-9] (@ref SwR-9), [SwR-11] (@ref SwR-11), [SwR-15] (@ref SwR-15)
  */
 void test_updateInternalObstacleState(void) {
     can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xD0, 0x07, 0x01} };
@@ -222,7 +226,9 @@ void test_updateInternalObstacleState(void) {
 }
 
 /**
- * @brief Test for the function updateInternalCarCState. [SwR-2], [SwR-3], [SwR-7], [SwR-8], [SwR-11], [SwR-12], [SwR-16]
+ * @test
+ * @brief Test for the function updateInternalCarCState. [SwR-2] (@ref SwR-2), [SwR-3] (@ref SwR-3), [SwR-7] (@ref SwR-7), 
+ * [SwR-8] (@ref SwR-8), [SwR-11] (@ref SwR-11), [SwR-12] (@ref SwR-12), [SwR-16] (@ref SwR-16)
  */
 void test_updateInternalCarCState(void) {
     can_msg captured_frame = { .identifier = ID_CAR_C, .dataFrame = {0x01} };
@@ -250,7 +256,10 @@ void test_updateInternalCarCState(void) {
 }
 
 /**
- * @brief Test for the function getAEBState. [SwR-2], [SwR-3], [SwR-6], [SwR-7], [SwR-8], [SwR-9], [SwR-11], [SwR-12], [SwR-15],[SwR-16]. 
+ * @test
+ * @brief Test for the function getAEBState. [SwR-2] (@ref SwR-2), [SwR-3] (@ref SwR-3), [SwR-6] (@ref SwR-6), [SwR-7], 
+ * [SwR-8] (@ref SwR-8), [SwR-9] (@ref SwR-9), [SwR-11] (@ref SwR-11), [SwR-12] (@ref SwR-12), [SwR-15] (@ref SwR-15),
+ * [SwR-16] (@ref SwR-16). 
  */
 void test_getAEBState(void) {
     // Initial setup of AEB state
@@ -322,7 +331,8 @@ void test_getAEBState(void) {
 }
 
 /**
- * @brief Series of tests for the function translateAndCallCanMsg. [SwR-9] 
+ * @test
+ * @brief Series of tests for the function translateAndCallCanMsg. [SwR-9] (@ref SwR-9)
  */
 void test_translateAndCallCanMsg_1(void) {
     can_msg captured_frame;
@@ -337,6 +347,7 @@ void test_translateAndCallCanMsg_1(void) {
     TEST_ASSERT_FALSE(aeb_internal_state.brake_pedal);  // Brake pedal should be OFF
 }
 
+/** @test */
 void test_translateAndCallCanMsg_2()
 {
     can_msg captured_frame;
@@ -350,6 +361,7 @@ void test_translateAndCallCanMsg_2()
     TEST_ASSERT_TRUE(aeb_internal_state.brake_pedal);  // Brake pedal should be ON
 }
 
+/** @test */
 void test_translateAndCallCanMsg_3()
 {
     can_msg captured_frame;
@@ -364,6 +376,7 @@ void test_translateAndCallCanMsg_3()
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.relative_velocity, 100.0);  // Speed should be 100 km/h
 }
 
+/** @test */
 void test_translateAndCallCanMsg_4()
 {
     can_msg captured_frame;
@@ -379,6 +392,7 @@ void test_translateAndCallCanMsg_4()
     TEST_ASSERT_EQUAL_FLOAT(aeb_internal_state.obstacle_distance, 100.0);  // Distance should be 100 meters
 }
 
+/** @test */
 void test_translateAndCallCanMsg_5()
 {
     can_msg captured_frame;
@@ -391,6 +405,7 @@ void test_translateAndCallCanMsg_5()
     TEST_ASSERT_TRUE(aeb_internal_state.on_off_aeb_system);  // AEB system should be ON
 }
 
+/** @test */
 void test_translateAndCallCanMsg_6()
 {
     can_msg captured_frame;
@@ -404,6 +419,7 @@ void test_translateAndCallCanMsg_6()
     // TEST_ASSERT_EQUAL_STRING("CAN Identifier unknown\n", capture_stdout());
 }
 
+/** @test */
 void test_translateAndCallCanMsg_7()
 {
     can_msg captured_frame;
@@ -417,6 +433,7 @@ void test_translateAndCallCanMsg_7()
     TEST_ASSERT_TRUE(aeb_internal_state.reverseEnabled);  // Reverse should be enabled
 }
 
+/** @test */
 void test_translateAndCallCanMsg_8()
 {
     can_msg captured_frame;
@@ -430,6 +447,7 @@ void test_translateAndCallCanMsg_8()
     TEST_ASSERT_FALSE(aeb_internal_state.reverseEnabled);  // Reverse should be disabled
 }
 
+/** @test */
 void test_translateAndCallCanMsg_9()
 {
     can_msg captured_frame;

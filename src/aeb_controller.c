@@ -1,3 +1,17 @@
+/**
+ * @file aeb_controller.c
+ * @brief Implements the main logic for the Autonomous Emergency Braking (AEB) controller system.
+ *
+ * This file contains the core implementation of the AEB controller, including the main control loop,
+ * message handling, state management, and CAN message translation logic. It interfaces with sensors 
+ * via message queues, processes data (e.g., velocity, obstacles, pedal inputs), and makes 
+ * decisions based on TTC (Time to Collision) to control actuators accordingly.
+ *
+ * The controller supports multiple operating states such as standby, active, alarm, and brake, and 
+ * ensures safe and timely actuation decisions based on vehicle and environmental data.
+ *
+ */
+
 // Necessary libraries
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,8 +31,9 @@
 /**
  * @enum aeb_controller_state
  * @brief Enum defining the possible states of the AEB system.
+ * Abstraction according to [SwR-12] (@ref SwR-12)
  */
-typedef enum // Abstraction according to [SwR-12]
+typedef enum 
 {
     AEB_STATE_ACTIVE,   /**< AEB system is active and performing actions */
     AEB_STATE_ALARM,    /**< AEB system is in alarm state, but not yet braking */
@@ -59,6 +74,7 @@ can_msg out_can_frame = {
     .identifier = ID_AEB_S,
     .dataFrame = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
 
+//! [SwR-5] (@ref SwR-5)
 can_msg empty_msg = { // [SwR-5]
     .identifier = ID_EMPTY,
     .dataFrame = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
@@ -103,6 +119,8 @@ can_msg empty_msg = { // [SwR-5]
  * 
  * This function continuously checks the message queue for new sensor data, processes it, 
  * and sends commands to the actuators based on the calculated AEB state.
+ * 
+ * Requirements [SwR-5] (@ref SwR-5), [SwR-6] (@ref SwR-6) and [SwR-9] (@ref SwR-9)
  * 
  * @param arg Arguments passed to the thread (not used here).
  * @return NULL.
@@ -224,6 +242,7 @@ void updateInternalPedalsState(can_msg captured_frame)
  * @brief Updates the internal speed state based on the received CAN message.
  * 
  * This function updates the internal speed (relative velocity) from the received CAN message.
+ * [SwR-10] (@req SwR-10)
  * 
  * @param captured_frame The captured CAN message containing speed data.
  */
@@ -374,6 +393,8 @@ void updateInternalCarCState(can_msg captured_frame)
  * This function creates a CAN message to be sent to the actuators based on the current 
  * state of the AEB system (e.g., brake, alarm, etc.).
  * 
+ * Requirements [SwR-2] (@ref SwR-2), [SwR-14] (@ref SwR-14) and [SwR-15] (@ref SwR-15)
+ * 
  * @param state The current state of the AEB system.
  * @return The generated CAN message.
  */
@@ -411,6 +432,8 @@ can_msg updateCanMsgOutput(aeb_controller_state state)
  * 
  * This function evaluates the current AEB state based on multiple sensor 
  * parameters, such as relative velocity, obstacle presence, and TTC (Time to Collision).
+ * 
+ * Requirements [SwR-7] (@ref SwR-7), [SwR-8] (@ref SwR-8) and [SwR-16] (@ref SwR-16)
  * 
  * @param aeb_internal_state The current sensor data for the AEB system.
  * @param ttc The time-to-collision value, calculated based on obstacle distance and vehicle speed.
