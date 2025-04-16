@@ -58,7 +58,7 @@ test/test_mq_utils: test/test_mq_utils.c src/mq_utils.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_mq_utils.c src/mq_utils.c test/unity.c -o test/test_mq_utils -I$(TESTFOLDER)
 
 test/test_file_reader: test/test_file_reader.c src/file_reader.c test/unity.c
-	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER)
+	$(CC) $(CFLAGS) $(TESTFLAGS) -Wl,--wrap=fopen -Wl,--wrap=perror -Wl,--wrap=exit test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER) -Itest
 
 test/test_log_utils: test/test_log_utils.c src/log_utils.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) -Wl,--wrap=fopen -Wl,--wrap=perror test/test_log_utils.c src/log_utils.c test/unity.c -o test/test_log_utils -I$(TESTFOLDER)
@@ -86,6 +86,8 @@ cov:
 		echo ""; \
 		if [ "$(test_file)" = "test_log_utils.c" ]; then \
 			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
+		elif [ "$(test_file)" = "test_file_reader.c" ]; then \
+			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror -Wl,--wrap=exit"; \
 		else \
 			WRAP_FLAGS=""; \
 		fi; \
@@ -103,6 +105,8 @@ lcov:
 		echo ""; \
 		if [ "$(test_file)" = "test_log_utils.c" ]; then \
 			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
+		elif [ "$(test_file)" = "test_file_reader.c" ]; then \
+			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror -Wl,--wrap=exit"; \
 		else \
 			WRAP_FLAGS=""; \
 		fi; \
@@ -122,6 +126,8 @@ full-cov: clean-cov
 		echo "\nProcessing $(test_file) for $(src_file)"; \
 		if [ "$(test_file)" = "test_log_utils.c" ]; then \
 			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
+		elif [ "$(test_file)" = "test_file_reader.c" ]; then \
+			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror -Wl,--wrap=exit"; \
 		else \
 			WRAP_FLAGS=""; \
 		fi; \
