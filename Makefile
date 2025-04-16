@@ -153,7 +153,6 @@ full-cov: clean
 	@echo "\nFull coverage analysis complete!"
 	@echo "Individual GCOV reports generated in the source directory"
 	@echo "Combined LCOV report available at $(COVFOLDER)full_report/index.html"
-	@open $(COVFOLDER)full_report/src/index.html
 
 cppcheck:
 	cppcheck --addon=misra -I ./inc --force --library=posix $(SRCFOLDER) $(INCFOLDER)
