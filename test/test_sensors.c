@@ -38,7 +38,7 @@ void tearDown()
 /** 
  * @test
  * @brief Tests for the function conv2CANCarClusterData on sensors.c 
- * [SwR-9], [SwR-10], [SwR-11]
+ * [SwR-9] (@ref SwR-9), [SwR-10] (@ref SwR-10), [SwR-11] (@ref SwR-11)
 */
 void test_conv2CANCarClusterData_AEB_on()
 {
@@ -51,6 +51,7 @@ void test_conv2CANCarClusterData_AEB_on()
 
 }
 
+/** @test */
 void test_conv2CANCarClusterData_AEB_off()
 {
     test_on_off_aeb_system = false;
@@ -65,7 +66,7 @@ void test_conv2CANCarClusterData_AEB_off()
 /** 
  * @test
  * @brief Tests for the function conv2CANVelocityData on sensors.c 
- * [SwR-9], [SwR-10], [SwR-11]
+ * [SwR-9] (@ref SwR-9), [SwR-10] (@ref SwR-10), [SwR-11] (@ref SwR-11)
 */
 void test_conv2CANVelocityData_Forward() 
 {
@@ -91,6 +92,7 @@ void test_conv2CANVelocityData_Forward()
     TEST_ASSERT_EQUAL_UINT8(0x00, result.dataFrame[5]); // Acceleration is positive
 }
 
+/** @test */
 void test_conv2CANVelocityData_Reverse() 
 {
     test_vehicle_direction = false;
@@ -119,7 +121,7 @@ void test_conv2CANVelocityData_Reverse()
 /** 
  * @test
  * @brief Tests for the function conv2CANObstacleData on sensors.c 
- * [SwR-9], [SwR-10], [SwR-11]
+ * [SwR-9] (@ref SwR-9), [SwR-10] (@ref SwR-10), [SwR-11] (@ref SwR-11)
 */
 void test_conv2CANObstacleData_Present() 
 {
@@ -136,6 +138,7 @@ void test_conv2CANObstacleData_Present()
     TEST_ASSERT_EQUAL_UINT8((expected_distance >> 8) & 0xFF, result.dataFrame[1]); // most significant byte
 }
 
+/** @test */
 void test_conv2CANObstacleData_NotPresent() 
 {
     test_has_obstacle = false;
@@ -154,7 +157,7 @@ void test_conv2CANObstacleData_NotPresent()
 /** 
  * @test
  * @brief Tests for the function conv2CANPedalsData on sensors.c 
- * [SwR-9], [SwR-10], [SwR-11]
+ * [SwR-9] (@ref SwR-9), [SwR-10] (@ref SwR-10), [SwR-11] (@ref SwR-11)
 */
 void test_conv2CANPedalsData_BrakeAndAccelerator() 
 {
@@ -169,6 +172,7 @@ void test_conv2CANPedalsData_BrakeAndAccelerator()
     TEST_ASSERT_EQUAL_UINT8(0x01, result.dataFrame[1]); // Brake pedal active
 }
 
+/** @test */
 void test_conv2CANPedalsData_BrakeOnly() 
 {
     test_brake_pedal = true;
@@ -182,6 +186,7 @@ void test_conv2CANPedalsData_BrakeOnly()
     TEST_ASSERT_EQUAL_UINT8(0x01, result.dataFrame[1]); // Brake pedal active
 }
 
+/** @test */
 void test_conv2CANPedalsData_AcceleratorOnly() 
 {
     test_brake_pedal = false;
@@ -195,6 +200,7 @@ void test_conv2CANPedalsData_AcceleratorOnly()
     TEST_ASSERT_EQUAL_UINT8(0x00, result.dataFrame[1]); // Brake pedal inactive
 }
 
+/** @test */
 void test_conv2CANPedalsData_NoneActive() 
 {
     test_brake_pedal = false;

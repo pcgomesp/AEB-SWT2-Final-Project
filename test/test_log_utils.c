@@ -61,6 +61,7 @@ void tearDown(){
     remove("test/test_log.txt");
 }
 
+/** @test */
 // first test: verify if the fopen is catchable by a test (using mock functions)
 void test_log_event_fopen_fail(){
     // Try to write:
@@ -97,6 +98,7 @@ actuators_abstraction read_line_test(){
     return actuators_test;
 }
 
+/** @test */
 void test_log_event_check_writing_no1(){
     // Try to write: done
     // Verify if write: done

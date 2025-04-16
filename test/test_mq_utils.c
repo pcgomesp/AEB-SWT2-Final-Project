@@ -55,6 +55,7 @@ void test_get_mq_attr()
     TEST_ASSERT_EQUAL(12, attr.mq_msgsize);
 }
 
+/** @test */
 void test_create_and_close_mq()
 {
     char *mq_name = "/test_mq";
@@ -108,6 +109,7 @@ void test_close_mq_fail_unlink()
     mq_unlink(mq_name);
 }
 
+/** @test */
 void test_open_mq()
 {
     mqd = create_mq(mq_name);
@@ -116,6 +118,7 @@ void test_open_mq()
     close_mq(mqd, mq_name);
 }
 
+/** @test */
 void test_open_mq_fail()
 {
     wrap_mq_open_fail = true;
@@ -126,6 +129,7 @@ void test_open_mq_fail()
     TEST_ASSERT_TRUE(wrap_perror_called);
 }
 
+/** @test */
 void test_read_mq_empty_queue()
 {
     mqd = create_mq(mq_name);
@@ -134,6 +138,7 @@ void test_read_mq_empty_queue()
     close_mq(mqd, mq_name);
 }
 
+/** @test */
 void test_write_mq_full_queue()
 {
     mqd = create_mq(mq_name);
@@ -146,6 +151,7 @@ void test_write_mq_full_queue()
     close_mq(mqd, mq_name);
 }
 
+/** @test */
 void test_read_and_write_mq_empty_can_msg()
 {
     mqd = create_mq(mq_name);
@@ -160,6 +166,7 @@ void test_read_and_write_mq_empty_can_msg()
     close_mq(mqd, mq_name);
 }
 
+/** @test */
 void test_read_and_write_mq_valid_can_msg()
 {
     mqd = create_mq(mq_name);

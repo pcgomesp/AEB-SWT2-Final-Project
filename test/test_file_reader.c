@@ -89,7 +89,7 @@ void test_open_file_fopen_fail_should_exit()
 
 /** 
  * @test
- * @brief Test for the function open_file on file_reader.c [SwR-9], [SwR-11]
+ * @brief Test for the function open_file on file_reader.c [SwR-9] (@ref SwR-9), [SwR-11] (@ref SwR-11)
 */
 void test_open_file_not_null_and_skip_header()
 {
@@ -114,7 +114,7 @@ void test_open_file_not_null_and_skip_header()
 
 /** 
  * @test
- * @brief Tests for the function read_sensor_data on file_reader.c [SwR-9], [SwR-11]
+ * @brief Tests for the function read_sensor_data on file_reader.c [SwR-9] (@ref SwR-9), [SwR-11] (@ref SwR-11)
 */
 void test_read_sensor_data_valid_data()
 {
@@ -140,6 +140,7 @@ void test_read_sensor_data_valid_data()
 
 }
 
+/**  @test */
 void test_read_sensor_data_eof()
 {
     sensors_input_data test_sensor_data;
