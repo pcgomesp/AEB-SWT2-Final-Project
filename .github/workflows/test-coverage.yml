@@ -1,0 +1,57 @@
+name: Coverage Check
+
+on:
+  push:
+    branches:
+      # - develop
+      - feature/add_lcov_action
+  # pull_request:
+  #   branches: [ "develop" ]
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      # - name: Install dependencies
+      #   run: sudo apt-get install -y lcov gcc make
+
+      - name: Install make
+        run: sudo apt-get update && sudo apt-get install -y make
+
+      - name: Install gcc 14
+        run: |
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+          sudo apt-get update
+          sudo apt-get install -y gcc-14 g++-14
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 60
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 60
+
+      - name: Install gcov 14
+        run: |
+          sudo apt-get install -y gcov-14
+          sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-14 60
+
+      - name: Install lcov 2.3.1
+        run: |
+          git clone https://github.com/linux-test-project/lcov.git
+          cd lcov
+          git checkout v2.3.1
+          sudo make install
+          cd ..
+          rm -rf lcov
+
+      - name: Run lcov
+        run: |
+          make full-cov
+
+      - name: Check coverage in HTML report
+        run: |
+          COV=$(grep -oP '<td class="headerCovTableEntryMed">\K[0-9.]+(?=&nbsp;%)' cov/full_report/src/index-sort-l.html)
+          echo "Extracted HTML coverage: $COV%"
+          if (( $(echo "$COV < 80.0" | bc -l) )); then
+            echo "HTML coverage is below threshold (80%)"
+            exit 1
+          fi
