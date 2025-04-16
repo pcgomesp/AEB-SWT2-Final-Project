@@ -51,6 +51,16 @@ jobs:
           gcov-14 --version
           lcov --version
 
+      - name: Set symbolic links to use gcc-14 and gcov-14
+        run: |
+          sudo rm -f /usr/bin/gcc
+          sudo rm -f /usr/bin/g++
+          sudo ln -s /usr/bin/gcc-14 /usr/bin/gcc
+          sudo ln -s /usr/bin/g++-14 /usr/bin/g++
+          sudo rm -f /usr/local/bin/gcov
+          sudo ln -s /usr/bin/gcov-14 /usr/local/bin/gcov
+          sudo ln -s /usr/local/bin/gcov-14 /usr/local/bin/gcov
+
       - name: Run lcov
         run: |
           make full-cov CC=gcc-14 GCOV=gcov-14
