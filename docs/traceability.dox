@@ -1,0 +1,10 @@
+/**
+ * @page traceability Traceability
+ *
+ * Esta página descreve os testes unitários existentes, seus identificadores únicos e os requisitos que validam.
+ *
+ * | Teste ID  | Nome do Teste            | Requisitos Validados         | Função Testada         | Resultado Esperado         |
+ * |-----------|--------------------------|-------------------------------|-------------------------|-----------------------------|
+ * | \anchor TEST-001 **TEST-001** | [test_calc_velocidade()](@ref test_calc_velocidade) | [REQ-001](@ref SwR-1) [REQ-002](@ref REQ-002)| [calc_velocidade()](@ref calc_velocidade) | Velocidade correta |
+ * | \anchor TEST-002 **TEST-002** | [test_verifica_tempo_zero()](@ref test_verifica_tempo_zero) | [REQ-002](@ref REQ-002) | [verifica_tempo()](@ref verifica_tempo) | Gera alerta corretamente |
+ */
