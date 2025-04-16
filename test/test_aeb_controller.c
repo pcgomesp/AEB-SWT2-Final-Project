@@ -713,6 +713,95 @@ void test_TC_AEB_CTRL_X15(void)
 }
 
 /**
+ * @brief Helper function to check the CAN message output for specific warning and brake values.
+ * 
+ * This function verifies that the CAN message contains the expected values for the 
+ * warning system and braking system based on the provided parameters.
+ * 
+ * @param expected_warning Expected state for the warning system (0x00 or 0x01).
+ * @param expected_brake Expected state for the braking system (0x00 or 0x01).
+ * @param msg The actual CAN message to be checked.
+ */
+void checkCanMsgOutput(int expected_warning, int expected_brake, can_msg msg) {
+    TEST_ASSERT_EQUAL_HEX8(expected_warning, msg.dataFrame[0]);  // Verifica o byte do sistema de alerta
+    TEST_ASSERT_EQUAL_HEX8(expected_brake, msg.dataFrame[1]);    // Verifica o byte do sistema de frenagem
+}
+
+/**
+ * @brief Test for the AEB_STATE_BRAKE state in the CAN message output.
+ * 
+ * This test verifies that when the AEB system is in the BRAKE state, the 
+ * corresponding CAN message values for the warning system and braking system
+ * are set correctly.
+ */
+void test_TC_AEB_CTRL_X16(void) {
+    aeb_controller_state state = AEB_STATE_BRAKE;
+    can_msg result = updateCanMsgOutput(state);
+
+    // Verifica os valores esperados para o sistema de alerta e frenagem
+    checkCanMsgOutput(0x01, 0x01, result);
+}
+
+/**
+ * @brief Test for the AEB_STATE_ALARM state in the CAN message output.
+ * 
+ * This test verifies that when the AEB system is in the ALARM state, the 
+ * corresponding CAN message values for the warning system and braking system
+ * are set correctly.
+ */
+void test_TC_AEB_CTRL_X17(void) {
+    aeb_controller_state state = AEB_STATE_ALARM;
+    can_msg result = updateCanMsgOutput(state);
+
+    // Verifica os valores esperados para o sistema de alerta e frenagem
+    checkCanMsgOutput(0x01, 0x00, result);
+}
+
+/**
+ * @brief Test for the AEB_STATE_ACTIVE state in the CAN message output.
+ * 
+ * This test verifies that when the AEB system is in the ACTIVE state, the 
+ * corresponding CAN message values for the warning system and braking system
+ * are set correctly.
+ */
+void test_TC_AEB_CTRL_X18(void) {
+    aeb_controller_state state = AEB_STATE_ACTIVE;
+    can_msg result = updateCanMsgOutput(state);
+
+    // Verifica os valores esperados para o sistema de alerta e frenagem
+    checkCanMsgOutput(0x00, 0x00, result);
+}
+
+/**
+ * @brief Test for the AEB_STATE_STANDBY state in the CAN message output.
+ * 
+ * This test verifies that when the AEB system is in the STANDBY state, the 
+ * corresponding CAN message values for the warning system and braking system
+ * are set correctly.
+ */
+void test_TC_AEB_CTRL_X19(void) {
+    aeb_controller_state state = AEB_STATE_STANDBY;
+    can_msg result = updateCanMsgOutput(state);
+
+    // Verifica os valores esperados para o sistema de alerta e frenagem
+    checkCanMsgOutput(0x00, 0x00, result);
+}
+
+/**
+ * @brief Test for an invalid AEB system state (out of the defined enumeration range).
+ * 
+ * This test verifies that when an invalid AEB state (e.g., 999) is provided,
+ * the corresponding CAN message retains the default values.
+ */
+void test_TC_AEB_CTRL_X20(void) {
+    aeb_controller_state state = (aeb_controller_state)999; // Valor inválido, fora da enumeração
+    can_msg result = updateCanMsgOutput(state);
+
+    // Verifica se os dados permanecem inalterados quando um estado inválido é passado
+    checkCanMsgOutput(0xFF, 0xFF, result);
+}
+
+/**
  * @brief Main function to run the tests.
  * 
  * @return int The result of the test run.
@@ -770,5 +859,13 @@ int main(void) {
     RUN_TEST(test_TC_AEB_CTRL_X13);
     RUN_TEST(test_TC_AEB_CTRL_X14);
     RUN_TEST(test_TC_AEB_CTRL_X15);
+
+    // Tests to verify the Output of CAN Messages
+    RUN_TEST(test_TC_AEB_CTRL_X16);
+    RUN_TEST(test_TC_AEB_CTRL_X17);
+    RUN_TEST(test_TC_AEB_CTRL_X18);
+    RUN_TEST(test_TC_AEB_CTRL_X19);
+    RUN_TEST(test_TC_AEB_CTRL_X20);
+
     return UNITY_END();
 }
