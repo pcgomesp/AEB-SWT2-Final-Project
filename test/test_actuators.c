@@ -168,6 +168,7 @@ void test_actuatorsTranslateCanMsg_Unknown_Identifier(void) {
     TEST_ASSERT_FALSE(actuators_state.alarm_buzzer);
 }
 
+/** @test */
 void test_updateInternalActuatorsState_DataFrame0_Active(void) {
     // Verifies if updateInternalActuatorsState processes correctly when dataFrame[0] == 0x01
     can_msg test_msg = {
@@ -190,7 +191,7 @@ void test_updateInternalActuatorsState_DataFrame0_Active(void) {
 
 
 
-
+/** @test */
 void test_InitialActuatorsState(void) {
     // Verifies that the initial state of the actuators is zero
     //// Test case ID: TC_AEB_A__007
@@ -201,6 +202,7 @@ void test_InitialActuatorsState(void) {
     TEST_ASSERT_FALSE(actuators_state.alarm_buzzer);
 }
 
+/** @test */
 void test_actuatorsTranslateCanMsg_Unexpected_DataFrame(void) {
     // Verifies if actuatorsTranslateCanMsg handles an unexpected dataFrame correctly
     can_msg test_msg = {
