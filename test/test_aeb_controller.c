@@ -1539,12 +1539,32 @@ void test_TC_AEB_CTRL_X19(void) {
  * @post The CAN message will retain the default values (`0xFF`).
  */
 void test_TC_AEB_CTRL_X20(void) {
-    aeb_controller_state state = (aeb_controller_state)999; // Valor inválido, fora da enumeração
+    aeb_controller_state state = (aeb_controller_state)999; // Invalid value
     can_msg result = updateCanMsgOutput(state);
 
     checkCanMsgOutput(0xFF, 0xFF, result);
 }
 
+/**
+ * @brief Test for valid and invalid pedal states.
+ * 
+ * This test verifies that the internal pedal states (accelerator and brake) are correctly 
+ * updated based on the received CAN message. The test checks both valid and invalid input 
+ * values for the pedal states.
+ * 
+ * @details
+ * This test simulates two scenarios:
+ * 1. When the received CAN message contains valid data (`0x01` for both accelerator and 
+ *    brake pedals), both pedals should be turned ON.
+ * 2. When the received CAN message contains invalid data (`0x02` for both pedals), the 
+ *    internal pedal states should remain unchanged (still ON), as the data is not processed 
+ *    as valid.
+ * 
+ * @pre The CAN message is initialized with valid data (`0x01` for both pedals) and then 
+ *      modified to invalid data (`0x02` for both pedals).
+ * @post The internal pedal states will reflect the expected values for valid input and 
+ *       remain unchanged for invalid input.
+ */
 void test_TC_AEB_CTRL_X21(void) {
     can_msg captured_frame = { .identifier = ID_PEDALS, .dataFrame = {0x01, 0x01} };
 
@@ -1610,6 +1630,115 @@ void test_TC_AEB_CTRL_X23()
     can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xFD, 0xFF, 0x01} };
     updateInternalObstacleState(captured_frame);
     checkObstacleState(true, 300.0);
+}
+
+/**
+ * @brief Test Case: Clear acceleration data (0xFE, 0xFF).
+ * 
+ * @details This test verifies the behavior of the system when the acceleration
+ *          portion of the CAN frame is set to the "clear data" values.
+ * 
+ * @pre The input CAN frame must have dataFrame[3] == 0xFE and dataFrame[4] == 0xFF.
+ * 
+ * @post The internal acceleration value (aeb_internal_state.relative_acceleration) 
+ *       is expected to be reset to 0.0.
+ */
+void test_TC_AEB_CTRL_X24(void) {
+    can_msg frame = {.dataFrame = {0x00, 0x00, 0x00, 0xFE, 0xFF}};
+    updateInternalSpeedState(frame);
+    TEST_ASSERT_EQUAL_FLOAT(0.0, aeb_internal_state.relative_acceleration);
+}
+/**
+ * @brief Test Case: Acceleration update skipped when set to ignore (0xFF, 0xFF).
+ * 
+ * @details This test ensures that the system does not update the internal acceleration value
+ *          when the acceleration bytes in the CAN frame are set to 0xFF, 0xFF — a condition
+ *          defined to indicate "ignore update."
+ * 
+ * @pre The CAN message must have dataFrame[3] == 0xFF and dataFrame[4] == 0xFF.
+ * 
+ * @post The internal acceleration value should remain at the default (0.0).
+ */
+void test_TC_AEB_CTRL_X25(void) {
+    can_msg frame = {.dataFrame = {0x00, 0x00, 0x00, 0xFF, 0xFF}};
+    updateInternalSpeedState(frame);
+    TEST_ASSERT_EQUAL_FLOAT(0.0, aeb_internal_state.relative_acceleration);
+}
+
+/**
+ * @brief Test Case: Maximum allowed acceleration (positive).
+ * 
+ * @details This test verifies that the computed acceleration is capped at the maximum
+ *          limit (12.5 m/s²) when the raw CAN value would exceed it.
+ * 
+ * @pre The acceleration bytes must decode to a value greater than MAX_ACCELERATION_S.
+ * 
+ * @post The stored internal acceleration should be limited to 12.5.
+ */
+void test_TC_AEB_CTRL_X26(void) {
+    can_msg frame = {
+        .identifier = ID_SPEED_S,
+        .dataFrame = {0x00, 0x00, 0x00, 0xA8, 0x61, 0x00}  // 25000 → (25000 - 12500) * 0.001 = 12.5
+    };
+    updateInternalSpeedState(frame);
+    TEST_ASSERT_EQUAL_FLOAT(12.5, aeb_internal_state.relative_acceleration);
+}
+
+/**
+ * @brief Test Case: Maximum allowed deceleration (negative).
+ * 
+ * @details This test validates that the system handles negative acceleration properly 
+ *          using the direction flag, and ensures it respects the -12.5 m/s² minimum limit.
+ * 
+ * @pre CAN frame must include a direction flag set to reverse (dataFrame[5] == 0x01).
+ * 
+ * @post The internal acceleration should be capped at -12.5.
+ */
+void test_TC_AEB_CTRL_X27(void) {
+    can_msg frame = {
+        .identifier = ID_SPEED_S,
+        .dataFrame = {0x00, 0x00, 0x00, 0xA8, 0x61, 0x01}  // direction = reverse
+    };
+    updateInternalSpeedState(frame);
+    TEST_ASSERT_EQUAL_FLOAT(-12.5, aeb_internal_state.relative_acceleration);
+}
+
+/**
+ * @brief Test Case: Acceleration exceeding max limit is clamped.
+ * 
+ * @details This test ensures that even when the decoded value is above the valid maximum,
+ *          the internal system clamps it to 12.5 m/s².
+ * 
+ * @pre Acceleration bytes must convert to a float above 12.5.
+ * 
+ * @post Acceleration value stored must not exceed 12.5.
+ */
+void test_TC_AEB_CTRL_X28(void) {
+    can_msg frame = {
+        .identifier = ID_SPEED_S,
+        .dataFrame = {0x00, 0x00, 0x00, 0x30, 0x75, 0x00}  // 30000 → (30000 - 12500) * 0.001 = 17.5 → clamp to 12.5
+    };
+    updateInternalSpeedState(frame);
+    TEST_ASSERT_EQUAL_FLOAT(12.5, aeb_internal_state.relative_acceleration);
+}
+
+/**
+ * @brief Test Case: Acceleration below min limit is clamped (reverse direction).
+ * 
+ * @details This test verifies that when a negative acceleration value exceeds the minimum
+ *          allowed threshold, it is clamped to -12.5 m/s².
+ * 
+ * @pre The raw decoded acceleration must be below -12.5 and the direction flag must be active.
+ * 
+ * @post The internal acceleration is limited to -12.5.
+ */
+void test_TC_AEB_CTRL_X29(void) {
+    can_msg frame = {
+        .identifier = ID_SPEED_S,
+        .dataFrame = {0x00, 0x00, 0x00, 0x00, 0x00, 0x01}  // raw = 0 → (-12500) * 0.001 = -12.5
+    };
+    updateInternalSpeedState(frame);
+    TEST_ASSERT_EQUAL_FLOAT(-12.5, aeb_internal_state.relative_acceleration);
 }
 
 /**
@@ -1683,5 +1812,12 @@ int main(void) {
     RUN_TEST(test_TC_AEB_CTRL_X22);
     RUN_TEST(test_TC_AEB_CTRL_X23);
 
+    // Tests for acceleration and deceleration
+    RUN_TEST(test_TC_AEB_CTRL_X24);
+    RUN_TEST(test_TC_AEB_CTRL_X25);
+    RUN_TEST(test_TC_AEB_CTRL_X26);
+    RUN_TEST(test_TC_AEB_CTRL_X27);
+    RUN_TEST(test_TC_AEB_CTRL_X28);
+    RUN_TEST(test_TC_AEB_CTRL_X29);
     return UNITY_END();
 }
