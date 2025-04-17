@@ -615,20 +615,6 @@ void test_TC_AEB_CTRL_013(void) {
     checkObstacleState(false, 300.0);
 }
 
-void test_updateInternalObstacleState()
-{
-    can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xFE, 0xFF, 0x01} };
-    updateInternalObstacleState(captured_frame);
-    checkObstacleState(true, 300.0);
-}
-
-void test_updateInternalObstacleState_max_internal_distance()
-{
-    can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xFD, 0xFF, 0x01} };
-    updateInternalObstacleState(captured_frame);
-    checkObstacleState(true, 300.0);
-}
-
 /**
  * @brief Helper function to check the AEB system state.
  * 
@@ -1576,6 +1562,57 @@ void test_TC_AEB_CTRL_X21(void) {
 }
 
 /**
+ * @brief Test Case: Update internal obstacle state with specific CAN data.
+ * 
+ * This test case verifies the behavior when a CAN message with the identifier
+ * `ID_OBSTACLE_S` is received with specific data values that should update the
+ * internal obstacle state. The data frame `{0xFE, 0xFF, 0x01}` is used to
+ * simulate a scenario where an obstacle is detected at a preset distance.
+ * 
+ * @details
+ * This test ensures that the `updateInternalObstacleState` function handles 
+ * the given data correctly, updating the internal state to indicate an obstacle 
+ * is present. The test checks that the obstacle detection flag is set to `true` 
+ * and the obstacle distance is maintained at 300.0 meters.
+ * 
+ * @pre The AEB system is initialized and ready to process CAN messages.
+ * @post The internal state should reflect the presence of an obstacle with 
+ * a distance of 300.0 meters.
+ */
+
+void test_TC_AEB_CTRL_X22()
+{
+    can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xFE, 0xFF, 0x01} };
+    updateInternalObstacleState(captured_frame);
+    checkObstacleState(true, 300.0);
+}
+
+/**
+ * @brief Test Case: Update internal obstacle state with specific CAN data.
+ * 
+ * This test case verifies the behavior when a CAN message with the identifier
+ * `ID_OBSTACLE_S` is received with specific data values that should update the
+ * internal obstacle state. The data frame `{0xFD, 0xFF, 0x01}` is used to
+ * simulate a scenario where an obstacle is detected at a preset distance.
+ * 
+ * @details
+ * This test ensures that the `updateInternalObstacleState` function handles 
+ * the given data correctly, updating the internal state to indicate an obstacle 
+ * is present. The test checks that the obstacle detection flag is set to `true` 
+ * and the obstacle distance is maintained at 300.0 meters.
+ * 
+ * @pre The AEB system is initialized and ready to process CAN messages.
+ * @post The internal state should reflect the presence of an obstacle with 
+ * a distance of 300.0 meters.
+ */
+void test_TC_AEB_CTRL_X23()
+{
+    can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xFD, 0xFF, 0x01} };
+    updateInternalObstacleState(captured_frame);
+    checkObstacleState(true, 300.0);
+}
+
+/**
  * @brief Main function to run the tests.
  * 
  * @return int The result of the test run.
@@ -1643,8 +1680,8 @@ int main(void) {
 
     // Tests for enhancements of MC/DC coverage
     RUN_TEST(test_TC_AEB_CTRL_X21);
-    RUN_TEST(test_updateInternalObstacleState);
-    RUN_TEST(test_updateInternalObstacleState_max_internal_distance);
+    RUN_TEST(test_TC_AEB_CTRL_X22);
+    RUN_TEST(test_TC_AEB_CTRL_X23);
 
     return UNITY_END();
 }
