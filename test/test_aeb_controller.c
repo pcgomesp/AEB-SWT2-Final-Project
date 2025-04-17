@@ -615,6 +615,20 @@ void test_TC_AEB_CTRL_013(void) {
     checkObstacleState(false, 300.0);
 }
 
+void test_updateInternalObstacleState()
+{
+    can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xFE, 0xFF, 0x01} };
+    updateInternalObstacleState(captured_frame);
+    checkObstacleState(true, 300.0);
+}
+
+void test_updateInternalObstacleState_max_internal_distance()
+{
+    can_msg captured_frame = { .identifier = ID_OBSTACLE_S, .dataFrame = {0xFD, 0xFF, 0x01} };
+    updateInternalObstacleState(captured_frame);
+    checkObstacleState(true, 300.0);
+}
+
 /**
  * @brief Helper function to check the AEB system state.
  * 
@@ -1629,6 +1643,8 @@ int main(void) {
 
     // Tests for enhancements of MC/DC coverage
     RUN_TEST(test_TC_AEB_CTRL_X21);
+    RUN_TEST(test_updateInternalObstacleState);
+    RUN_TEST(test_updateInternalObstacleState_max_internal_distance);
 
     return UNITY_END();
 }
