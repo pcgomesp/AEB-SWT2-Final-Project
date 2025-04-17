@@ -42,7 +42,7 @@ mqd_t create_mq(char *mq_name)
     if (mqd == (mqd_t)-1)
     {
         perror("Error creating message queue");
-        exit(1);
+        return (mqd_t)-1;
     }
 
     printf("Queue %s created\n", mq_name);
@@ -63,7 +63,7 @@ mqd_t open_mq(char *mq_name)
     if (mqd == (mqd_t)-1)
     {
         perror("Error opening message queue");
-        exit(1);
+        return (mqd_t)-1;
     }
     return mqd;
 }
@@ -80,12 +80,12 @@ void close_mq(mqd_t mqd, char *mq_name)
     if (mq_close(mqd) == -1)
     {
         perror("Error closing message queue");
-        exit(1);
+        return;
     }
     if (mq_unlink(mq_name) == -1)
     {
         perror("Error unlinking message queue");
-        exit(1);
+        return;
     }
 }
 

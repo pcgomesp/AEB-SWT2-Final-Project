@@ -51,14 +51,14 @@ test:
 test_all: $(TESTS)
 	@for test in $^; do \
 		echo "\n\033[1;33mTest $$test results:\033[0m"; \
-		./$$test; \
+		./$$test || exit 1; \
 	done
 
 test/test_mq_utils: test/test_mq_utils.c src/mq_utils.c test/unity.c
-	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_mq_utils.c src/mq_utils.c test/unity.c -o test/test_mq_utils -I$(TESTFOLDER)
+	$(CC) $(CFLAGS) $(TESTFLAGS) -Wl,--wrap=mq_open -Wl,--wrap=perror -Wl,--wrap=mq_unlink test/test_mq_utils.c src/mq_utils.c test/unity.c -o test/test_mq_utils -I$(TESTFOLDER)
 
 test/test_file_reader: test/test_file_reader.c src/file_reader.c test/unity.c
-	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER)
+	$(CC) $(CFLAGS) $(TESTFLAGS) -Wl,--wrap=fopen -Wl,--wrap=perror -Wl,--wrap=exit test/test_file_reader.c src/file_reader.c test/unity.c -o test/test_file_reader -I$(TESTFOLDER) -Itest
 
 test/test_log_utils: test/test_log_utils.c src/log_utils.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) -Wl,--wrap=fopen -Wl,--wrap=perror test/test_log_utils.c src/log_utils.c test/unity.c -o test/test_log_utils -I$(TESTFOLDER)
@@ -76,7 +76,7 @@ test/test_sensors: test/test_sensors.c src/sensors.c test/unity.c
 	$(CC) $(CFLAGS) $(TESTFLAGS) test/test_sensors.c src/sensors.c test/unity.c -o test/test_sensors -I$(TESTFOLDER) -Itest -lpthread
 
 # Coverage targets
-.PHONY: cov lcov full-cov clean-cov
+.PHONY: cov lcov full-cov
 
 cov:
 	if [ -z "$(src_file)" ] || [ -z "$(test_file)" ]; then \
@@ -86,8 +86,14 @@ cov:
 		echo ""; \
 		if [ "$(test_file)" = "test_log_utils.c" ]; then \
 			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
+		elif [ "$(test_file)" = "test_file_reader.c" ]; then \
+			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror -Wl,--wrap=exit"; \
 		else \
-			WRAP_FLAGS=""; \
+			if [ "$(test_file)" = "test_mq_utils.c" ]; then \
+				WRAP_FLAGS="-Wl,--wrap=mq_open -Wl,--wrap=perror -Wl,--wrap=mq_unlink"; \
+			else \
+				WRAP_FLAGS=""; \
+			fi; \
 		fi; \
 		$(CC) $(TESTFLAGS) $(COVFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) -lm -lrt $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_gcov_bin; \
 		./$(OBJFOLDER)$(test_file:.c=)_gcov_bin > /dev/null 2>&1; \
@@ -103,8 +109,14 @@ lcov:
 		echo ""; \
 		if [ "$(test_file)" = "test_log_utils.c" ]; then \
 			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
+		elif [ "$(test_file)" = "test_file_reader.c" ]; then \
+			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror -Wl,--wrap=exit"; \
 		else \
-			WRAP_FLAGS=""; \
+			if [ "$(test_file)" = "test_mq_utils.c" ]; then \
+				WRAP_FLAGS="-Wl,--wrap=mq_open -Wl,--wrap=perror -Wl,--wrap=mq_unlink"; \
+			else \
+				WRAP_FLAGS=""; \
+			fi; \
 		fi; \
 		$(CC) $(TESTFLAGS) $(COVFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) -lm -lrt $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_lcov_bin; \
 		./$(OBJFOLDER)$(test_file:.c=)_lcov_bin > /dev/null 2>&1; \
@@ -113,7 +125,7 @@ lcov:
 		echo "LCOV report generated at $(COVFOLDER)$(src_file:.c=)_report/index.html"; \
 	fi
 
-full-cov: clean-cov
+full-cov: clean
 	@echo "Running full coverage analysis for all tests..."
 	@mkdir -p $(COVFOLDER)
 	@$(foreach pair, $(TEST_SRC_MAP), \
@@ -122,8 +134,14 @@ full-cov: clean-cov
 		echo "\nProcessing $(test_file) for $(src_file)"; \
 		if [ "$(test_file)" = "test_log_utils.c" ]; then \
 			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror"; \
+		elif [ "$(test_file)" = "test_file_reader.c" ]; then \
+			WRAP_FLAGS="-Wl,--wrap=fopen -Wl,--wrap=perror -Wl,--wrap=exit"; \
 		else \
-			WRAP_FLAGS=""; \
+			if [ "$(test_file)" = "test_mq_utils.c" ]; then \
+				WRAP_FLAGS="-Wl,--wrap=mq_open -Wl,--wrap=perror -Wl,--wrap=mq_unlink"; \
+			else \
+				WRAP_FLAGS=""; \
+			fi; \
 		fi; \
 		$(CC) $(TESTFLAGS) $(COVFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) -lm -lrt $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_cov_bin; \
 		./$(OBJFOLDER)$(test_file:.c=)_cov_bin > /dev/null 2>&1; \
@@ -145,11 +163,9 @@ docs:
 
 .PHONY: clean-docs
 clean-docs:
-	rm -rf docs/html
-	rm -rf docs/latex
-	rm -rf docs/rtf
+	find docs/ -mindepth 1 ! -name '*.pdf' ! -name '.gitkeep' ! -name '*.dox' -print0 | xargs -0 rm -rf
 
-.PHONY: clean clean-cov
+.PHONY: clean
 clean:
 	rm -rf obj/*
 	rm -rf bin/*
@@ -157,7 +173,5 @@ clean:
 	rm -f *.gcov
 	rm -f *.gcda
 	rm -f *.gcno
-
-clean-cov:
 	rm -rf $(COVFOLDER)*
 	rm -f *.info
