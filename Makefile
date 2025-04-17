@@ -6,7 +6,6 @@ TESTFOLDER := test/
 COVFOLDER := cov/
 
 CC := gcc
-GCOV := gcov
 CFLAGS := -Wall -lpthread -lm -lrt -I$(INCFOLDER)
 TESTFLAGS := -DUNITY_OUTPUT_COLOR -DTEST_MODE -DUNITY_INCLUDE_DOUBLE
 COVFLAGS := -fprofile-arcs -ftest-coverage -fcondition-coverage
@@ -146,7 +145,7 @@ full-cov: clean
 		fi; \
 		$(CC) $(TESTFLAGS) $(COVFLAGS) $$WRAP_FLAGS $(SRCFOLDER)$(src_file) -lm -lrt $(TESTFOLDER)$(test_file) $(TESTFOLDER)unity.c -I$(INCFOLDER) -o $(OBJFOLDER)$(test_file:.c=)_cov_bin; \
 		./$(OBJFOLDER)$(test_file:.c=)_cov_bin > /dev/null 2>&1; \
-		$(GCOV) -b $(SRCFOLDER)$(src_file) -o $(OBJFOLDER)$(test_file:.c=)_cov_bin-$(src_file:.c=.gcda); \
+		gcov -b $(SRCFOLDER)$(src_file) -o $(OBJFOLDER)$(test_file:.c=)_cov_bin-$(src_file:.c=.gcda); \
 	)
 	@echo "\nGenerating combined LCOV report..."
 	@lcov --mcdc-coverage --rc lcov_branch_coverage=1 --capture --directory . --output-file $(COVFOLDER)combined.info --no-external
