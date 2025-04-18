@@ -20,6 +20,11 @@
  * @param id_aeb Identifier for the AEB system.
  * @param event_id The unique event identifier (formatted as a hexadecimal string).
  * @param actuators Structure containing actuator state information.
+ *
+ * \anchor log_event
+ *
+ * @note This function is a called from the actuators module, and it is used as a way to guarantee tava 
+ * every change to the AEB internal state is captured and stored on the log file.
  */
 
 void log_event(const char *id_aeb, uint32_t event_id, actuators_abstraction actuators) {
