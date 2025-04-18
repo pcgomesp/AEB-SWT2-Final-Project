@@ -27,10 +27,14 @@
  *
  * @param dis_rel The relative distance between the objects in meters.
  * @param spd_rel The relative speed between the objects in km/h.
+ * @param rel_acel The relative acceleration between the objects in m/s2.
  * 
  * @return The time to collision in seconds. If no real solution is found (i.e., negative discriminant),
  *         the function returns -1.0. If there is no relative acceleration, the time to collision is calculated
  *         as distance divided by speed.
+ *
+ * \anchor ttc_calc
+ *
  */
 double ttc_calc(double dis_rel, double spd_rel, double rel_acel) {
     double a, b, c, ttc, delta;
@@ -80,6 +84,9 @@ double ttc_calc(double dis_rel, double spd_rel, double rel_acel) {
  * 
  * @note The function complies with the requirements ([SwR-2] (@ref SwR-2), [SwR-3](@ref SwR-3), [SwR-5] (@ref SwR-5),
  *       SwR-11 (@ref SwR-11), SwR-14 (@ref SwR-14), SwR-15 (@ref SwR-15), Sys-F-8, Sys-F-9, Sys-F-14).
+ *
+ * \anchor aeb_control
+ *
  */
 void aeb_control(bool *enable_aeb, bool *alarm_cluster, bool *enable_breaking,
                  bool *lk_seatbelt, bool *lk_doors, double *spd, double *dist, double *acel) {
