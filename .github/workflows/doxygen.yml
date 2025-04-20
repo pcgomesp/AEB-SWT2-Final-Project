@@ -2,7 +2,7 @@ name: Generate Documentation
 
 on:
   push:
-    branches: [ docs/documentation_doxygen ]  # Ou a branch que será usada
+    branches: [ docs/documentation_doxygen ]  # Ou a branch que será usada(provavelmente a main)
 
 jobs:
   build-docs:
