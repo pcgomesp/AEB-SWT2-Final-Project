@@ -25,4 +25,8 @@
  * | \anchor TC_TTC_CTRL_006 **TC_TTC_CTRL_006** | [test_aeb_worst_situation()](@ref test_aeb_worst_situation) | [SwR-1](@ref SwR-1), [SwR-2](@ref SwR-2), [SwR-3](@ref SwR-3), [SwR-6](@ref SwR-6) | [aeb_control()](@ref aeb_control) | All actuator abstractions must be in the activated state, except 'door_lock'.		 |
  * | \anchor TC_TTC_CTRL_007 **TC_TTC_CTRL_007** | [test_aeb_generic_break_situations()](@ref test_aeb_generic_break_situations) | [SwR-1](@ref SwR-1), [SwR-2](@ref SwR-2), [SwR-3](@ref SwR-3), [SwR-6](@ref SwR-6) | [aeb_control()](@ref aeb_control) | Alarm and ABS abstractions must be in the activated state, regardless of the others actuators.		 |
  * | \anchor TC_TTC_CTRL_008 **TC_TTC_CTRL_008** | [test_aeb_alarm_situation()](@ref test_aeb_alarm_situation) | [SwR-1](@ref SwR-1), [SwR-2](@ref SwR-2), [SwR-3](@ref SwR-3), [SwR-6](@ref SwR-6) | [aeb_control()](@ref aeb_control) | Alarm abstraction must be in the activated state, while ABS must remain deactivated.		 |
+ * | \anchor TC_AEB_CTRL_001 **TC_AEB_CTRL_001** | [test_TC_AEB_CTRL_001()](@ref test_TC_AEB_CTRL_001) | [SwR-1](@ref SwR-1), [SwR-2](@ref SwR-2) | [updateInternalPedalsState()](@ref updateInternalPedalsState) | Accelerator pedal = ON, Brake pedal = OFF |
+ * | \anchor TC_AEB_CTRL_002 **TC_AEB_CTRL_002** | [test_TC_AEB_CTRL_002()](@ref test_TC_AEB_CTRL_002) | [SwR-1](@ref SwR-1), [SwR-2](@ref SwR-2) | [updateInternalPedalsState()](@ref updateInternalPedalsState) | Accelerator pedal = ON, Brake pedal = ON |
+
+
  */

@@ -151,6 +151,8 @@ void checkPedalState(bool expected_accelerator, bool expected_brake) {
  * 
  * @pre The internal state of the AEB system is initialized.
  * @post The internal state of the AEB system reflects the changes: accelerator ON, brake OFF.
+ * 
+ * @anchor TC_AEB_CTRL_001
  */
 void test_TC_AEB_CTRL_001(void) {
     can_msg captured_frame = { .identifier = ID_PEDALS, .dataFrame = {0x01, 0x00} };
@@ -177,6 +179,8 @@ void test_TC_AEB_CTRL_001(void) {
  * 
  * @pre The internal state of the AEB system is initialized.
  * @post The internal state of the AEB system reflects the changes: accelerator ON, brake ON.
+ * 
+ * @anchor TC_AEB_CTRL_002
  */
 void test_TC_AEB_CTRL_002(void) {
     can_msg captured_frame = { .identifier = ID_PEDALS, .dataFrame = {0x01, 0x01} };
