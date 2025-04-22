@@ -813,6 +813,8 @@ void checkAEBState(aeb_controller_state expected_state, aeb_controller_state sta
  * 
  * @pre The AEB system is initialized and active, and the sensor data is provided.
  * @post The AEB system should be in the ALARM state.
+ * 
+ * @anchor TC_AEB_CTRL_X06
  */
 void test_TC_AEB_CTRL_X06(void) {
     aeb_internal_state.relative_velocity = MAX_SPD_ENABLED;
@@ -849,6 +851,8 @@ void test_TC_AEB_CTRL_X06(void) {
  * 
  * @pre The AEB system is initialized and active, and the sensor data is provided.
  * @post The AEB system should be in the BRAKE state.
+ * 
+ * @anchor TC_AEB_CTRL_X07
  */
 void test_TC_AEB_CTRL_X07(void) {
     aeb_internal_state.relative_velocity = MAX_SPD_ENABLED;
@@ -884,6 +888,8 @@ void test_TC_AEB_CTRL_X07(void) {
  * 
  * @pre The AEB system is initialized with the specified values and the sensor data is provided.
  * @post The AEB system should be in the STANDBY state.
+ * 
+ * @anchor TC_AEB_CTRL_X08
  */
 void test_TC_AEB_CTRL_X08(void) {
     aeb_internal_state.relative_velocity = 80.0;
@@ -919,6 +925,8 @@ void test_TC_AEB_CTRL_X08(void) {
  * 
  * @pre The AEB system is initialized and active, with sensor data provided.
  * @post The AEB system should be in the STANDBY state due to low speed.
+ * 
+ * @anchor TC_AEB_CTRL_X09
  */
 void test_TC_AEB_CTRL_X09(void) {
     aeb_internal_state.relative_velocity = MIN_SPD_ENABLED - 1;
@@ -954,6 +962,8 @@ void test_TC_AEB_CTRL_X09(void) {
  * 
  * @pre The AEB system is initialized and active, with sensor data provided.
  * @post The AEB system should be in the STANDBY state due to high speed.
+ * 
+ * @anchor TC_AEB_CTRL_X10
  */
 void test_TC_AEB_CTRL_X10(void) {
     aeb_internal_state.relative_velocity = MAX_SPD_ENABLED + 1;
@@ -990,6 +1000,8 @@ void test_TC_AEB_CTRL_X10(void) {
  * 
  * @pre The AEB system is active, and sensor data is provided with low TTC.
  * @post The AEB system should be in the BRAKE state to initiate braking.
+ * 
+ * @anchor TC_AEB_CTRL_016
  */
 void test_TC_AEB_CTRL_016(void) {
     aeb_internal_state.relative_velocity = 60.0;
@@ -1028,6 +1040,8 @@ void test_TC_AEB_CTRL_016(void) {
  * 
  * @pre The AEB system is active, and sensor data is provided with TTC within alarm range.
  * @post The AEB system should be in the ALARM state to activate the warning system.
+ * 
+ * @anchor TC_AEB_CTRL_017
  */
 void test_TC_AEB_CTRL_017(void) {
     aeb_internal_state.relative_velocity = 60.0;
@@ -1066,6 +1080,8 @@ void test_TC_AEB_CTRL_017(void) {
  * 
  * @pre The AEB system is active, and sensor data is provided with TTC greater than the alarm threshold.
  * @post The AEB system should remain in the ACTIVE state.
+ * 
+ * @anchor TC_AEB_CTRL_018
  */
 void test_TC_AEB_CTRL_018(void) {
     aeb_internal_state.relative_velocity = 60.0;
@@ -1108,6 +1124,8 @@ void test_TC_AEB_CTRL_018(void) {
  * 
  * @pre The AEB system is active, and the brake pedal is pressed.
  * @post The AEB system should be in the ACTIVE state, indicating normal operation with the brake pedal engaged.
+ * 
+ * @anchor TC_AEB_CTRL_019
  */
 void test_TC_AEB_CTRL_019(void) {
     aeb_internal_state.relative_velocity = 60.0;
@@ -1149,6 +1167,8 @@ void test_TC_AEB_CTRL_019(void) {
  * 
  * @pre The AEB system is active, and the accelerator pedal is pressed.
  * @post The AEB system should be in the ACTIVE state, indicating normal operation with the accelerator pedal engaged.
+ * 
+ * @anchor TC_AEB_CTRL_020
  */
 void test_TC_AEB_CTRL_020(void) {
     aeb_internal_state.relative_velocity = 60.0;
@@ -1183,6 +1203,8 @@ void test_TC_AEB_CTRL_020(void) {
  * 
  * @pre The CAN message has been received with the correct data for the pedals.
  * @post The internal state of the accelerator and brake pedals should be updated correctly.
+ * 
+ * @anchor TC_AEB_CTRL_021
  */
 void test_TC_AEB_CTRL_021(void) {
     can_msg captured_frame;
@@ -1215,6 +1237,8 @@ void test_TC_AEB_CTRL_021(void) {
  * 
  * @pre The CAN message is correctly formatted with `ID_PEDALS` and pedal states.
  * @post The internal state of the accelerator and brake pedals should be updated as expected.
+ * 
+ * @anchor TC_AEB_CTRL_X11
  */
 void test_TC_AEB_CTRL_X11(void) {
     can_msg captured_frame;
@@ -1246,6 +1270,8 @@ void test_TC_AEB_CTRL_X11(void) {
  * 
  * @pre The CAN message is correctly formatted with `ID_SPEED_S` and the correct speed data.
  * @post The internal state `relative_velocity` should be updated to 100.0 km/h.
+ * 
+ * @anchor TC_AEB_CTRL_022
  */
 void test_TC_AEB_CTRL_022(void) {
     can_msg captured_frame;
@@ -1277,6 +1303,8 @@ void test_TC_AEB_CTRL_022(void) {
  * 
  * @pre The CAN message is correctly formatted with `ID_OBSTACLE_S` and obstacle data.
  * @post The internal state `has_obstacle` should be true, and `obstacle_distance` should be 100.0 meters.
+ * 
+ * @anchor TC_AEB_CTRL_023
  */
 void test_TC_AEB_CTRL_023(void)
 {
@@ -1308,6 +1336,8 @@ void test_TC_AEB_CTRL_023(void)
  * 
  * @pre The CAN message is correctly formatted with `ID_CAR_C` and the AEB system state.
  * @post The internal state `on_off_aeb_system` should be updated to `true` (AEB system ON).
+ * 
+ * @anchor TC_AEB_CTRL_024
  */
 void test_TC_AEB_CTRL_024(void)
 {
@@ -1337,6 +1367,8 @@ void test_TC_AEB_CTRL_024(void)
  * 
  * @note This test currently ignores the check for printed output. It can be modified to capture 
  *       and verify the printed output if necessary.
+ * 
+ * @anchor TC_AEB_CTRL_X12
  */
 void test_TC_AEB_CTRL_X12(void)
 {
@@ -1368,6 +1400,8 @@ void test_TC_AEB_CTRL_X12(void)
  * 
  * @pre The CAN message is correctly formatted with `ID_SPEED_S` and the reverse flag data.
  * @post The internal state `reverseEnabled` should be updated to `true`.
+ * 
+ * @anchor TC_AEB_CTRL_X13
  */
 void test_TC_AEB_CTRL_X13(void)
 {
@@ -1399,6 +1433,8 @@ void test_TC_AEB_CTRL_X13(void)
  * 
  * @pre The CAN message is correctly formatted with the clear data command for speed.
  * @post The internal state `relative_velocity` should be set to `0.0`, and `reverseEnabled` should be `false`.
+ * 
+ * @anchor TC_AEB_CTRL_X14
  */
 void test_TC_AEB_CTRL_X14(void)
 {
@@ -1431,6 +1467,8 @@ void test_TC_AEB_CTRL_X14(void)
  * 
  * @pre The CAN message is correctly formatted with invalid obstacle data.
  * @post The internal state `has_obstacle` should be set to `false`, and `obstacle_distance` should be set to `0.0`.
+ * 
+ * @anchor TC_AEB_CTRL_X15
  */
 void test_TC_AEB_CTRL_X15(void)
 {
@@ -1479,6 +1517,8 @@ void checkCanMsgOutput(int expected_warning, int expected_brake, can_msg msg) {
  * 
  * @pre The AEB system state is set to `AEB_STATE_BRAKE`.
  * @post The CAN message will have the warning system and braking system set to `0x01`.
+ * 
+ * @anchor TC_AEB_CTRL_X16
  */
 void test_TC_AEB_CTRL_X16(void) {
     aeb_controller_state state = AEB_STATE_BRAKE;
@@ -1504,6 +1544,8 @@ void test_TC_AEB_CTRL_X16(void) {
  * 
  * @pre The AEB system state is set to `AEB_STATE_ALARM`.
  * @post The CAN message will have the warning system activated and the braking system deactivated.
+ * 
+ * @anchor TC_AEB_CTRL_X17
  */
 void test_TC_AEB_CTRL_X17(void) {
     aeb_controller_state state = AEB_STATE_ALARM;
@@ -1528,6 +1570,8 @@ void test_TC_AEB_CTRL_X17(void) {
  * 
  * @pre The AEB system state is set to `AEB_STATE_ACTIVE`.
  * @post The CAN message will have both the warning system and braking system deactivated (`0x00`).
+ * 
+ * @anchor TC_AEB_CTRL_X18
  */
 void test_TC_AEB_CTRL_X18(void) {
     aeb_controller_state state = AEB_STATE_ACTIVE;
@@ -1553,6 +1597,8 @@ void test_TC_AEB_CTRL_X18(void) {
  * 
  * @pre The AEB system state is set to `AEB_STATE_STANDBY`.
  * @post The CAN message will have both the warning system and braking system deactivated (`0x00`).
+ * 
+ * @anchor TC_AEB_CTRL_X19
  */
 void test_TC_AEB_CTRL_X19(void) {
     aeb_controller_state state = AEB_STATE_STANDBY;
@@ -1577,6 +1623,8 @@ void test_TC_AEB_CTRL_X19(void) {
  * 
  * @pre The AEB system state is set to an invalid value (e.g., `999`).
  * @post The CAN message will retain the default values (`0xFF`).
+ * 
+ * @anchor TC_AEB_CTRL_X20
  */
 void test_TC_AEB_CTRL_X20(void) {
     aeb_controller_state state = (aeb_controller_state)999; // Invalid value
@@ -1604,6 +1652,8 @@ void test_TC_AEB_CTRL_X20(void) {
  *      modified to invalid data (`0x02` for both pedals).
  * @post The internal pedal states will reflect the expected values for valid input and 
  *       remain unchanged for invalid input.
+ * 
+ * @anchor TC_AEB_CTRL_X21
  */
 void test_TC_AEB_CTRL_X21(void) {
     can_msg captured_frame = { .identifier = ID_PEDALS, .dataFrame = {0x01, 0x01} };
@@ -1638,6 +1688,8 @@ void test_TC_AEB_CTRL_X21(void) {
  * @pre The AEB system is initialized and ready to process CAN messages.
  * @post The internal state should reflect the presence of an obstacle with 
  * a distance of 300.0 meters.
+ * 
+ * @anchor TC_AEB_CTRL_X22
  */
 
 void test_TC_AEB_CTRL_X22()
@@ -1664,6 +1716,8 @@ void test_TC_AEB_CTRL_X22()
  * @pre The AEB system is initialized and ready to process CAN messages.
  * @post The internal state should reflect the presence of an obstacle with 
  * a distance of 300.0 meters.
+ * 
+ * @anchor TC_AEB_CTRL_X23
  */
 void test_TC_AEB_CTRL_X23()
 {
@@ -1682,12 +1736,15 @@ void test_TC_AEB_CTRL_X23()
  * 
  * @post The internal acceleration value (aeb_internal_state.relative_acceleration) 
  *       is expected to be reset to 0.0.
+ * 
+ * @anchor TC_AEB_CTRL_X24
  */
 void test_TC_AEB_CTRL_X24(void) {
     can_msg frame = {.dataFrame = {0x00, 0x00, 0x00, 0xFE, 0xFF}};
     updateInternalSpeedState(frame);
     TEST_ASSERT_EQUAL_FLOAT(0.0, aeb_internal_state.relative_acceleration);
 }
+
 /**
  * @brief Test Case: Acceleration update skipped when set to ignore (0xFF, 0xFF).
  * 
@@ -1698,6 +1755,8 @@ void test_TC_AEB_CTRL_X24(void) {
  * @pre The CAN message must have dataFrame[3] == 0xFF and dataFrame[4] == 0xFF.
  * 
  * @post The internal acceleration value should remain at the default (0.0).
+ * 
+ * @anchor TC_AEB_CTRL_X25
  */
 void test_TC_AEB_CTRL_X25(void) {
     can_msg frame = {.dataFrame = {0x00, 0x00, 0x00, 0xFF, 0xFF}};
@@ -1714,6 +1773,8 @@ void test_TC_AEB_CTRL_X25(void) {
  * @pre The acceleration bytes must decode to a value greater than MAX_ACCELERATION_S.
  * 
  * @post The stored internal acceleration should be limited to 12.5.
+ * 
+ * @anchor TC_AEB_CTRL_X26
  */
 void test_TC_AEB_CTRL_X26(void) {
     can_msg frame = {
@@ -1733,6 +1794,8 @@ void test_TC_AEB_CTRL_X26(void) {
  * @pre CAN frame must include a direction flag set to reverse (dataFrame[5] == 0x01).
  * 
  * @post The internal acceleration should be capped at -12.5.
+ * 
+ * @anchor TC_AEB_CTRL_X27
  */
 void test_TC_AEB_CTRL_X27(void) {
     can_msg frame = {
@@ -1752,6 +1815,8 @@ void test_TC_AEB_CTRL_X27(void) {
  * @pre Acceleration bytes must convert to a float above 12.5.
  * 
  * @post Acceleration value stored must not exceed 12.5.
+ * 
+ * @anchor TC_AEB_CTRL_X28
  */
 void test_TC_AEB_CTRL_X28(void) {
     can_msg frame = {
@@ -1771,6 +1836,8 @@ void test_TC_AEB_CTRL_X28(void) {
  * @pre The raw decoded acceleration must be below -12.5 and the direction flag must be active.
  * 
  * @post The internal acceleration is limited to -12.5.
+ * 
+ * @anchor TC_AEB_CTRL_X29
  */
 void test_TC_AEB_CTRL_X29(void) {
     can_msg frame = {
