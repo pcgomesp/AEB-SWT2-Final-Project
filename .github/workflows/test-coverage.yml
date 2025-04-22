@@ -83,3 +83,41 @@ jobs:
           else
             echo "✅ All coverage values are at or above 80%"
           fi
+
+      - name: Upload coverage report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: cov/full_report/src
+
+  deploy-pages:
+    needs: coverage
+    if: github.ref == 'refs/heads/develop'
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Download coverage report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+          path: cov/full_report/src
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload coverage report
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: cov/full_report/src
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v2
