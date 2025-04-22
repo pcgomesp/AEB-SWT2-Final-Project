@@ -102,14 +102,14 @@ jobs:
       id-token: write
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Download coverage report artifact
         uses: actions/download-artifact@v4
         with:
           name: coverage-report
           path: cov/full_report/src
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
       - name: Set up Pages
         uses: actions/configure-pages@v3
