@@ -26,5 +26,8 @@ jobs:
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        deploy_key: ${{ secrets.DEPLOY_TOKEN }}  # Substitui GITHUB_TOKEN pelo PAT
         publish_dir: ./docs
+        keep_files: false  # Limpa arquivos antigos
+        external_repository: pcgomesp/AEB-SWT2-Final-Project  # Repo original
+        publish_branch: gh-pages  # Branch específica para docs
