@@ -70,6 +70,8 @@ void tearDown()
 /** 
  * @test
  * @brief Test open_file() when fopen fails
+ * \anchor test_open_file_fopen_fail_should_exit
+ * test ID [TC_FILE_READER_001](@ref TC_FILE_READER_001)
  */
 void test_open_file_fopen_fail_should_exit() 
 {
@@ -90,6 +92,8 @@ void test_open_file_fopen_fail_should_exit()
 /** 
  * @test
  * @brief Test for the function open_file on file_reader.c [SwR-9] (@ref SwR-9), [SwR-11] (@ref SwR-11)
+ * \anchor test_open_file_not_null_and_skip_header
+ * test ID [TC_FILE_READER_002](@ref TC_FILE_READER_002)
 */
 void test_open_file_not_null_and_skip_header()
 {
@@ -115,6 +119,8 @@ void test_open_file_not_null_and_skip_header()
 /** 
  * @test
  * @brief Tests for the function read_sensor_data on file_reader.c [SwR-9] (@ref SwR-9), [SwR-11] (@ref SwR-11)
+ * \anchor test_read_sensor_data_valid_data
+ * test ID [TC_FILE_READER_003](@ref TC_FILE_READER_003)
 */
 void test_read_sensor_data_valid_data()
 {
@@ -140,7 +146,10 @@ void test_read_sensor_data_valid_data()
 
 }
 
-/**  @test */
+/**  @test 
+ * \anchor test_read_sensor_data_eof
+ * test ID [TC_FILE_READER_004](@ref TC_FILE_READER_004)
+*/
 void test_read_sensor_data_eof()
 {
     sensors_input_data test_sensor_data;

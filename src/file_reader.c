@@ -16,6 +16,7 @@
  * @param filename Name of the file to be opened.
  * @return FILE* Pointer to the opened file.
  * @note If the file cannot be opened, the program exits with an error.
+ * \anchor open_file
  */
 
 FILE* open_file(const char* filename) {
@@ -42,6 +43,7 @@ FILE* open_file(const char* filename) {
  * 
  * @note The expected file format will follow this label formact:
             Distance(m) Obstacle Speed(m/s) Brake Accelerator AEB_on_off Reverse
+    \anchor read_sensor_data
  */
 int read_sensor_data(FILE *file, sensors_input_data *sensor_data) {
     return fscanf(file, "%lf %d %lf %d %d %d %d %lf", 
