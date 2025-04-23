@@ -5,44 +5,58 @@ on:
     branches: ["docs/pages"]
 
 jobs:
-  generate-coverage:
+  coverage:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout source
         uses: actions/checkout@v4
-      - name: Generate LCOV
+
+      - name: Install deps (make, gcc, lcov, perl, etc.)
         run: |
-          # comandos que geram o LCOV
-          mkdir -p cov/full_report/src
-          echo "<html><body>LCOV Report</body></html>" > cov/full_report/src/index.html
-      - name: Upload LCOV
+          sudo apt-get update && sudo apt-get install -y make cpanminus
+          sudo cpanm Capture::Tiny DateTime
+          sudo apt-get install -y gcc g++  # ou gcc-14 se quiser manter
+          git clone https://github.com/linux-test-project/lcov.git
+          cd lcov && sudo make install && cd .. && rm -rf lcov
+
+      - name: Run LCOV and generate report
+        run: |
+          make full-cov
+          # Aqui você pode fazer seus testes de % de cobertura
+          echo "✔ LCOV generated"
+
+      - name: Upload LCOV artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: cov/full_report/src
 
   generate-docs-and-deploy:
-    needs: generate-coverage
+    needs: coverage
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Install Doxygen
         run: |
           sudo apt-get update
           sudo apt-get install -y doxygen graphviz
+
       - name: Generate Doxygen
         run: |
           doxygen Doxyfile
           mkdir -p docs/doxygen
           mv docs/html/* docs/doxygen/
+
       - name: Download LCOV artifact
         uses: actions/download-artifact@v4
         with:
           name: coverage-report
           path: docs/lcov
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.DEPLOY_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
