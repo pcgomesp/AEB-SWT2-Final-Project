@@ -2,7 +2,7 @@ name: Generate Documentation
 
 on:
   push:
-    branches: [ "gh-pages" ]  # Ou a branch que será usada(provavelmente a main)
+    branches: [ "docs/pages" ]  # Ou a branch que será usada(provavelmente a main)
 
 jobs:
   build-docs:
