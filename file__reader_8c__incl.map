@@ -1,0 +1,13 @@
+<map id="src/file_reader.c" name="src/file_reader.c">
+<area shape="rect" id="Node000001" title="Module responsible for handling input file operations related to sensor data." alt="" coords="91,5,215,31"/>
+<area shape="rect" id="Node000002" href="$file__reader_8h.html" title=" " alt="" coords="47,79,150,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,33,118,69,114,66,142,29"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="174,79,245,104"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="165,29,194,66,190,69,160,33"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,152,72,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="91,106,59,143,55,140,87,103"/>
+<area shape="rect" id="Node000004" href="$sensors__input_8h.html" title="Defines the data structure for sensor inputs to the AEB system." alt="" coords="97,152,221,177"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="111,103,142,140,138,143,107,106"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="117,225,200,251"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="161,178,161,212,156,212,156,178"/>
+</map>
