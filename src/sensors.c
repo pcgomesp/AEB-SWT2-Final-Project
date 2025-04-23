@@ -107,6 +107,8 @@ void* getSensorsData(void *arg)
  * 
  * @return structure that contains the CAN message ID and Frame.
  * 
+ * \anchor conv2CANCarClusterData
+ * 
 */
 can_msg conv2CANCarClusterData(bool on_off_aeb_system)
 {
@@ -137,6 +139,8 @@ can_msg conv2CANCarClusterData(bool on_off_aeb_system)
  * @param relative_acceleration Relative acceleration of the vehicle.
  * 
  * @return structure that contains the CAN message ID and Frame.
+ * 
+ * \anchor conv2CANVelocityData
  * 
 */
 can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity, double relative_acceleration)
@@ -197,6 +201,8 @@ can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity, d
  * 
  * @return structure that contains the CAN message ID and Frame.
  * 
+ * \anchor conv2CANObstacleData
+ * 
 */
 can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance)
 {
@@ -236,6 +242,8 @@ can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance)
  * @param accelerator_pedal Argument that refers if the accelerator is pressed or not.
  * 
  * @return structure that contains the CAN message ID and Frame.
+ * 
+ * \anchor conv2CANPedalsData
  * 
 */
 can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal)
