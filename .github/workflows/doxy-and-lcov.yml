@@ -57,11 +57,11 @@ jobs:
         run: |
           make full-cov CC=gcc-14 GCOV=gcov-14
 
-      - name:  
+      - name: Lcov_act
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: cov/full_report/src
+          path: cov/full_report
 
   generate-docs-and-deploy:
     needs: coverage
