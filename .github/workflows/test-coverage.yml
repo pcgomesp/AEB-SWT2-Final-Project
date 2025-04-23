@@ -5,7 +5,6 @@ on:
     branches:
       - develop
       - feature/add_lcov_action
-      - docs/pages
   pull_request:
     branches: [ "develop" ]
 
@@ -85,7 +84,7 @@ jobs:
             echo "✅ All coverage values are at or above 80%"
           fi
 
-      - name: Upload coverage report artifact
+      - name:  
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
