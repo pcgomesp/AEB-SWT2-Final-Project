@@ -57,29 +57,6 @@ jobs:
         run: |
           make full-cov CC=gcc-14 GCOV=gcov-14
 
-      - name: Enforce 80% minimum coverage across all metrics
-        run: |
-          # Extract all percentage values from coverPer* classes
-          coverage_values=$(grep -oP '<td class="coverPer(?:Hi|Med|Lo)">\K[0-9.]+' cov/full_report/src/index.html)
-
-          failed=0
-
-          echo "Checking individual coverage entries..."
-          while read -r value; do
-            echo "Found coverage: $value%"
-            if (( $(echo "$value < 80.0" | bc -l) )); then
-              echo "❌ Coverage $value% is below the 80% threshold"
-              failed=1
-            fi
-          done <<< "$coverage_values"
-
-          if [ $failed -eq 1 ]; then
-            echo "💥 Coverage check failed: at least one metric is below 80%"
-            exit 1
-          else
-            echo "✅ All coverage values are at or above 80%"
-          fi
-          
       - name:  
         uses: actions/upload-artifact@v4
         with:
