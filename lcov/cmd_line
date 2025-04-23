@@ -1,0 +1,1 @@
+genhtml --mcdc-coverage --branch-coverage cov/combined.info --output-directory cov/full_report
