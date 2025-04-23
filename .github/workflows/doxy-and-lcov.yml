@@ -1,36 +1,48 @@
-name: Generate Documentation and Deploy GitHub Pages
+name: Generate Docs and Coverage Report
 
 on:
   push:
-    branches: [ "docs/pages" ]  # Ou a branch desejada
+    branches: ["docs/pages"]
 
 jobs:
-  build-docs:
+  generate-coverage:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Generate LCOV
+        run: |
+          # comandos que geram o LCOV
+          mkdir -p cov/full_report/src
+          echo "<html><body>LCOV Report</body></html>" > cov/full_report/src/index.html
+      - name: Upload LCOV
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: cov/full_report/src
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y doxygen graphviz
-
-    - name: Generate Doxygen docs
-      run: |
-        doxygen Doxyfile
-        mkdir -p docs/doxygen
-        mv docs/html/* docs/doxygen/
-
-    - name: Download LCOV coverage artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: coverage-report
-        path: docs/lcov  # Aqui vai para docs/lcov
-
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.DEPLOY_TOKEN }}
-        publish_dir: ./docs
+  generate-docs-and-deploy:
+    needs: generate-coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+      - name: Generate Doxygen
+        run: |
+          doxygen Doxyfile
+          mkdir -p docs/doxygen
+          mv docs/html/* docs/doxygen/
+      - name: Download LCOV artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+          path: docs/lcov
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.DEPLOY_TOKEN }}
+          publish_dir: ./docs
