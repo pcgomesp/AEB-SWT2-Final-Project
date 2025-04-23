@@ -1,13 +1,13 @@
-name: Generate Documentation
+name: Generate Documentation and Deploy GitHub Pages
 
 on:
   push:
-    branches: [ "docs/pages" ]  # Ou a branch que será usada(provavelmente a main)
+    branches: [ "docs/pages" ]  # Ou a branch desejada
 
 jobs:
   build-docs:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -20,8 +20,14 @@ jobs:
     - name: Generate Doxygen docs
       run: |
         doxygen Doxyfile
-        mv docs/html/* docs/  # Organiza a saída
+        mkdir -p docs/doxygen
+        mv docs/html/* docs/doxygen/
 
+    - name: Download LCOV coverage artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: coverage-report
+        path: docs/lcov  # Aqui vai para docs/lcov
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3

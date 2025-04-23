@@ -5,6 +5,7 @@ on:
     branches:
       - develop
       - feature/add_lcov_action
+      - docs/pages
   pull_request:
     branches: [ "develop" ]
 
