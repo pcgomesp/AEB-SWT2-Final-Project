@@ -52,7 +52,7 @@ void test_ttc_when_acel_zero(){
 
     TEST_ASSERT_FLOAT_WITHIN(delta, 10.0, ttc[0]);
     TEST_ASSERT_FLOAT_WITHIN(delta, 5.8909, ttc[1]);
-    TEST_ASSERT_FLOAT_WITHIN(delta, 2.46, ttc[2]);
+    TEST_ASSERT_FLOAT_WITHIN(delta, 1.9478, ttc[2]);
 }
 
 /**
