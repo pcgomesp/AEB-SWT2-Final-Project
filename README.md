@@ -8,7 +8,7 @@ To implement this system, **POSIX** (Portable Operating System Interface) concep
 
 ## Project Objective
 
-This project is part of the final course in Automotive Propulsion Engineering, aka **Residência Tecnológica Stellantis 2024, SWT2**. It is dedicated to the development of an Automotive Emergency Braking (AEB) system, aligning with Stellantis’ interests. The project takes a multidisciplinary approach, demonstrating the student's understanding of various topics covered during the course. Key topics include Vehicle Modeling and Simulation, Agile Methodologies, Vehicular Networks, Vehicle Function Allocation, Automotive Embedded Software Modeling and Testing, and the Implementation of Automotive Control Systems.
+This project is part of the final step on an course in Automotive Propulsion Engineering, aka **Residência Tecnológica Stellantis 2024, SWT2**. It is dedicated to the development of an Automotive Emergency Braking (AEB) system, aligning with Stellantis’ interests. The project takes a multidisciplinary approach, demonstrating the student's understanding of various topics covered during the course. Key topics include Vehicle Modeling and Simulation, Agile Methodologies, Vehicular Networks, Vehicle Function Allocation, Automotive Embedded Software Modeling and Testing, and the Implementation of Automotive Control Systems.
 
 ## Main Features
 
