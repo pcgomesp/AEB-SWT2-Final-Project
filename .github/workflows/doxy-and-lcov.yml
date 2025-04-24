@@ -2,7 +2,7 @@ name: Generate Docs and Coverage Report
 
 on:
   push:
-    branches: ["docs/pages"]
+    branches: ["docs/pages"] #change this to the branch you want to trigger the workflow(in this case, main)
 
 jobs:
   coverage:
