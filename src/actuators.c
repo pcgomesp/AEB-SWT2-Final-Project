@@ -33,7 +33,7 @@ actuators_abstraction actuators_state = {
     .door_lock = true,
     .should_activate_abs = false,
     .alarm_led = false,
-    .alarm_buzzer = true};
+    .alarm_buzzer = false};
 
 can_msg captured_can_frame = {
     .identifier = 0x0CFFB027,
