@@ -18,6 +18,7 @@
  * @brief Gets the default attributes for a message queue.
  *
  * @return A mq_attr structure configured with default values.
+ * \anchor get_mq_attr
  */
 struct mq_attr get_mq_attr()
 {
@@ -34,6 +35,7 @@ struct mq_attr get_mq_attr()
  *
  * @param mq_name Name of the message queue to be created.
  * @return Message queue identifier (mqd_t).
+ * \anchor create_mq
  */
 mqd_t create_mq(char *mq_name)
 {
@@ -55,6 +57,7 @@ mqd_t create_mq(char *mq_name)
  *
  * @param mq_name Name of the message queue to be opened.
  * @return Message queue identifier (mqd_t).
+ * \anchor open_mq
  */
 mqd_t open_mq(char *mq_name)
 {
@@ -73,6 +76,8 @@ mqd_t open_mq(char *mq_name)
  *
  * @param mqd Message queue identifier.
  * @param mq_name Name of the message queue to be closed.
+ * @return void
+ * \anchor close_mq
  */
 void close_mq(mqd_t mqd, char *mq_name)
 {
@@ -95,6 +100,7 @@ void close_mq(mqd_t mqd, char *mq_name)
  * @param mq_receiver Identifier of the message queue from which the message will be read.
  * @param msg_read Pointer to the structure where the read message will be stored, in can_msg struct type.
  * @return 0 on success, -1 on failure.
+ * \anchor read_mq
  */
 int read_mq(mqd_t mq_receiver, can_msg *msg_read)
 {
@@ -114,6 +120,7 @@ int read_mq(mqd_t mq_receiver, can_msg *msg_read)
  * @param mq_receiver Identifier of the message queue from which the message will be read.
  * @param msg_read Pointer to the can_msg struct type used to write a message in the MQ POSIX format.
  * @return 0 on success, -1 on failure.
+ * \anchor write_mq
  */
 int write_mq(mqd_t mq_sender, can_msg *msg)
 {
