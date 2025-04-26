@@ -76,7 +76,7 @@ can_msg out_can_frame = {
 
 //! [SwR-5] (@ref SwR-5)
 can_msg empty_msg = { // [SwR-5]
-    .identifier = ID_EMPTY,
+    .identifier = ID_AEB_S,
     .dataFrame = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
 
 /**
@@ -438,21 +438,46 @@ can_msg updateCanMsgOutput(aeb_controller_state state)
  * @param ttc The time-to-collision value, calculated based on obstacle distance and vehicle speed.
  * @return The current AEB state.
  */
+// aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double ttc) 
+// {// Abstraction according to [SwR-12]
+//     if (aeb_internal_state.on_off_aeb_system == false)
+//         my_new_state = AEB_STATE_STANDBY;
+//     if (aeb_internal_state.relative_velocity < MIN_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-7][SwR-16]
+//         my_new_state = AEB_STATE_STANDBY;
+//     // Required by [SwR-7][SwR-16]
+//     if (aeb_internal_state.relative_velocity > MAX_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) 
+//         my_new_state = AEB_STATE_STANDBY;
+//     if (aeb_internal_state.brake_pedal == false && aeb_internal_state.accelerator_pedal == false)
+//     {
+//         if (ttc < THRESHOLD_BRAKING)
+//             return AEB_STATE_BRAKE;
+//         if (ttc < THRESHOLD_ALARM)
+//             return AEB_STATE_ALARM;
+//     }
+//     return AEB_STATE_ACTIVE; // [SwR-8]
+// }
+
 aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double ttc) 
 {// Abstraction according to [SwR-12]
+    aeb_controller_state my_new_state = AEB_STATE_ACTIVE;
     if (aeb_internal_state.on_off_aeb_system == false)
-        return AEB_STATE_STANDBY;
+        my_new_state = AEB_STATE_STANDBY;
     if (aeb_internal_state.relative_velocity < MIN_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-7][SwR-16]
-        return AEB_STATE_STANDBY;
+        my_new_state = AEB_STATE_STANDBY;
     // Required by [SwR-7][SwR-16]
     if (aeb_internal_state.relative_velocity > MAX_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) 
-        return AEB_STATE_STANDBY;
-    if (aeb_internal_state.brake_pedal == false && aeb_internal_state.accelerator_pedal == false)
+        my_new_state = AEB_STATE_STANDBY;
+    if (aeb_internal_state.brake_pedal == false && aeb_internal_state.accelerator_pedal == false &&
+        aeb_internal_state.relative_velocity > MIN_SPD_ENABLED && aeb_internal_state.relative_velocity < MAX_SPD_ENABLED)
     {
         if (ttc < THRESHOLD_BRAKING)
             return AEB_STATE_BRAKE;
         if (ttc < THRESHOLD_ALARM)
             return AEB_STATE_ALARM;
     }
-    return AEB_STATE_ACTIVE; // [SwR-8]
+
+    if (ttc < THRESHOLD_ALARM && my_new_state != AEB_STATE_BRAKE)
+        my_new_state = AEB_STATE_ALARM;
+
+    return my_new_state; // [SwR-8]
 }
