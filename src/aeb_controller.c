@@ -76,7 +76,7 @@ can_msg out_can_frame = {
 
 //! [SwR-5] (@ref SwR-5)
 can_msg empty_msg = { // [SwR-5]
-    .identifier = ID_AEB_S,
+    .identifier = ID_EMPTY,
     .dataFrame = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
 
 /**
@@ -461,12 +461,12 @@ aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double t
 {// Abstraction according to [SwR-12]
     aeb_controller_state my_new_state = AEB_STATE_ACTIVE;
     if (aeb_internal_state.on_off_aeb_system == false)
-        my_new_state = AEB_STATE_STANDBY;
+        return AEB_STATE_STANDBY;
     if (aeb_internal_state.relative_velocity < MIN_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-7][SwR-16]
-        my_new_state = AEB_STATE_STANDBY;
+        my_new_state = AEB_STATE_ACTIVE;
     // Required by [SwR-7][SwR-16]
     if (aeb_internal_state.relative_velocity > MAX_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) 
-        my_new_state = AEB_STATE_STANDBY;
+        my_new_state = AEB_STATE_ACTIVE;
     if (aeb_internal_state.brake_pedal == false && aeb_internal_state.accelerator_pedal == false &&
         aeb_internal_state.relative_velocity > MIN_SPD_ENABLED && aeb_internal_state.relative_velocity < MAX_SPD_ENABLED)
     {
