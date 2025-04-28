@@ -468,7 +468,7 @@ aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double t
     if (aeb_internal_state.relative_velocity > MAX_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) 
         my_new_state = AEB_STATE_ACTIVE;
     if (aeb_internal_state.brake_pedal == false && aeb_internal_state.accelerator_pedal == false &&
-        aeb_internal_state.relative_velocity > MIN_SPD_ENABLED && aeb_internal_state.relative_velocity < MAX_SPD_ENABLED)
+        aeb_internal_state.relative_velocity >= MIN_SPD_ENABLED && aeb_internal_state.relative_velocity <= MAX_SPD_ENABLED)
     {
         if (ttc < THRESHOLD_BRAKING)
             return AEB_STATE_BRAKE;

@@ -938,8 +938,12 @@ void test_TC_AEB_CTRL_X09(void) {
     double ttc = 1.9;
     aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
 
-    // Test: AEB system should go to STANDBY state
-    checkAEBState(AEB_STATE_STANDBY, state);
+    // Test: AEB system should go to ALARM state, but never to BRAKE state, so that the driver has control of the vehicle
+    checkAEBState(AEB_STATE_ALARM, state);
+
+    ttc = 0.9;
+    state = getAEBState(aeb_internal_state, ttc);
+    checkAEBState(AEB_STATE_ALARM, state);
 }
 
 /**
@@ -975,8 +979,12 @@ void test_TC_AEB_CTRL_X10(void) {
     double ttc = 1.9;
     aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
 
-    // Test: AEB system should go to STANDBY state
-    checkAEBState(AEB_STATE_STANDBY, state);
+    // Test: AEB system should go to ALARM state, but never to BRAKE state, so that the driver has control of the vehicle
+    checkAEBState(AEB_STATE_ALARM, state);
+
+    ttc = 0.9;
+    state = getAEBState(aeb_internal_state, ttc);
+    checkAEBState(AEB_STATE_ALARM, state);
 }
 
 /**
@@ -1139,8 +1147,13 @@ void test_TC_AEB_CTRL_019(void) {
     double ttc = 1.5;
     aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
 
-    // Test: AEB system should go to ACTIVE state regardless of TTC
-    checkAEBState(AEB_STATE_ACTIVE, state);
+    // Test: AEB system should go to ALARM when TTC is lower than 2, but never to BRAKE
+    // Since the driver is already activating the accelerator pedal.
+    checkAEBState(AEB_STATE_ALARM, state);
+
+    ttc = 0.9;
+    state = getAEBState(aeb_internal_state, ttc);
+    checkAEBState(AEB_STATE_ALARM, state);
 }
 
 /**
@@ -1182,8 +1195,13 @@ void test_TC_AEB_CTRL_020(void) {
     double ttc = 1.5;
     aeb_controller_state state = getAEBState(aeb_internal_state, ttc);
 
-    // Test: AEB system should go to ACTIVE state regardless of TTC
-    checkAEBState(AEB_STATE_ACTIVE, state);
+    // Test: AEB system should go to ALARM when TTC is lower than 2, but never to BRAKE
+    // Since the driver is already activating the brake pedal.
+    checkAEBState(AEB_STATE_ALARM, state);
+
+    ttc = 0.9;
+    state = getAEBState(aeb_internal_state, ttc);
+    checkAEBState(AEB_STATE_ALARM, state);
 }
 
 /**
