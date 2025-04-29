@@ -71,7 +71,7 @@ void* getSensorsData(void *arg)
         if (read_sensor_data(file, &sensorsData))
         {
             can_car_cluster = conv2CANCarClusterData(sensorsData.aeb_system_enabled);
-            can_velocity_sensor = conv2CANVelocityData(sensorsData.reverseEnabled, sensorsData.relative_velocity, sensorsData.relative_acceleration); // [SwR-10]
+            can_velocity_sensor = conv2CANVelocityData(sensorsData.reverse_enabled, sensorsData.relative_velocity, sensorsData.relative_acceleration); // [SwR-10]
             can_obstacle_sensor = conv2CANObstacleData(sensorsData.has_obstacle, sensorsData.obstacle_distance);
             can_pedals_sensor = conv2CANPedalsData(sensorsData.brake_pedal, sensorsData.accelerator_pedal);
 

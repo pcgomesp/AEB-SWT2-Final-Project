@@ -63,7 +63,7 @@ sensors_input_data aeb_internal_state = {
     .brake_pedal = false,
     .accelerator_pedal = false,
     .aeb_system_enabled = true,
-    .reverseEnabled = false,
+    .reverse_enabled = false,
     .relative_acceleration = 0.0};
 
 can_msg captured_can_frame = {
@@ -174,7 +174,7 @@ void print_info()
     printf("brake_pedal: %s\n", aeb_internal_state.brake_pedal ? "true" : "false");
     printf("accelerator_pedal: %s\n", aeb_internal_state.accelerator_pedal ? "true" : "false");
     printf("aeb_system_enabled: %s\n", aeb_internal_state.aeb_system_enabled ? "true" : "false");
-    printf("Is vehicle in reverse: %s\n", aeb_internal_state.reverseEnabled ? "true" : "false");
+    printf("Is vehicle in reverse: %s\n", aeb_internal_state.reverse_enabled ? "true" : "false");
 }
 #endif
 
@@ -279,11 +279,11 @@ void updateInternalSpeedState(can_msg captured_frame)
     // update internal data according to the movement direction reported by the sensor
     if (captured_frame.dataFrame[2] == 0x01)
     {
-        aeb_internal_state.reverseEnabled = true;
+        aeb_internal_state.reverse_enabled = true;
     }
     else
     {
-        aeb_internal_state.reverseEnabled = false;
+        aeb_internal_state.reverse_enabled = false;
     }
 
     // update internal data according to the relative acceleration detected by the sensor
@@ -442,24 +442,18 @@ can_msg updateCanMsgOutput(aeb_controller_state state)
  * This function evaluates the current AEB state based on multiple sensor
  * parameters, such as relative velocity, obstacle presence, and TTC (Time to Collision).
  *
- * Requirements [SwR-7] (@ref SwR-7), [SwR-8] (@ref SwR-8) and [SwR-16] (@ref SwR-16)
+ * Requirements [SwR-7] (@ref SwR-7), [SwR-8] (@ref SwR-8), [SwR-12] (@ref SwR-12) and [SwR-16] (@ref SwR-16)
  *
  * @param aeb_internal_state The current sensor data for the AEB system.
  * @param ttc The time-to-collision value, calculated based on obstacle distance and vehicle speed.
  * @return The current AEB state.
  */
 aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double ttc)
-{ // Abstraction according to [SwR-12]
+{
     aeb_controller_state my_new_state = AEB_STATE_ACTIVE;
+
     if (aeb_internal_state.aeb_system_enabled == false)
         return AEB_STATE_STANDBY;
-
-    if (aeb_internal_state.relative_velocity < MIN_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-7][SwR-16]
-        my_new_state = AEB_STATE_ACTIVE;
-
-    // Required by [SwR-7][SwR-16]
-    if (aeb_internal_state.relative_velocity > MAX_SPD_ENABLED && aeb_internal_state.reverseEnabled == false)
-        my_new_state = AEB_STATE_ACTIVE;
 
     if (aeb_internal_state.brake_pedal == false && aeb_internal_state.accelerator_pedal == false &&
         aeb_internal_state.relative_velocity >= MIN_SPD_ENABLED && aeb_internal_state.relative_velocity <= MAX_SPD_ENABLED)
@@ -470,8 +464,8 @@ aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double t
             return AEB_STATE_ALARM;
     }
 
-    if (ttc < THRESHOLD_ALARM && my_new_state != AEB_STATE_BRAKE)
+    if (ttc < THRESHOLD_ALARM)
         my_new_state = AEB_STATE_ALARM;
 
-    return my_new_state; // [SwR-8]
+    return my_new_state;
 }
