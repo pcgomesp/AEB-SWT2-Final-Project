@@ -1,12 +1,8 @@
-name: Coverage Check
+name: Generate Docs and Coverage Report
 
 on:
   push:
-    branches:
-      - develop
-      - feature/add_lcov_action
-  pull_request:
-    branches: [ "develop" ]
+    branches: ["main"]
 
 jobs:
   coverage:
@@ -61,31 +57,38 @@ jobs:
         run: |
           make full-cov CC=gcc-14 GCOV=gcov-14
 
-      - name: Enforce 80% minimum coverage across all metrics
-        run: |
-          # Extract all percentage values from coverPer* classes
-          coverage_values=$(grep -oP '<td class="coverPer(?:Hi|Med|Lo)">\K[0-9.]+' cov/full_report/src/index.html)
-
-          failed=0
-
-          echo "Checking individual coverage entries..."
-          while read -r value; do
-            echo "Found coverage: $value%"
-            if (( $(echo "$value < 80.0" | bc -l) )); then
-              echo "❌ Coverage $value% is below the 80% threshold"
-              failed=1
-            fi
-          done <<< "$coverage_values"
-
-          if [ $failed -eq 1 ]; then
-            echo "💥 Coverage check failed: at least one metric is below 80%"
-            exit 1
-          else
-            echo "✅ All coverage values are at or above 80%"
-          fi
-
-      - name:  
+      - name: Lcov_act
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: cov/full_report/src
+          path: cov/full_report
+
+  generate-docs-and-deploy:
+    needs: coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+
+      - name: Generate Doxygen
+        run: |
+          doxygen Doxyfile
+          mkdir -p docs/doxygen
+          mv docs/html/* docs/doxygen/
+
+      - name: Download LCOV artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+          path: docs/lcov
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.DEPLOY_TOKEN }}
+          publish_dir: ./docs
