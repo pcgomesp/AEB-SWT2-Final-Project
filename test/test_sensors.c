@@ -4,7 +4,7 @@
 #include "dbc.h"
 
 // Declaration of functions implemented in sensors.c that will be tested
-can_msg conv2CANCarClusterData(bool on_off_aeb_system);
+can_msg conv2CANCarClusterData(bool aeb_system_enabled);
 can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity, double relative_acceleration);
 can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance);
 can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal);

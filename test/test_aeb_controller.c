@@ -75,7 +75,7 @@ void setUp(void) {
     aeb_internal_state.obstacle_distance = 0.0;
     aeb_internal_state.brake_pedal = false;
     aeb_internal_state.accelerator_pedal = false;
-    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.aeb_system_enabled = true;
     aeb_internal_state.reverseEnabled = false;
 }
 
@@ -651,13 +651,13 @@ void test_TC_AEB_CTRL_013(void) {
  * @brief Helper function to check the AEB system state.
  * 
  * This helper function verifies whether the AEB system is turned ON or OFF by 
- * checking the `on_off_aeb_system` flag in the internal AEB state.
+ * checking the `aeb_system_enabled` flag in the internal AEB state.
  * 
  * @param expected_state Expected state of the AEB system (ON/OFF).
  * 
  * @details
  * This function compares the expected state of the AEB system (ON/OFF) with the 
- * actual state held in the `aeb_internal_state.on_off_aeb_system` flag. It asserts 
+ * actual state held in the `aeb_internal_state.aeb_system_enabled` flag. It asserts 
  * whether the state matches the expected state.
  * 
  * @pre The AEB system's internal state must be initialized.
@@ -665,9 +665,9 @@ void test_TC_AEB_CTRL_013(void) {
  */
 void checkAEBSystemState(bool expected_state) {
     if (expected_state){
-        TEST_ASSERT_TRUE(aeb_internal_state.on_off_aeb_system);
+        TEST_ASSERT_TRUE(aeb_internal_state.aeb_system_enabled);
     } else {
-        TEST_ASSERT_FALSE(aeb_internal_state.on_off_aeb_system);
+        TEST_ASSERT_FALSE(aeb_internal_state.aeb_system_enabled);
     }
 }
 
@@ -680,11 +680,11 @@ void checkAEBSystemState(bool expected_state) {
  * 
  * @details
  * The test case uses the data frame `{0x01}` to indicate that the AEB system is 
- * turned ON. The expected behavior is that the `on_off_aeb_system` flag in the 
+ * turned ON. The expected behavior is that the `aeb_system_enabled` flag in the 
  * `aeb_internal_state` should be set to `true`, indicating the system is active.
  * 
  * @pre The AEB system is initialized and ready to receive CAN messages.
- * @post The `on_off_aeb_system` flag should be set to true, indicating that the AEB system is ON.
+ * @post The `aeb_system_enabled` flag should be set to true, indicating that the AEB system is ON.
  * 
  * @anchor TC_AEB_CTRL_014
  */
@@ -702,15 +702,15 @@ void test_TC_AEB_CTRL_014(void) {
  * 
  * This test case simulates a scenario where the AEB system is turned OFF by setting 
  * `dataFrame[0]` to `0x00`. The system should deactivate the AEB system by setting 
- * the `on_off_aeb_system` flag to `false`.
+ * the `aeb_system_enabled` flag to `false`.
  * 
  * @details
  * The test case uses the data frame `{0x00}` to indicate that the AEB system should be 
- * turned OFF. The expected behavior is that the `on_off_aeb_system` flag in the 
+ * turned OFF. The expected behavior is that the `aeb_system_enabled` flag in the 
  * `aeb_internal_state` should be set to `false`.
  * 
  * @pre The AEB system is initialized and ready to receive CAN messages.
- * @post The `on_off_aeb_system` flag should be set to false, indicating that the AEB system is OFF.
+ * @post The `aeb_system_enabled` flag should be set to false, indicating that the AEB system is OFF.
  * 
  * @anchor TC_AEB_CTRL_015
  */
@@ -728,15 +728,15 @@ void test_TC_AEB_CTRL_015(void) {
  * 
  * This test case ensures that the AEB system remains OFF for any value other than `0x01` 
  * in the `dataFrame[0]` field. If a value other than `0x01` is received, the system should 
- * not activate the AEB system and the `on_off_aeb_system` flag should remain `false`.
+ * not activate the AEB system and the `aeb_system_enabled` flag should remain `false`.
  * 
  * @details
  * The test case uses an arbitrary value (`0x02`) in the `dataFrame[0]` to simulate a 
- * non-activation condition. The expected behavior is that the `on_off_aeb_system` flag 
+ * non-activation condition. The expected behavior is that the `aeb_system_enabled` flag 
  * remains `false`.
  * 
  * @pre The AEB system is initialized and ready to receive CAN messages.
- * @post The `on_off_aeb_system` flag should remain false for any value other than 0x01.
+ * @post The `aeb_system_enabled` flag should remain false for any value other than 0x01.
  * 
  * @anchor TC_AEB_CTRL_X04
  */
@@ -759,11 +759,11 @@ void test_TC_AEB_CTRL_X04(void) {
  * 
  * @details
  * The test case uses the data frame `{0x01}` to simulate the reactivation of the AEB system. 
- * The expected behavior is that the `on_off_aeb_system` flag in the `aeb_internal_state` 
+ * The expected behavior is that the `aeb_system_enabled` flag in the `aeb_internal_state` 
  * should be set to `true`, indicating that the AEB system is turned ON.
  * 
  * @pre The AEB system is initialized and ready to receive CAN messages.
- * @post The `on_off_aeb_system` flag should be set to true, indicating that the AEB system is back ON.
+ * @post The `aeb_system_enabled` flag should be set to true, indicating that the AEB system is back ON.
  * 
  * @anchor TC_AEB_CTRL_X05
  */
@@ -805,7 +805,7 @@ void checkAEBState(aeb_controller_state expected_state, aeb_controller_state sta
  * - `relative_velocity` set to the maximum speed enabled (`MAX_SPD_ENABLED`).
  * - `has_obstacle` set to true, indicating that an obstacle is detected.
  * - `obstacle_distance` set to 10.0 meters.
- * - `on_off_aeb_system` set to true, ensuring the AEB system is active.
+ * - `aeb_system_enabled` set to true, ensuring the AEB system is active.
  * - `reverseEnabled` set to false, indicating the vehicle is not in reverse.
  * 
  * The TTC value of `1.9` will be used to simulate a scenario where the AEB system 
@@ -820,7 +820,7 @@ void test_TC_AEB_CTRL_X06(void) {
     aeb_internal_state.relative_velocity = MAX_SPD_ENABLED;
     aeb_internal_state.has_obstacle = true;
     aeb_internal_state.obstacle_distance = 10.0;
-    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.aeb_system_enabled = true;
     aeb_internal_state.reverseEnabled = false;
 
     double ttc = 1.9;
@@ -843,7 +843,7 @@ void test_TC_AEB_CTRL_X06(void) {
  * - `relative_velocity` set to the maximum speed enabled (`MAX_SPD_ENABLED`).
  * - `has_obstacle` set to true, indicating that an obstacle is detected.
  * - `obstacle_distance` set to 10.0 meters.
- * - `on_off_aeb_system` set to true, ensuring the AEB system is active.
+ * - `aeb_system_enabled` set to true, ensuring the AEB system is active.
  * - `reverseEnabled` set to false, indicating the vehicle is not in reverse.
  * 
  * The TTC value of `0.9` is used to simulate a scenario where the TTC is too low 
@@ -858,7 +858,7 @@ void test_TC_AEB_CTRL_X07(void) {
     aeb_internal_state.relative_velocity = MAX_SPD_ENABLED;
     aeb_internal_state.has_obstacle = true;
     aeb_internal_state.obstacle_distance = 10.0;
-    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.aeb_system_enabled = true;
     aeb_internal_state.reverseEnabled = false;
 
     double ttc = 0.9;
@@ -869,7 +869,7 @@ void test_TC_AEB_CTRL_X07(void) {
 }
 
 /**
- * @brief Test Case: AEB system OFF (on_off_aeb_system == false, high speed).
+ * @brief Test Case: AEB system OFF (aeb_system_enabled == false, high speed).
  * 
  * This test case simulates a scenario where the AEB system is turned OFF, 
  * and the vehicle is traveling at high speed. The expected behavior is that 
@@ -880,7 +880,7 @@ void test_TC_AEB_CTRL_X07(void) {
  * - `relative_velocity` set to 80.0 (high speed).
  * - `has_obstacle` set to true, indicating that an obstacle is detected.
  * - `obstacle_distance` set to 10.0 meters.
- * - `on_off_aeb_system` set to false, deactivating the AEB system.
+ * - `aeb_system_enabled` set to false, deactivating the AEB system.
  * - `reverseEnabled` set to false, indicating the vehicle is not in reverse.
  * 
  * The TTC value of `1.9` will be used to simulate a situation where the AEB system is inactive, 
@@ -895,7 +895,7 @@ void test_TC_AEB_CTRL_X08(void) {
     aeb_internal_state.relative_velocity = 80.0;
     aeb_internal_state.has_obstacle = true;
     aeb_internal_state.obstacle_distance = 10.0;
-    aeb_internal_state.on_off_aeb_system = false;
+    aeb_internal_state.aeb_system_enabled = false;
     aeb_internal_state.reverseEnabled = false;
 
     double ttc = 1.9;
@@ -917,7 +917,7 @@ void test_TC_AEB_CTRL_X08(void) {
  * - `relative_velocity` set to a value below `MIN_SPD_ENABLED` (speed below the minimum).
  * - `has_obstacle` set to true, indicating that an obstacle is detected.
  * - `obstacle_distance` set to 10.0 meters.
- * - `on_off_aeb_system` set to true, ensuring the AEB system is active.
+ * - `aeb_system_enabled` set to true, ensuring the AEB system is active.
  * - `reverseEnabled` set to false, indicating the vehicle is not in reverse.
  * 
  * The TTC value of `1.9` is used to simulate a situation where the vehicle is moving at low speed, 
@@ -932,7 +932,7 @@ void test_TC_AEB_CTRL_X09(void) {
     aeb_internal_state.relative_velocity = MIN_SPD_ENABLED - 1;
     aeb_internal_state.has_obstacle = true;
     aeb_internal_state.obstacle_distance = 10.0;
-    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.aeb_system_enabled = true;
     aeb_internal_state.reverseEnabled = false;
 
     double ttc = 1.9;
@@ -958,7 +958,7 @@ void test_TC_AEB_CTRL_X09(void) {
  * - `relative_velocity` set to a value above `MAX_SPD_ENABLED` (speed above the maximum).
  * - `has_obstacle` set to true, indicating that an obstacle is detected.
  * - `obstacle_distance` set to 10.0 meters.
- * - `on_off_aeb_system` set to true, ensuring the AEB system is active.
+ * - `aeb_system_enabled` set to true, ensuring the AEB system is active.
  * - `reverseEnabled` set to false, indicating the vehicle is not in reverse.
  * 
  * The TTC value of `1.9` is used to simulate a situation where the vehicle is moving at a speed 
@@ -973,7 +973,7 @@ void test_TC_AEB_CTRL_X10(void) {
     aeb_internal_state.relative_velocity = MAX_SPD_ENABLED + 1;
     aeb_internal_state.has_obstacle = true;
     aeb_internal_state.obstacle_distance = 10.0;
-    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.aeb_system_enabled = true;
     aeb_internal_state.reverseEnabled = false;
 
     double ttc = 1.9;
@@ -999,7 +999,7 @@ void test_TC_AEB_CTRL_X10(void) {
  * - `relative_velocity` set to 60.0 (normal driving speed).
  * - `has_obstacle` set to true, indicating that an obstacle is detected.
  * - `obstacle_distance` set to 10.0 meters.
- * - `on_off_aeb_system` set to true, activating the AEB system.
+ * - `aeb_system_enabled` set to true, activating the AEB system.
  * - `reverseEnabled` set to false, indicating that the vehicle is not in reverse.
  * - `accelerator_pedal` set to false and `brake_pedal` set to false, simulating deactivated pedals.
  * - `ttc` set to 0.8, which is lower than the braking threshold.
@@ -1015,7 +1015,7 @@ void test_TC_AEB_CTRL_016(void) {
     aeb_internal_state.relative_velocity = 60.0;
     aeb_internal_state.has_obstacle = true;
     aeb_internal_state.obstacle_distance = 10.0;
-    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.aeb_system_enabled = true;
     aeb_internal_state.reverseEnabled = false;
     aeb_internal_state.accelerator_pedal = false;
     aeb_internal_state.brake_pedal = false;
@@ -1039,7 +1039,7 @@ void test_TC_AEB_CTRL_016(void) {
  * - `relative_velocity` set to 60.0 (normal driving speed).
  * - `has_obstacle` set to true, indicating that an obstacle is detected.
  * - `obstacle_distance` set to 10.0 meters.
- * - `on_off_aeb_system` set to true, activating the AEB system.
+ * - `aeb_system_enabled` set to true, activating the AEB system.
  * - `reverseEnabled` set to false, indicating that the vehicle is not in reverse.
  * - `accelerator_pedal` set to false and `brake_pedal` set to false, simulating deactivated pedals.
  * - `ttc` set to 1.5, which is greater than the braking threshold but less than the alarm threshold.
@@ -1055,7 +1055,7 @@ void test_TC_AEB_CTRL_017(void) {
     aeb_internal_state.relative_velocity = 60.0;
     aeb_internal_state.has_obstacle = true;
     aeb_internal_state.obstacle_distance = 10.0;
-    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.aeb_system_enabled = true;
     aeb_internal_state.reverseEnabled = false;
     aeb_internal_state.accelerator_pedal = false;
     aeb_internal_state.brake_pedal = false;
@@ -1079,7 +1079,7 @@ void test_TC_AEB_CTRL_017(void) {
  * - `relative_velocity` set to 60.0 (normal driving speed).
  * - `has_obstacle` set to true, indicating that an obstacle is detected.
  * - `obstacle_distance` set to 10.0 meters.
- * - `on_off_aeb_system` set to true, activating the AEB system.
+ * - `aeb_system_enabled` set to true, activating the AEB system.
  * - `reverseEnabled` set to false, indicating that the vehicle is not in reverse.
  * - `accelerator_pedal` set to false and `brake_pedal` set to false, simulating deactivated pedals.
  * - `ttc` set to `THRESHOLD_ALARM + 0.1`, which is greater than the alarm threshold.
@@ -1095,7 +1095,7 @@ void test_TC_AEB_CTRL_018(void) {
     aeb_internal_state.relative_velocity = 60.0;
     aeb_internal_state.has_obstacle = true;
     aeb_internal_state.obstacle_distance = 10.0;
-    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.aeb_system_enabled = true;
     aeb_internal_state.reverseEnabled = false;
     aeb_internal_state.accelerator_pedal = false;
     aeb_internal_state.brake_pedal = false;
@@ -1120,7 +1120,7 @@ void test_TC_AEB_CTRL_018(void) {
  * - `relative_velocity` set to 60.0 (normal driving speed).
  * - `has_obstacle` set to true, indicating that an obstacle is detected.
  * - `obstacle_distance` set to 10.0 meters.
- * - `on_off_aeb_system` set to true, activating the AEB system.
+ * - `aeb_system_enabled` set to true, activating the AEB system.
  * - `reverseEnabled` set to false, indicating that the vehicle is not in reverse.
  * - `accelerator_pedal` set to false, indicating that the accelerator is off.
  * - `brake_pedal` set to true, indicating that the brake pedal is pressed.
@@ -1139,7 +1139,7 @@ void test_TC_AEB_CTRL_019(void) {
     aeb_internal_state.relative_velocity = 60.0;
     aeb_internal_state.has_obstacle = true;
     aeb_internal_state.obstacle_distance = 10.0;
-    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.aeb_system_enabled = true;
     aeb_internal_state.reverseEnabled = false;
     aeb_internal_state.accelerator_pedal = false;
     aeb_internal_state.brake_pedal = true;  // Brake pedal pressed
@@ -1168,7 +1168,7 @@ void test_TC_AEB_CTRL_019(void) {
  * - `relative_velocity` set to 60.0 (normal driving speed).
  * - `has_obstacle` set to true, indicating that an obstacle is detected.
  * - `obstacle_distance` set to 10.0 meters.
- * - `on_off_aeb_system` set to true, activating the AEB system.
+ * - `aeb_system_enabled` set to true, activating the AEB system.
  * - `reverseEnabled` set to false, indicating that the vehicle is not in reverse.
  * - `accelerator_pedal` set to true, indicating that the accelerator is pressed.
  * - `brake_pedal` set to false, indicating that the brake pedal is not pressed.
@@ -1187,7 +1187,7 @@ void test_TC_AEB_CTRL_020(void) {
     aeb_internal_state.relative_velocity = 60.0;
     aeb_internal_state.has_obstacle = true;
     aeb_internal_state.obstacle_distance = 10.0;
-    aeb_internal_state.on_off_aeb_system = true;
+    aeb_internal_state.aeb_system_enabled = true;
     aeb_internal_state.reverseEnabled = false;
     aeb_internal_state.accelerator_pedal = true;  // Accelerator pedal pressed
     aeb_internal_state.brake_pedal = false;
@@ -1350,10 +1350,10 @@ void test_TC_AEB_CTRL_023(void)
  * - `dataFrame[0]` set to `0x01`, indicating that the AEB system should be ON.
  * 
  * The expected result is that:
- * - The `on_off_aeb_system` in the internal state should be set to `true`, indicating that the AEB system is ON.
+ * - The `aeb_system_enabled` in the internal state should be set to `true`, indicating that the AEB system is ON.
  * 
  * @pre The CAN message is correctly formatted with `ID_CAR_C` and the AEB system state.
- * @post The internal state `on_off_aeb_system` should be updated to `true` (AEB system ON).
+ * @post The internal state `aeb_system_enabled` should be updated to `true` (AEB system ON).
  * 
  * @anchor TC_AEB_CTRL_024
  */
@@ -1364,7 +1364,7 @@ void test_TC_AEB_CTRL_024(void)
     captured_frame.identifier = ID_CAR_C;
     captured_frame.dataFrame[0] = 0x01;  // AEB system ON
     translateAndCallCanMsg(captured_frame);
-    TEST_ASSERT_TRUE(aeb_internal_state.on_off_aeb_system);  // AEB system should be ON
+    TEST_ASSERT_TRUE(aeb_internal_state.aeb_system_enabled);  // AEB system should be ON
 }
 
 /**

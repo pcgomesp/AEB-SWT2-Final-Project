@@ -24,7 +24,7 @@ typedef struct {
     double obstacle_distance;
     int brake_pedal;
     int accelerator_pedal;
-    int on_off_aeb_system;
+    int aeb_system_enabled;
     int reverseEnabled;
     double relative_acceleration;
 } sensors_input_data;
