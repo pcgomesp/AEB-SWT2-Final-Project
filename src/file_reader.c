@@ -52,8 +52,8 @@ int read_sensor_data(FILE *file, sensors_input_data *sensor_data) {
                   &sensor_data->relative_velocity, 
                   &sensor_data->brake_pedal, 
                   &sensor_data->accelerator_pedal, 
-                  &sensor_data->on_off_aeb_system,
-                  &sensor_data->reverseEnabled,
+                  &sensor_data->aeb_system_enabled,
+                  &sensor_data->reverse_enabled,
                   &sensor_data->relative_acceleration
                 ) == 8;
 }
