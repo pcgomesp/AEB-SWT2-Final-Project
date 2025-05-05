@@ -1,7 +1,7 @@
 var searchData=
 [
   ['main_0',['main',['../test__ttc__control_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;test_ttc_control.c'],['../actuators_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;actuators.c'],['../aeb__controller_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;aeb_controller.c'],['../main_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;main.c'],['../sensors_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;sensors.c'],['../test__actuators_8c.html#a840291bc02cba5474a4cb46a9b9566fe',1,'main(void):&#160;test_actuators.c'],['../test__aeb__controller_8c.html#a840291bc02cba5474a4cb46a9b9566fe',1,'main(void):&#160;test_aeb_controller.c'],['../test__file__reader_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;test_file_reader.c'],['../test__log__utils_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;test_log_utils.c'],['../test__mq__utils_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;test_mq_utils.c'],['../test__sensors_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;test_sensors.c']]],
-  ['main_20features_1',['Main Features',['../index.html#autotoc_md3',1,'']]],
+  ['main_20features_1',['Main Features',['../index.html#autotoc_md4',1,'']]],
   ['main_2ec_2',['main.c',['../main_8c.html',1,'']]],
   ['mainworkingloop_3',['mainWorkingLoop',['../aeb__controller_8c.html#a75689aa11501c348bd09370b739bf2e5',1,'aeb_controller.c']]],
   ['max_5facceleration_5fs_4',['MAX_ACCELERATION_S',['../dbc_8h.html#a87a12837cc18d05d01e84f339fa0c2b0',1,'dbc.h']]],

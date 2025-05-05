@@ -4,7 +4,9 @@ var searchData=
   ['dbc_2ec_1',['dbc.c',['../dbc_8c.html',1,'']]],
   ['dbc_2eh_2',['dbc.h',['../dbc_8h.html',1,'']]],
   ['delta_3',['delta',['../test__ttc__control_8c.html#a9c93339149b1cebe866fe7fb45d33404',1,'test_ttc_control.c']]],
-  ['description_4',['Project Description',['../index.html#autotoc_md1',1,'']]],
+  ['description_4',['Project Description',['../index.html#autotoc_md2',1,'']]],
   ['distance_5ftest_5',['distance_test',['../test__ttc__control_8c.html#a5e054082fe88136d91692118876cc2fc',1,'test_ttc_control.c']]],
-  ['door_5flock_6',['door_lock',['../structactuators__abstraction.html#a68e97e44238339a9011a5a1bea267444',1,'actuators_abstraction']]]
+  ['documentation_6',['Coverage Report and Doxygen Documentation',['../index.html#autotoc_md1',1,'']]],
+  ['door_5flock_7',['door_lock',['../structactuators__abstraction.html#a68e97e44238339a9011a5a1bea267444',1,'actuators_abstraction']]],
+  ['doxygen_20documentation_8',['Coverage Report and Doxygen Documentation',['../index.html#autotoc_md1',1,'']]]
 ];

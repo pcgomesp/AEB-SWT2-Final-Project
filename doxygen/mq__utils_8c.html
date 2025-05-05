@@ -199,21 +199,22 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>void <a class="anchor" id="close_mq"></a></dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mq__utils_8c_source.html#l00077">77</a> of file <a class="el" href="mq__utils_8c_source.html">mq_utils.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   78</span>{</div>
-<div class="line"><span class="lineno">   79</span>    printf(<span class="stringliteral">&quot;Closing %s message queue\n&quot;</span>, <a class="code hl_variable" href="test__mq__utils_8c.html#ae489c9593b1bbb3eec9b12a49a8e3ea2">mq_name</a>);</div>
-<div class="line"><span class="lineno">   80</span>    <span class="keywordflow">if</span> (mq_close(<a class="code hl_variable" href="test__mq__utils_8c.html#af41cafd7242f0c9fc52b22ead7d5ec0d">mqd</a>) == -1)</div>
-<div class="line"><span class="lineno">   81</span>    {</div>
-<div class="line"><span class="lineno">   82</span>        perror(<span class="stringliteral">&quot;Error closing message queue&quot;</span>);</div>
-<div class="line"><span class="lineno">   83</span>        <span class="keywordflow">return</span>;</div>
-<div class="line"><span class="lineno">   84</span>    }</div>
-<div class="line"><span class="lineno">   85</span>    <span class="keywordflow">if</span> (mq_unlink(<a class="code hl_variable" href="test__mq__utils_8c.html#ae489c9593b1bbb3eec9b12a49a8e3ea2">mq_name</a>) == -1)</div>
+<p class="definition">Definition at line <a class="el" href="mq__utils_8c_source.html#l00082">82</a> of file <a class="el" href="mq__utils_8c_source.html">mq_utils.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   83</span>{</div>
+<div class="line"><span class="lineno">   84</span>    printf(<span class="stringliteral">&quot;Closing %s message queue\n&quot;</span>, <a class="code hl_variable" href="test__mq__utils_8c.html#ae489c9593b1bbb3eec9b12a49a8e3ea2">mq_name</a>);</div>
+<div class="line"><span class="lineno">   85</span>    <span class="keywordflow">if</span> (mq_close(<a class="code hl_variable" href="test__mq__utils_8c.html#af41cafd7242f0c9fc52b22ead7d5ec0d">mqd</a>) == -1)</div>
 <div class="line"><span class="lineno">   86</span>    {</div>
-<div class="line"><span class="lineno">   87</span>        perror(<span class="stringliteral">&quot;Error unlinking message queue&quot;</span>);</div>
+<div class="line"><span class="lineno">   87</span>        perror(<span class="stringliteral">&quot;Error closing message queue&quot;</span>);</div>
 <div class="line"><span class="lineno">   88</span>        <span class="keywordflow">return</span>;</div>
 <div class="line"><span class="lineno">   89</span>    }</div>
-<div class="line"><span class="lineno">   90</span>}</div>
+<div class="line"><span class="lineno">   90</span>    <span class="keywordflow">if</span> (mq_unlink(<a class="code hl_variable" href="test__mq__utils_8c.html#ae489c9593b1bbb3eec9b12a49a8e3ea2">mq_name</a>) == -1)</div>
+<div class="line"><span class="lineno">   91</span>    {</div>
+<div class="line"><span class="lineno">   92</span>        perror(<span class="stringliteral">&quot;Error unlinking message queue&quot;</span>);</div>
+<div class="line"><span class="lineno">   93</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   94</span>    }</div>
+<div class="line"><span class="lineno">   95</span>}</div>
 <div class="ttc" id="atest__mq__utils_8c_html_ae489c9593b1bbb3eec9b12a49a8e3ea2"><div class="ttname"><a href="test__mq__utils_8c.html#ae489c9593b1bbb3eec9b12a49a8e3ea2">mq_name</a></div><div class="ttdeci">char * mq_name</div><div class="ttdef"><b>Definition</b> <a href="test__mq__utils_8c_source.html#l00010">test_mq_utils.c:10</a></div></div>
 <div class="ttc" id="atest__mq__utils_8c_html_af41cafd7242f0c9fc52b22ead7d5ec0d"><div class="ttname"><a href="test__mq__utils_8c.html#af41cafd7242f0c9fc52b22ead7d5ec0d">mqd</a></div><div class="ttdeci">mqd_t mqd</div><div class="ttdef"><b>Definition</b> <a href="test__mq__utils_8c_source.html#l00012">test_mq_utils.c:12</a></div></div>
 </div><!-- fragment -->
@@ -242,23 +243,23 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Message queue identifier (mqd_t). </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Message queue identifier (mqd_t). <a class="anchor" id="create_mq"></a></dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mq__utils_8c_source.html#l00038">38</a> of file <a class="el" href="mq__utils_8c_source.html">mq_utils.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   39</span>{</div>
-<div class="line"><span class="lineno">   40</span>    <span class="keyword">struct </span>mq_attr attr = <a class="code hl_function" href="mq__utils_8c.html#a1e06b8e09ecff9ff95ec9218ad2e6b11">get_mq_attr</a>();</div>
-<div class="line"><span class="lineno">   41</span>    mqd_t <a class="code hl_variable" href="test__mq__utils_8c.html#af41cafd7242f0c9fc52b22ead7d5ec0d">mqd</a> = mq_open(<a class="code hl_variable" href="test__mq__utils_8c.html#ae489c9593b1bbb3eec9b12a49a8e3ea2">mq_name</a>, O_RDWR | O_CREAT | O_NONBLOCK, <a class="code hl_define" href="mq__utils_8c.html#acb3d9a2722912cafa1aca17ed086f771">QUEUE_PERMISSIONS</a>, &amp;attr);</div>
-<div class="line"><span class="lineno">   42</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="test__mq__utils_8c.html#af41cafd7242f0c9fc52b22ead7d5ec0d">mqd</a> == (mqd_t)-1)</div>
-<div class="line"><span class="lineno">   43</span>    {</div>
-<div class="line"><span class="lineno">   44</span>        perror(<span class="stringliteral">&quot;Error creating message queue&quot;</span>);</div>
-<div class="line"><span class="lineno">   45</span>        <span class="keywordflow">return</span> (mqd_t)-1;</div>
-<div class="line"><span class="lineno">   46</span>    }</div>
-<div class="line"><span class="lineno">   47</span> </div>
-<div class="line"><span class="lineno">   48</span>    printf(<span class="stringliteral">&quot;Queue %s created\n&quot;</span>, <a class="code hl_variable" href="test__mq__utils_8c.html#ae489c9593b1bbb3eec9b12a49a8e3ea2">mq_name</a>);</div>
+<p class="definition">Definition at line <a class="el" href="mq__utils_8c_source.html#l00040">40</a> of file <a class="el" href="mq__utils_8c_source.html">mq_utils.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   41</span>{</div>
+<div class="line"><span class="lineno">   42</span>    <span class="keyword">struct </span>mq_attr attr = <a class="code hl_function" href="mq__utils_8c.html#a1e06b8e09ecff9ff95ec9218ad2e6b11">get_mq_attr</a>();</div>
+<div class="line"><span class="lineno">   43</span>    mqd_t <a class="code hl_variable" href="test__mq__utils_8c.html#af41cafd7242f0c9fc52b22ead7d5ec0d">mqd</a> = mq_open(<a class="code hl_variable" href="test__mq__utils_8c.html#ae489c9593b1bbb3eec9b12a49a8e3ea2">mq_name</a>, O_RDWR | O_CREAT | O_NONBLOCK, <a class="code hl_define" href="mq__utils_8c.html#acb3d9a2722912cafa1aca17ed086f771">QUEUE_PERMISSIONS</a>, &amp;attr);</div>
+<div class="line"><span class="lineno">   44</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="test__mq__utils_8c.html#af41cafd7242f0c9fc52b22ead7d5ec0d">mqd</a> == (mqd_t)-1)</div>
+<div class="line"><span class="lineno">   45</span>    {</div>
+<div class="line"><span class="lineno">   46</span>        perror(<span class="stringliteral">&quot;Error creating message queue&quot;</span>);</div>
+<div class="line"><span class="lineno">   47</span>        <span class="keywordflow">return</span> (mqd_t)-1;</div>
+<div class="line"><span class="lineno">   48</span>    }</div>
 <div class="line"><span class="lineno">   49</span> </div>
-<div class="line"><span class="lineno">   50</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="test__mq__utils_8c.html#af41cafd7242f0c9fc52b22ead7d5ec0d">mqd</a>;</div>
-<div class="line"><span class="lineno">   51</span>}</div>
-<div class="ttc" id="amq__utils_8c_html_a1e06b8e09ecff9ff95ec9218ad2e6b11"><div class="ttname"><a href="mq__utils_8c.html#a1e06b8e09ecff9ff95ec9218ad2e6b11">get_mq_attr</a></div><div class="ttdeci">struct mq_attr get_mq_attr()</div><div class="ttdoc">Gets the default attributes for a message queue.</div><div class="ttdef"><b>Definition</b> <a href="mq__utils_8c_source.html#l00022">mq_utils.c:22</a></div></div>
+<div class="line"><span class="lineno">   50</span>    printf(<span class="stringliteral">&quot;Queue %s created\n&quot;</span>, <a class="code hl_variable" href="test__mq__utils_8c.html#ae489c9593b1bbb3eec9b12a49a8e3ea2">mq_name</a>);</div>
+<div class="line"><span class="lineno">   51</span> </div>
+<div class="line"><span class="lineno">   52</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="test__mq__utils_8c.html#af41cafd7242f0c9fc52b22ead7d5ec0d">mqd</a>;</div>
+<div class="line"><span class="lineno">   53</span>}</div>
+<div class="ttc" id="amq__utils_8c_html_a1e06b8e09ecff9ff95ec9218ad2e6b11"><div class="ttname"><a href="mq__utils_8c.html#a1e06b8e09ecff9ff95ec9218ad2e6b11">get_mq_attr</a></div><div class="ttdeci">struct mq_attr get_mq_attr()</div><div class="ttdoc">Gets the default attributes for a message queue.</div><div class="ttdef"><b>Definition</b> <a href="mq__utils_8c_source.html#l00023">mq_utils.c:23</a></div></div>
 <div class="ttc" id="amq__utils_8c_html_acb3d9a2722912cafa1aca17ed086f771"><div class="ttname"><a href="mq__utils_8c.html#acb3d9a2722912cafa1aca17ed086f771">QUEUE_PERMISSIONS</a></div><div class="ttdeci">#define QUEUE_PERMISSIONS</div><div class="ttdef"><b>Definition</b> <a href="mq__utils_8c_source.html#l00015">mq_utils.c:15</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -279,17 +280,17 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Gets the default attributes for a message queue. </p>
-<dl class="section return"><dt>Returns</dt><dd>A mq_attr structure configured with default values. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A mq_attr structure configured with default values. <a class="anchor" id="get_mq_attr"></a></dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mq__utils_8c_source.html#l00022">22</a> of file <a class="el" href="mq__utils_8c_source.html">mq_utils.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   23</span>{</div>
-<div class="line"><span class="lineno">   24</span>    <span class="keyword">struct </span>mq_attr attr;</div>
-<div class="line"><span class="lineno">   25</span>    attr.mq_flags = O_NONBLOCK;</div>
-<div class="line"><span class="lineno">   26</span>    attr.mq_curmsgs = 0;</div>
-<div class="line"><span class="lineno">   27</span>    attr.mq_maxmsg = <a class="code hl_define" href="constants_8h.html#abcda99a24ca583d06b2d88c6df456a43">MQ_MAX_MESSAGES</a>;</div>
-<div class="line"><span class="lineno">   28</span>    attr.mq_msgsize = <a class="code hl_define" href="constants_8h.html#a28deba7f7a074fcec9ad971ac28521ee">MQ_MAX_MSG_SIZE</a>;</div>
-<div class="line"><span class="lineno">   29</span>    <span class="keywordflow">return</span> attr;</div>
-<div class="line"><span class="lineno">   30</span>}</div>
+<p class="definition">Definition at line <a class="el" href="mq__utils_8c_source.html#l00023">23</a> of file <a class="el" href="mq__utils_8c_source.html">mq_utils.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   24</span>{</div>
+<div class="line"><span class="lineno">   25</span>    <span class="keyword">struct </span>mq_attr attr;</div>
+<div class="line"><span class="lineno">   26</span>    attr.mq_flags = O_NONBLOCK;</div>
+<div class="line"><span class="lineno">   27</span>    attr.mq_curmsgs = 0;</div>
+<div class="line"><span class="lineno">   28</span>    attr.mq_maxmsg = <a class="code hl_define" href="constants_8h.html#abcda99a24ca583d06b2d88c6df456a43">MQ_MAX_MESSAGES</a>;</div>
+<div class="line"><span class="lineno">   29</span>    attr.mq_msgsize = <a class="code hl_define" href="constants_8h.html#a28deba7f7a074fcec9ad971ac28521ee">MQ_MAX_MSG_SIZE</a>;</div>
+<div class="line"><span class="lineno">   30</span>    <span class="keywordflow">return</span> attr;</div>
+<div class="line"><span class="lineno">   31</span>}</div>
 <div class="ttc" id="aconstants_8h_html_a28deba7f7a074fcec9ad971ac28521ee"><div class="ttname"><a href="constants_8h.html#a28deba7f7a074fcec9ad971ac28521ee">MQ_MAX_MSG_SIZE</a></div><div class="ttdeci">#define MQ_MAX_MSG_SIZE</div><div class="ttdef"><b>Definition</b> <a href="constants_8h_source.html#l00024">constants.h:24</a></div></div>
 <div class="ttc" id="aconstants_8h_html_abcda99a24ca583d06b2d88c6df456a43"><div class="ttname"><a href="constants_8h.html#abcda99a24ca583d06b2d88c6df456a43">MQ_MAX_MESSAGES</a></div><div class="ttdeci">#define MQ_MAX_MESSAGES</div><div class="ttdef"><b>Definition</b> <a href="constants_8h_source.html#l00023">constants.h:23</a></div></div>
 </div><!-- fragment -->
@@ -318,19 +319,19 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Message queue identifier (mqd_t). </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Message queue identifier (mqd_t). <a class="anchor" id="open_mq"></a></dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mq__utils_8c_source.html#l00059">59</a> of file <a class="el" href="mq__utils_8c_source.html">mq_utils.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   60</span>{</div>
-<div class="line"><span class="lineno">   61</span>    <span class="keyword">struct </span>mq_attr attr = <a class="code hl_function" href="mq__utils_8c.html#a1e06b8e09ecff9ff95ec9218ad2e6b11">get_mq_attr</a>();</div>
-<div class="line"><span class="lineno">   62</span>    mqd_t <a class="code hl_variable" href="test__mq__utils_8c.html#af41cafd7242f0c9fc52b22ead7d5ec0d">mqd</a> = mq_open(<a class="code hl_variable" href="test__mq__utils_8c.html#ae489c9593b1bbb3eec9b12a49a8e3ea2">mq_name</a>, O_RDWR | O_NONBLOCK, <a class="code hl_define" href="mq__utils_8c.html#acb3d9a2722912cafa1aca17ed086f771">QUEUE_PERMISSIONS</a>, &amp;attr);</div>
-<div class="line"><span class="lineno">   63</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="test__mq__utils_8c.html#af41cafd7242f0c9fc52b22ead7d5ec0d">mqd</a> == (mqd_t)-1)</div>
-<div class="line"><span class="lineno">   64</span>    {</div>
-<div class="line"><span class="lineno">   65</span>        perror(<span class="stringliteral">&quot;Error opening message queue&quot;</span>);</div>
-<div class="line"><span class="lineno">   66</span>        <span class="keywordflow">return</span> (mqd_t)-1;</div>
-<div class="line"><span class="lineno">   67</span>    }</div>
-<div class="line"><span class="lineno">   68</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="test__mq__utils_8c.html#af41cafd7242f0c9fc52b22ead7d5ec0d">mqd</a>;</div>
-<div class="line"><span class="lineno">   69</span>}</div>
+<p class="definition">Definition at line <a class="el" href="mq__utils_8c_source.html#l00062">62</a> of file <a class="el" href="mq__utils_8c_source.html">mq_utils.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   63</span>{</div>
+<div class="line"><span class="lineno">   64</span>    <span class="keyword">struct </span>mq_attr attr = <a class="code hl_function" href="mq__utils_8c.html#a1e06b8e09ecff9ff95ec9218ad2e6b11">get_mq_attr</a>();</div>
+<div class="line"><span class="lineno">   65</span>    mqd_t <a class="code hl_variable" href="test__mq__utils_8c.html#af41cafd7242f0c9fc52b22ead7d5ec0d">mqd</a> = mq_open(<a class="code hl_variable" href="test__mq__utils_8c.html#ae489c9593b1bbb3eec9b12a49a8e3ea2">mq_name</a>, O_RDWR | O_NONBLOCK, <a class="code hl_define" href="mq__utils_8c.html#acb3d9a2722912cafa1aca17ed086f771">QUEUE_PERMISSIONS</a>, &amp;attr);</div>
+<div class="line"><span class="lineno">   66</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="test__mq__utils_8c.html#af41cafd7242f0c9fc52b22ead7d5ec0d">mqd</a> == (mqd_t)-1)</div>
+<div class="line"><span class="lineno">   67</span>    {</div>
+<div class="line"><span class="lineno">   68</span>        perror(<span class="stringliteral">&quot;Error opening message queue&quot;</span>);</div>
+<div class="line"><span class="lineno">   69</span>        <span class="keywordflow">return</span> (mqd_t)-1;</div>
+<div class="line"><span class="lineno">   70</span>    }</div>
+<div class="line"><span class="lineno">   71</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="test__mq__utils_8c.html#af41cafd7242f0c9fc52b22ead7d5ec0d">mqd</a>;</div>
+<div class="line"><span class="lineno">   72</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -368,19 +369,19 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on failure. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on failure. <a class="anchor" id="read_mq"></a></dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mq__utils_8c_source.html#l00099">99</a> of file <a class="el" href="mq__utils_8c_source.html">mq_utils.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  100</span>{</div>
-<div class="line"><span class="lineno">  101</span>    <span class="keywordtype">char</span> buffer[<a class="code hl_define" href="constants_8h.html#a28deba7f7a074fcec9ad971ac28521ee">MQ_MAX_MSG_SIZE</a>];</div>
-<div class="line"><span class="lineno">  102</span>    <span class="keywordflow">if</span> (mq_receive(mq_receiver, buffer, <a class="code hl_define" href="constants_8h.html#a28deba7f7a074fcec9ad971ac28521ee">MQ_MAX_MSG_SIZE</a>, NULL) == (mqd_t)-1)</div>
-<div class="line"><span class="lineno">  103</span>    {</div>
-<div class="line"><span class="lineno">  104</span>        <span class="comment">// perror(&quot;Error receiving message&quot;);</span></div>
-<div class="line"><span class="lineno">  105</span>        <span class="keywordflow">return</span> -1;</div>
-<div class="line"><span class="lineno">  106</span>    }</div>
-<div class="line"><span class="lineno">  107</span>    memcpy(msg_read, buffer, <a class="code hl_define" href="constants_8h.html#a28deba7f7a074fcec9ad971ac28521ee">MQ_MAX_MSG_SIZE</a>);</div>
-<div class="line"><span class="lineno">  108</span>    <span class="keywordflow">return</span> 0;</div>
-<div class="line"><span class="lineno">  109</span>}</div>
+<p class="definition">Definition at line <a class="el" href="mq__utils_8c_source.html#l00105">105</a> of file <a class="el" href="mq__utils_8c_source.html">mq_utils.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  106</span>{</div>
+<div class="line"><span class="lineno">  107</span>    <span class="keywordtype">char</span> buffer[<a class="code hl_define" href="constants_8h.html#a28deba7f7a074fcec9ad971ac28521ee">MQ_MAX_MSG_SIZE</a>];</div>
+<div class="line"><span class="lineno">  108</span>    <span class="keywordflow">if</span> (mq_receive(mq_receiver, buffer, <a class="code hl_define" href="constants_8h.html#a28deba7f7a074fcec9ad971ac28521ee">MQ_MAX_MSG_SIZE</a>, NULL) == (mqd_t)-1)</div>
+<div class="line"><span class="lineno">  109</span>    {</div>
+<div class="line"><span class="lineno">  110</span>        <span class="comment">// perror(&quot;Error receiving message&quot;);</span></div>
+<div class="line"><span class="lineno">  111</span>        <span class="keywordflow">return</span> -1;</div>
+<div class="line"><span class="lineno">  112</span>    }</div>
+<div class="line"><span class="lineno">  113</span>    memcpy(msg_read, buffer, <a class="code hl_define" href="constants_8h.html#a28deba7f7a074fcec9ad971ac28521ee">MQ_MAX_MSG_SIZE</a>);</div>
+<div class="line"><span class="lineno">  114</span>    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><span class="lineno">  115</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -418,19 +419,19 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on failure. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on failure. <a class="anchor" id="write_mq"></a></dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mq__utils_8c_source.html#l00118">118</a> of file <a class="el" href="mq__utils_8c_source.html">mq_utils.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  119</span>{</div>
-<div class="line"><span class="lineno">  120</span>    <span class="keywordtype">char</span> buffer[<a class="code hl_define" href="constants_8h.html#a28deba7f7a074fcec9ad971ac28521ee">MQ_MAX_MSG_SIZE</a>];</div>
-<div class="line"><span class="lineno">  121</span>    memcpy(buffer, msg, <a class="code hl_define" href="constants_8h.html#a28deba7f7a074fcec9ad971ac28521ee">MQ_MAX_MSG_SIZE</a>);</div>
-<div class="line"><span class="lineno">  122</span>    <span class="keywordflow">if</span> (mq_send(mq_sender, buffer, <a class="code hl_define" href="constants_8h.html#a28deba7f7a074fcec9ad971ac28521ee">MQ_MAX_MSG_SIZE</a>, 0) == -1)</div>
-<div class="line"><span class="lineno">  123</span>    {</div>
-<div class="line"><span class="lineno">  124</span>        perror(<span class="stringliteral">&quot;Error sending message. Message queue is full&quot;</span>);</div>
-<div class="line"><span class="lineno">  125</span>        <span class="keywordflow">return</span> -1;</div>
-<div class="line"><span class="lineno">  126</span>    }</div>
-<div class="line"><span class="lineno">  127</span>    <span class="keywordflow">return</span> 0;</div>
-<div class="line"><span class="lineno">  128</span>}</div>
+<p class="definition">Definition at line <a class="el" href="mq__utils_8c_source.html#l00125">125</a> of file <a class="el" href="mq__utils_8c_source.html">mq_utils.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  126</span>{</div>
+<div class="line"><span class="lineno">  127</span>    <span class="keywordtype">char</span> buffer[<a class="code hl_define" href="constants_8h.html#a28deba7f7a074fcec9ad971ac28521ee">MQ_MAX_MSG_SIZE</a>];</div>
+<div class="line"><span class="lineno">  128</span>    memcpy(buffer, msg, <a class="code hl_define" href="constants_8h.html#a28deba7f7a074fcec9ad971ac28521ee">MQ_MAX_MSG_SIZE</a>);</div>
+<div class="line"><span class="lineno">  129</span>    <span class="keywordflow">if</span> (mq_send(mq_sender, buffer, <a class="code hl_define" href="constants_8h.html#a28deba7f7a074fcec9ad971ac28521ee">MQ_MAX_MSG_SIZE</a>, 0) == -1)</div>
+<div class="line"><span class="lineno">  130</span>    {</div>
+<div class="line"><span class="lineno">  131</span>        perror(<span class="stringliteral">&quot;Error sending message. Message queue is full&quot;</span>);</div>
+<div class="line"><span class="lineno">  132</span>        <span class="keywordflow">return</span> -1;</div>
+<div class="line"><span class="lineno">  133</span>    }</div>
+<div class="line"><span class="lineno">  134</span>    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><span class="lineno">  135</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>

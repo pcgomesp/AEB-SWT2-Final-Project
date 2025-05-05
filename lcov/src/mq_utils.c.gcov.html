@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Test Date:</td>
-            <td class="headerValue">2025-04-24 00:29:41</td>
+            <td class="headerValue">2025-05-05 14:46:49</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntryHi">100.0&nbsp;%</td>
@@ -98,114 +98,121 @@
 <span id="L18"><span class="lineNum">      18</span>                 :              :             :  * @brief Gets the default attributes for a message queue.</span>
 <span id="L19"><span class="lineNum">      19</span>                 :              :             :  *</span>
 <span id="L20"><span class="lineNum">      20</span>                 :              :             :  * @return A mq_attr structure configured with default values.</span>
-<span id="L21"><span class="lineNum">      21</span>                 :              :             :  */</span>
-<span id="L22"><span class="lineNum">      22</span>                 :              :<span class="tlaGNC">          13 : struct mq_attr get_mq_attr()</span></span>
-<span id="L23"><span class="lineNum">      23</span>                 :              :             : {</span>
-<span id="L24"><span class="lineNum">      24</span>                 :              :             :     struct mq_attr attr;</span>
-<span id="L25"><span class="lineNum">      25</span>                 :              :<span class="tlaGNC">          13 :     attr.mq_flags = O_NONBLOCK;</span></span>
-<span id="L26"><span class="lineNum">      26</span>                 :              :<span class="tlaGNC">          13 :     attr.mq_curmsgs = 0;</span></span>
-<span id="L27"><span class="lineNum">      27</span>                 :              :<span class="tlaGNC">          13 :     attr.mq_maxmsg = MQ_MAX_MESSAGES;</span></span>
-<span id="L28"><span class="lineNum">      28</span>                 :              :<span class="tlaGNC">          13 :     attr.mq_msgsize = MQ_MAX_MSG_SIZE;</span></span>
-<span id="L29"><span class="lineNum">      29</span>                 :              :<span class="tlaGNC">          13 :     return attr;</span></span>
-<span id="L30"><span class="lineNum">      30</span>                 :              :             : }</span>
-<span id="L31"><span class="lineNum">      31</span>                 :              :             : </span>
-<span id="L32"><span class="lineNum">      32</span>                 :              :             : /**</span>
-<span id="L33"><span class="lineNum">      33</span>                 :              :             :  * @brief Creates a POSIX message queue.</span>
-<span id="L34"><span class="lineNum">      34</span>                 :              :             :  *</span>
-<span id="L35"><span class="lineNum">      35</span>                 :              :             :  * @param mq_name Name of the message queue to be created.</span>
-<span id="L36"><span class="lineNum">      36</span>                 :              :             :  * @return Message queue identifier (mqd_t).</span>
-<span id="L37"><span class="lineNum">      37</span>                 :              :             :  */</span>
-<span id="L38"><span class="lineNum">      38</span>                 :              :<span class="tlaGNC">           8 : mqd_t create_mq(char *mq_name)</span></span>
-<span id="L39"><span class="lineNum">      39</span>                 :              :             : {</span>
-<span id="L40"><span class="lineNum">      40</span>                 :              :<span class="tlaGNC">           8 :     struct mq_attr attr = get_mq_attr();</span></span>
-<span id="L41"><span class="lineNum">      41</span>                 :              :<span class="tlaGNC">           8 :     mqd_t mqd = mq_open(mq_name, O_RDWR | O_CREAT | O_NONBLOCK, QUEUE_PERMISSIONS, &amp;attr);</span></span>
-<span id="L42"><span class="lineNum">      42</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:      [<span class="tlaGBC" title="True sense of expression &quot;0&quot; was sensitized"> T </span><span class="tlaGBC" title="False sense of expression &quot;0&quot; was sensitized"> F </span>]:<span class="tlaGNC">           8 :     if (mqd == (mqd_t)-1)</span></span>
-<span id="L43"><span class="lineNum">      43</span>                 :              :             :     {</span>
-<span id="L44"><span class="lineNum">      44</span>                 :              :<span class="tlaGNC">           1 :         perror(&quot;Error creating message queue&quot;);</span></span>
-<span id="L45"><span class="lineNum">      45</span>                 :              :<span class="tlaGNC">           1 :         return (mqd_t)-1;</span></span>
-<span id="L46"><span class="lineNum">      46</span>                 :              :             :     }</span>
-<span id="L47"><span class="lineNum">      47</span>                 :              :             : </span>
-<span id="L48"><span class="lineNum">      48</span>                 :              :<span class="tlaGNC">           7 :     printf(&quot;Queue %s created\n&quot;, mq_name);</span></span>
+<span id="L21"><span class="lineNum">      21</span>                 :              :             :  * \anchor get_mq_attr</span>
+<span id="L22"><span class="lineNum">      22</span>                 :              :             :  */</span>
+<span id="L23"><span class="lineNum">      23</span>                 :              :<span class="tlaGNC">          13 : struct mq_attr get_mq_attr()</span></span>
+<span id="L24"><span class="lineNum">      24</span>                 :              :             : {</span>
+<span id="L25"><span class="lineNum">      25</span>                 :              :             :     struct mq_attr attr;</span>
+<span id="L26"><span class="lineNum">      26</span>                 :              :<span class="tlaGNC">          13 :     attr.mq_flags = O_NONBLOCK;</span></span>
+<span id="L27"><span class="lineNum">      27</span>                 :              :<span class="tlaGNC">          13 :     attr.mq_curmsgs = 0;</span></span>
+<span id="L28"><span class="lineNum">      28</span>                 :              :<span class="tlaGNC">          13 :     attr.mq_maxmsg = MQ_MAX_MESSAGES;</span></span>
+<span id="L29"><span class="lineNum">      29</span>                 :              :<span class="tlaGNC">          13 :     attr.mq_msgsize = MQ_MAX_MSG_SIZE;</span></span>
+<span id="L30"><span class="lineNum">      30</span>                 :              :<span class="tlaGNC">          13 :     return attr;</span></span>
+<span id="L31"><span class="lineNum">      31</span>                 :              :             : }</span>
+<span id="L32"><span class="lineNum">      32</span>                 :              :             : </span>
+<span id="L33"><span class="lineNum">      33</span>                 :              :             : /**</span>
+<span id="L34"><span class="lineNum">      34</span>                 :              :             :  * @brief Creates a POSIX message queue.</span>
+<span id="L35"><span class="lineNum">      35</span>                 :              :             :  *</span>
+<span id="L36"><span class="lineNum">      36</span>                 :              :             :  * @param mq_name Name of the message queue to be created.</span>
+<span id="L37"><span class="lineNum">      37</span>                 :              :             :  * @return Message queue identifier (mqd_t).</span>
+<span id="L38"><span class="lineNum">      38</span>                 :              :             :  * \anchor create_mq</span>
+<span id="L39"><span class="lineNum">      39</span>                 :              :             :  */</span>
+<span id="L40"><span class="lineNum">      40</span>                 :              :<span class="tlaGNC">           8 : mqd_t create_mq(char *mq_name)</span></span>
+<span id="L41"><span class="lineNum">      41</span>                 :              :             : {</span>
+<span id="L42"><span class="lineNum">      42</span>                 :              :<span class="tlaGNC">           8 :     struct mq_attr attr = get_mq_attr();</span></span>
+<span id="L43"><span class="lineNum">      43</span>                 :              :<span class="tlaGNC">           8 :     mqd_t mqd = mq_open(mq_name, O_RDWR | O_CREAT | O_NONBLOCK, QUEUE_PERMISSIONS, &amp;attr);</span></span>
+<span id="L44"><span class="lineNum">      44</span>         [<span class="tlaGBC" title="Branch 0 was taken 1 time"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:      [<span class="tlaGBC" title="True sense of expression &quot;0&quot; was sensitized"> T </span><span class="tlaGBC" title="False sense of expression &quot;0&quot; was sensitized"> F </span>]:<span class="tlaGNC">           8 :     if (mqd == (mqd_t)-1)</span></span>
+<span id="L45"><span class="lineNum">      45</span>                 :              :             :     {</span>
+<span id="L46"><span class="lineNum">      46</span>                 :              :<span class="tlaGNC">           1 :         perror(&quot;Error creating message queue&quot;);</span></span>
+<span id="L47"><span class="lineNum">      47</span>                 :              :<span class="tlaGNC">           1 :         return (mqd_t)-1;</span></span>
+<span id="L48"><span class="lineNum">      48</span>                 :              :             :     }</span>
 <span id="L49"><span class="lineNum">      49</span>                 :              :             : </span>
-<span id="L50"><span class="lineNum">      50</span>                 :              :<span class="tlaGNC">           7 :     return mqd;</span></span>
-<span id="L51"><span class="lineNum">      51</span>                 :              :             : }</span>
-<span id="L52"><span class="lineNum">      52</span>                 :              :             : </span>
-<span id="L53"><span class="lineNum">      53</span>                 :              :             :  /**</span>
-<span id="L54"><span class="lineNum">      54</span>                 :              :             :  * @brief Opens a POSIX message queue.</span>
-<span id="L55"><span class="lineNum">      55</span>                 :              :             :  *</span>
-<span id="L56"><span class="lineNum">      56</span>                 :              :             :  * @param mq_name Name of the message queue to be opened.</span>
-<span id="L57"><span class="lineNum">      57</span>                 :              :             :  * @return Message queue identifier (mqd_t).</span>
-<span id="L58"><span class="lineNum">      58</span>                 :              :             :  */</span>
-<span id="L59"><span class="lineNum">      59</span>                 :              :<span class="tlaGNC">           4 : mqd_t open_mq(char *mq_name)</span></span>
-<span id="L60"><span class="lineNum">      60</span>                 :              :             : {</span>
-<span id="L61"><span class="lineNum">      61</span>                 :              :<span class="tlaGNC">           4 :     struct mq_attr attr = get_mq_attr();</span></span>
-<span id="L62"><span class="lineNum">      62</span>                 :              :<span class="tlaGNC">           4 :     mqd_t mqd = mq_open(mq_name, O_RDWR | O_NONBLOCK, QUEUE_PERMISSIONS, &amp;attr);</span></span>
-<span id="L63"><span class="lineNum">      63</span>         [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:      [<span class="tlaGBC" title="True sense of expression &quot;0&quot; was sensitized"> T </span><span class="tlaUNC" title="False sense of expression &quot;0&quot; was not sensitized"> f </span>]:<span class="tlaGNC">           4 :     if (mqd == (mqd_t)-1)</span></span>
-<span id="L64"><span class="lineNum">      64</span>                 :              :             :     {</span>
-<span id="L65"><span class="lineNum">      65</span>                 :              :<span class="tlaGNC">           4 :         perror(&quot;Error opening message queue&quot;);</span></span>
-<span id="L66"><span class="lineNum">      66</span>                 :              :<span class="tlaGNC">           4 :         return (mqd_t)-1;</span></span>
-<span id="L67"><span class="lineNum">      67</span>                 :              :             :     }</span>
-<span id="L68"><span class="lineNum">      68</span>                 :              :<span class="tlaUNC">           0 :     return mqd;</span></span>
-<span id="L69"><span class="lineNum">      69</span>                 :              :             : }</span>
-<span id="L70"><span class="lineNum">      70</span>                 :              :             : </span>
-<span id="L71"><span class="lineNum">      71</span>                 :              :             : /**</span>
-<span id="L72"><span class="lineNum">      72</span>                 :              :             :  * @brief Closes and unlinks the specified POSIX message queue.</span>
-<span id="L73"><span class="lineNum">      73</span>                 :              :             :  *</span>
-<span id="L74"><span class="lineNum">      74</span>                 :              :             :  * @param mqd Message queue identifier.</span>
-<span id="L75"><span class="lineNum">      75</span>                 :              :             :  * @param mq_name Name of the message queue to be closed.</span>
-<span id="L76"><span class="lineNum">      76</span>                 :              :             :  */</span>
-<span id="L77"><span class="lineNum">      77</span>                 :              :<span class="tlaGNC">          17 : void close_mq(mqd_t mqd, char *mq_name)</span></span>
-<span id="L78"><span class="lineNum">      78</span>                 :              :             : {</span>
-<span id="L79"><span class="lineNum">      79</span>                 :              :<span class="tlaGNC">          17 :     printf(&quot;Closing %s message queue\n&quot;, mq_name);</span></span>
-<span id="L80"><span class="lineNum">      80</span>         [<span class="tlaGBC" title="Branch 0 was taken 10 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:      [<span class="tlaGBC" title="True sense of expression &quot;0&quot; was sensitized"> T </span><span class="tlaGBC" title="False sense of expression &quot;0&quot; was sensitized"> F </span>]:<span class="tlaGNC">          17 :     if (mq_close(mqd) == -1)</span></span>
-<span id="L81"><span class="lineNum">      81</span>                 :              :             :     {</span>
-<span id="L82"><span class="lineNum">      82</span>                 :              :<span class="tlaGNC">          10 :         perror(&quot;Error closing message queue&quot;);</span></span>
-<span id="L83"><span class="lineNum">      83</span>                 :              :<span class="tlaGNC">          10 :         return;</span></span>
-<span id="L84"><span class="lineNum">      84</span>                 :              :             :     }</span>
-<span id="L85"><span class="lineNum">      85</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:      [<span class="tlaGBC" title="True sense of expression &quot;0&quot; was sensitized"> T </span><span class="tlaGBC" title="False sense of expression &quot;0&quot; was sensitized"> F </span>]:<span class="tlaGNC">           7 :     if (mq_unlink(mq_name) == -1)</span></span>
+<span id="L50"><span class="lineNum">      50</span>                 :              :<span class="tlaGNC">           7 :     printf(&quot;Queue %s created\n&quot;, mq_name);</span></span>
+<span id="L51"><span class="lineNum">      51</span>                 :              :             : </span>
+<span id="L52"><span class="lineNum">      52</span>                 :              :<span class="tlaGNC">           7 :     return mqd;</span></span>
+<span id="L53"><span class="lineNum">      53</span>                 :              :             : }</span>
+<span id="L54"><span class="lineNum">      54</span>                 :              :             : </span>
+<span id="L55"><span class="lineNum">      55</span>                 :              :             :  /**</span>
+<span id="L56"><span class="lineNum">      56</span>                 :              :             :  * @brief Opens a POSIX message queue.</span>
+<span id="L57"><span class="lineNum">      57</span>                 :              :             :  *</span>
+<span id="L58"><span class="lineNum">      58</span>                 :              :             :  * @param mq_name Name of the message queue to be opened.</span>
+<span id="L59"><span class="lineNum">      59</span>                 :              :             :  * @return Message queue identifier (mqd_t).</span>
+<span id="L60"><span class="lineNum">      60</span>                 :              :             :  * \anchor open_mq</span>
+<span id="L61"><span class="lineNum">      61</span>                 :              :             :  */</span>
+<span id="L62"><span class="lineNum">      62</span>                 :              :<span class="tlaGNC">           4 : mqd_t open_mq(char *mq_name)</span></span>
+<span id="L63"><span class="lineNum">      63</span>                 :              :             : {</span>
+<span id="L64"><span class="lineNum">      64</span>                 :              :<span class="tlaGNC">           4 :     struct mq_attr attr = get_mq_attr();</span></span>
+<span id="L65"><span class="lineNum">      65</span>                 :              :<span class="tlaGNC">           4 :     mqd_t mqd = mq_open(mq_name, O_RDWR | O_NONBLOCK, QUEUE_PERMISSIONS, &amp;attr);</span></span>
+<span id="L66"><span class="lineNum">      66</span>         [<span class="tlaGBC" title="Branch 0 was taken 4 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:      [<span class="tlaGBC" title="True sense of expression &quot;0&quot; was sensitized"> T </span><span class="tlaUNC" title="False sense of expression &quot;0&quot; was not sensitized"> f </span>]:<span class="tlaGNC">           4 :     if (mqd == (mqd_t)-1)</span></span>
+<span id="L67"><span class="lineNum">      67</span>                 :              :             :     {</span>
+<span id="L68"><span class="lineNum">      68</span>                 :              :<span class="tlaGNC">           4 :         perror(&quot;Error opening message queue&quot;);</span></span>
+<span id="L69"><span class="lineNum">      69</span>                 :              :<span class="tlaGNC">           4 :         return (mqd_t)-1;</span></span>
+<span id="L70"><span class="lineNum">      70</span>                 :              :             :     }</span>
+<span id="L71"><span class="lineNum">      71</span>                 :              :<span class="tlaUNC">           0 :     return mqd;</span></span>
+<span id="L72"><span class="lineNum">      72</span>                 :              :             : }</span>
+<span id="L73"><span class="lineNum">      73</span>                 :              :             : </span>
+<span id="L74"><span class="lineNum">      74</span>                 :              :             : /**</span>
+<span id="L75"><span class="lineNum">      75</span>                 :              :             :  * @brief Closes and unlinks the specified POSIX message queue.</span>
+<span id="L76"><span class="lineNum">      76</span>                 :              :             :  *</span>
+<span id="L77"><span class="lineNum">      77</span>                 :              :             :  * @param mqd Message queue identifier.</span>
+<span id="L78"><span class="lineNum">      78</span>                 :              :             :  * @param mq_name Name of the message queue to be closed.</span>
+<span id="L79"><span class="lineNum">      79</span>                 :              :             :  * @return void</span>
+<span id="L80"><span class="lineNum">      80</span>                 :              :             :  * \anchor close_mq</span>
+<span id="L81"><span class="lineNum">      81</span>                 :              :             :  */</span>
+<span id="L82"><span class="lineNum">      82</span>                 :              :<span class="tlaGNC">          17 : void close_mq(mqd_t mqd, char *mq_name)</span></span>
+<span id="L83"><span class="lineNum">      83</span>                 :              :             : {</span>
+<span id="L84"><span class="lineNum">      84</span>                 :              :<span class="tlaGNC">          17 :     printf(&quot;Closing %s message queue\n&quot;, mq_name);</span></span>
+<span id="L85"><span class="lineNum">      85</span>         [<span class="tlaGBC" title="Branch 0 was taken 10 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 7 times"> + </span>]:      [<span class="tlaGBC" title="True sense of expression &quot;0&quot; was sensitized"> T </span><span class="tlaGBC" title="False sense of expression &quot;0&quot; was sensitized"> F </span>]:<span class="tlaGNC">          17 :     if (mq_close(mqd) == -1)</span></span>
 <span id="L86"><span class="lineNum">      86</span>                 :              :             :     {</span>
-<span id="L87"><span class="lineNum">      87</span>                 :              :<span class="tlaGNC">           2 :         perror(&quot;Error unlinking message queue&quot;);</span></span>
-<span id="L88"><span class="lineNum">      88</span>                 :              :<span class="tlaGNC">           2 :         return;</span></span>
+<span id="L87"><span class="lineNum">      87</span>                 :              :<span class="tlaGNC">          10 :         perror(&quot;Error closing message queue&quot;);</span></span>
+<span id="L88"><span class="lineNum">      88</span>                 :              :<span class="tlaGNC">          10 :         return;</span></span>
 <span id="L89"><span class="lineNum">      89</span>                 :              :             :     }</span>
-<span id="L90"><span class="lineNum">      90</span>                 :              :             : }</span>
-<span id="L91"><span class="lineNum">      91</span>                 :              :             : </span>
-<span id="L92"><span class="lineNum">      92</span>                 :              :             : /**</span>
-<span id="L93"><span class="lineNum">      93</span>                 :              :             :  * @brief Reads a message from a POSIX message queue.</span>
-<span id="L94"><span class="lineNum">      94</span>                 :              :             :  *</span>
-<span id="L95"><span class="lineNum">      95</span>                 :              :             :  * @param mq_receiver Identifier of the message queue from which the message will be read.</span>
-<span id="L96"><span class="lineNum">      96</span>                 :              :             :  * @param msg_read Pointer to the structure where the read message will be stored, in can_msg struct type.</span>
-<span id="L97"><span class="lineNum">      97</span>                 :              :             :  * @return 0 on success, -1 on failure.</span>
-<span id="L98"><span class="lineNum">      98</span>                 :              :             :  */</span>
-<span id="L99"><span class="lineNum">      99</span>                 :              :<span class="tlaGNC">           3 : int read_mq(mqd_t mq_receiver, can_msg *msg_read)</span></span>
-<span id="L100"><span class="lineNum">     100</span>                 :              :             : {</span>
-<span id="L101"><span class="lineNum">     101</span>                 :              :             :     char buffer[MQ_MAX_MSG_SIZE];</span>
-<span id="L102"><span class="lineNum">     102</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:      [<span class="tlaGBC" title="True sense of expression &quot;0&quot; was sensitized"> T </span><span class="tlaUNC" title="False sense of expression &quot;0&quot; was not sensitized"> f </span>]:<span class="tlaGNC">           3 :     if (mq_receive(mq_receiver, buffer, MQ_MAX_MSG_SIZE, NULL) == (mqd_t)-1)</span></span>
-<span id="L103"><span class="lineNum">     103</span>                 :              :             :     {</span>
-<span id="L104"><span class="lineNum">     104</span>                 :              :             :         // perror(&quot;Error receiving message&quot;);</span>
-<span id="L105"><span class="lineNum">     105</span>                 :              :<span class="tlaGNC">           3 :         return -1;</span></span>
-<span id="L106"><span class="lineNum">     106</span>                 :              :             :     }</span>
-<span id="L107"><span class="lineNum">     107</span>                 :              :<span class="tlaUNC">           0 :     memcpy(msg_read, buffer, MQ_MAX_MSG_SIZE);</span></span>
-<span id="L108"><span class="lineNum">     108</span>                 :              :<span class="tlaUNC">           0 :     return 0;</span></span>
-<span id="L109"><span class="lineNum">     109</span>                 :              :             : }</span>
-<span id="L110"><span class="lineNum">     110</span>                 :              :             : </span>
-<span id="L111"><span class="lineNum">     111</span>                 :              :             : /**</span>
-<span id="L112"><span class="lineNum">     112</span>                 :              :             :  * @brief Writes a message from a POSIX message queue.</span>
-<span id="L113"><span class="lineNum">     113</span>                 :              :             :  *</span>
-<span id="L114"><span class="lineNum">     114</span>                 :              :             :  * @param mq_receiver Identifier of the message queue from which the message will be read.</span>
-<span id="L115"><span class="lineNum">     115</span>                 :              :             :  * @param msg_read Pointer to the can_msg struct type used to write a message in the MQ POSIX format.</span>
-<span id="L116"><span class="lineNum">     116</span>                 :              :             :  * @return 0 on success, -1 on failure.</span>
-<span id="L117"><span class="lineNum">     117</span>                 :              :             :  */</span>
-<span id="L118"><span class="lineNum">     118</span>                 :              :<span class="tlaGNC">          13 : int write_mq(mqd_t mq_sender, can_msg *msg)</span></span>
-<span id="L119"><span class="lineNum">     119</span>                 :              :             : {</span>
-<span id="L120"><span class="lineNum">     120</span>                 :              :             :     char buffer[MQ_MAX_MSG_SIZE];</span>
-<span id="L121"><span class="lineNum">     121</span>                 :              :<span class="tlaGNC">          13 :     memcpy(buffer, msg, MQ_MAX_MSG_SIZE);</span></span>
-<span id="L122"><span class="lineNum">     122</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>]:      [<span class="tlaGBC" title="True sense of expression &quot;0&quot; was sensitized"> T </span><span class="tlaGBC" title="False sense of expression &quot;0&quot; was sensitized"> F </span>]:<span class="tlaGNC">          13 :     if (mq_send(mq_sender, buffer, MQ_MAX_MSG_SIZE, 0) == -1)</span></span>
-<span id="L123"><span class="lineNum">     123</span>                 :              :             :     {</span>
-<span id="L124"><span class="lineNum">     124</span>                 :              :<span class="tlaGNC">           3 :         perror(&quot;Error sending message. Message queue is full&quot;);</span></span>
-<span id="L125"><span class="lineNum">     125</span>                 :              :<span class="tlaGNC">           3 :         return -1;</span></span>
-<span id="L126"><span class="lineNum">     126</span>                 :              :             :     }</span>
-<span id="L127"><span class="lineNum">     127</span>                 :              :<span class="tlaGNC">          10 :     return 0;</span></span>
-<span id="L128"><span class="lineNum">     128</span>                 :              :             : }</span>
+<span id="L90"><span class="lineNum">      90</span>         [<span class="tlaGBC" title="Branch 0 was taken 2 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 5 times"> + </span>]:      [<span class="tlaGBC" title="True sense of expression &quot;0&quot; was sensitized"> T </span><span class="tlaGBC" title="False sense of expression &quot;0&quot; was sensitized"> F </span>]:<span class="tlaGNC">           7 :     if (mq_unlink(mq_name) == -1)</span></span>
+<span id="L91"><span class="lineNum">      91</span>                 :              :             :     {</span>
+<span id="L92"><span class="lineNum">      92</span>                 :              :<span class="tlaGNC">           2 :         perror(&quot;Error unlinking message queue&quot;);</span></span>
+<span id="L93"><span class="lineNum">      93</span>                 :              :<span class="tlaGNC">           2 :         return;</span></span>
+<span id="L94"><span class="lineNum">      94</span>                 :              :             :     }</span>
+<span id="L95"><span class="lineNum">      95</span>                 :              :             : }</span>
+<span id="L96"><span class="lineNum">      96</span>                 :              :             : </span>
+<span id="L97"><span class="lineNum">      97</span>                 :              :             : /**</span>
+<span id="L98"><span class="lineNum">      98</span>                 :              :             :  * @brief Reads a message from a POSIX message queue.</span>
+<span id="L99"><span class="lineNum">      99</span>                 :              :             :  *</span>
+<span id="L100"><span class="lineNum">     100</span>                 :              :             :  * @param mq_receiver Identifier of the message queue from which the message will be read.</span>
+<span id="L101"><span class="lineNum">     101</span>                 :              :             :  * @param msg_read Pointer to the structure where the read message will be stored, in can_msg struct type.</span>
+<span id="L102"><span class="lineNum">     102</span>                 :              :             :  * @return 0 on success, -1 on failure.</span>
+<span id="L103"><span class="lineNum">     103</span>                 :              :             :  * \anchor read_mq</span>
+<span id="L104"><span class="lineNum">     104</span>                 :              :             :  */</span>
+<span id="L105"><span class="lineNum">     105</span>                 :              :<span class="tlaGNC">           3 : int read_mq(mqd_t mq_receiver, can_msg *msg_read)</span></span>
+<span id="L106"><span class="lineNum">     106</span>                 :              :             : {</span>
+<span id="L107"><span class="lineNum">     107</span>                 :              :             :     char buffer[MQ_MAX_MSG_SIZE];</span>
+<span id="L108"><span class="lineNum">     108</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaUNC" title="Branch 1 was not taken"> - </span>]:      [<span class="tlaGBC" title="True sense of expression &quot;0&quot; was sensitized"> T </span><span class="tlaUNC" title="False sense of expression &quot;0&quot; was not sensitized"> f </span>]:<span class="tlaGNC">           3 :     if (mq_receive(mq_receiver, buffer, MQ_MAX_MSG_SIZE, NULL) == (mqd_t)-1)</span></span>
+<span id="L109"><span class="lineNum">     109</span>                 :              :             :     {</span>
+<span id="L110"><span class="lineNum">     110</span>                 :              :             :         // perror(&quot;Error receiving message&quot;);</span>
+<span id="L111"><span class="lineNum">     111</span>                 :              :<span class="tlaGNC">           3 :         return -1;</span></span>
+<span id="L112"><span class="lineNum">     112</span>                 :              :             :     }</span>
+<span id="L113"><span class="lineNum">     113</span>                 :              :<span class="tlaUNC">           0 :     memcpy(msg_read, buffer, MQ_MAX_MSG_SIZE);</span></span>
+<span id="L114"><span class="lineNum">     114</span>                 :              :<span class="tlaUNC">           0 :     return 0;</span></span>
+<span id="L115"><span class="lineNum">     115</span>                 :              :             : }</span>
+<span id="L116"><span class="lineNum">     116</span>                 :              :             : </span>
+<span id="L117"><span class="lineNum">     117</span>                 :              :             : /**</span>
+<span id="L118"><span class="lineNum">     118</span>                 :              :             :  * @brief Writes a message from a POSIX message queue.</span>
+<span id="L119"><span class="lineNum">     119</span>                 :              :             :  *</span>
+<span id="L120"><span class="lineNum">     120</span>                 :              :             :  * @param mq_receiver Identifier of the message queue from which the message will be read.</span>
+<span id="L121"><span class="lineNum">     121</span>                 :              :             :  * @param msg_read Pointer to the can_msg struct type used to write a message in the MQ POSIX format.</span>
+<span id="L122"><span class="lineNum">     122</span>                 :              :             :  * @return 0 on success, -1 on failure.</span>
+<span id="L123"><span class="lineNum">     123</span>                 :              :             :  * \anchor write_mq</span>
+<span id="L124"><span class="lineNum">     124</span>                 :              :             :  */</span>
+<span id="L125"><span class="lineNum">     125</span>                 :              :<span class="tlaGNC">          13 : int write_mq(mqd_t mq_sender, can_msg *msg)</span></span>
+<span id="L126"><span class="lineNum">     126</span>                 :              :             : {</span>
+<span id="L127"><span class="lineNum">     127</span>                 :              :             :     char buffer[MQ_MAX_MSG_SIZE];</span>
+<span id="L128"><span class="lineNum">     128</span>                 :              :<span class="tlaGNC">          13 :     memcpy(buffer, msg, MQ_MAX_MSG_SIZE);</span></span>
+<span id="L129"><span class="lineNum">     129</span>         [<span class="tlaGBC" title="Branch 0 was taken 3 times"> + </span><span class="tlaGBC" title="Branch 1 was taken 10 times"> + </span>]:      [<span class="tlaGBC" title="True sense of expression &quot;0&quot; was sensitized"> T </span><span class="tlaGBC" title="False sense of expression &quot;0&quot; was sensitized"> F </span>]:<span class="tlaGNC">          13 :     if (mq_send(mq_sender, buffer, MQ_MAX_MSG_SIZE, 0) == -1)</span></span>
+<span id="L130"><span class="lineNum">     130</span>                 :              :             :     {</span>
+<span id="L131"><span class="lineNum">     131</span>                 :              :<span class="tlaGNC">           3 :         perror(&quot;Error sending message. Message queue is full&quot;);</span></span>
+<span id="L132"><span class="lineNum">     132</span>                 :              :<span class="tlaGNC">           3 :         return -1;</span></span>
+<span id="L133"><span class="lineNum">     133</span>                 :              :             :     }</span>
+<span id="L134"><span class="lineNum">     134</span>                 :              :<span class="tlaGNC">          10 :     return 0;</span></span>
+<span id="L135"><span class="lineNum">     135</span>                 :              :             : }</span>
         </pre>
               </td>
             </tr>

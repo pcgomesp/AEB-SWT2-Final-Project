@@ -145,22 +145,22 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>FILE* Pointer to the opened file. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>If the file cannot be opened, the program exits with an error. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>If the file cannot be opened, the program exits with an error. <a class="anchor" id="open_file"></a></dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="file__reader_8c_source.html#l00021">21</a> of file <a class="el" href="file__reader_8c_source.html">file_reader.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   21</span>                                      {</div>
-<div class="line"><span class="lineno">   22</span>    FILE *file = fopen(filename, <span class="stringliteral">&quot;r&quot;</span>);</div>
-<div class="line"><span class="lineno">   23</span>    <span class="keywordflow">if</span> (file == NULL) {</div>
-<div class="line"><span class="lineno">   24</span>        perror(<span class="stringliteral">&quot;Erro ao abrir o arquivo&quot;</span>);</div>
-<div class="line"><span class="lineno">   25</span>        exit(EXIT_FAILURE);</div>
-<div class="line"><span class="lineno">   26</span>    }</div>
-<div class="line"><span class="lineno">   27</span> </div>
-<div class="line"><span class="lineno">   28</span>    <span class="comment">// Skip header</span></div>
-<div class="line"><span class="lineno">   29</span>    <span class="keywordtype">char</span> header[100];</div>
-<div class="line"><span class="lineno">   30</span>    fgets(header, <span class="keyword">sizeof</span>(header), file);</div>
-<div class="line"><span class="lineno">   31</span> </div>
-<div class="line"><span class="lineno">   32</span>    <span class="keywordflow">return</span> file;</div>
-<div class="line"><span class="lineno">   33</span>}</div>
+<p class="definition">Definition at line <a class="el" href="file__reader_8c_source.html#l00022">22</a> of file <a class="el" href="file__reader_8c_source.html">file_reader.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   22</span>                                      {</div>
+<div class="line"><span class="lineno">   23</span>    FILE *file = fopen(filename, <span class="stringliteral">&quot;r&quot;</span>);</div>
+<div class="line"><span class="lineno">   24</span>    <span class="keywordflow">if</span> (file == NULL) {</div>
+<div class="line"><span class="lineno">   25</span>        perror(<span class="stringliteral">&quot;Erro ao abrir o arquivo&quot;</span>);</div>
+<div class="line"><span class="lineno">   26</span>        exit(EXIT_FAILURE);</div>
+<div class="line"><span class="lineno">   27</span>    }</div>
+<div class="line"><span class="lineno">   28</span> </div>
+<div class="line"><span class="lineno">   29</span>    <span class="comment">// Skip header</span></div>
+<div class="line"><span class="lineno">   30</span>    <span class="keywordtype">char</span> header[100];</div>
+<div class="line"><span class="lineno">   31</span>    fgets(header, <span class="keyword">sizeof</span>(header), file);</div>
+<div class="line"><span class="lineno">   32</span> </div>
+<div class="line"><span class="lineno">   33</span>    <span class="keywordflow">return</span> file;</div>
+<div class="line"><span class="lineno">   34</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -199,29 +199,29 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>int Returns 1 if the reading is successful, 0 otherwise.</dd></dl>
-<dl class="section note"><dt>Note</dt><dd>The expected file format will follow this label formact: Distance(m) Obstacle Speed(m/s) Brake Accelerator AEB_on_off Reverse </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>The expected file format will follow this label formact: Distance(m) Obstacle Speed(m/s) Brake Accelerator AEB_on_off Reverse <a class="anchor" id="read_sensor_data"></a></dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="file__reader_8c_source.html#l00046">46</a> of file <a class="el" href="file__reader_8c_source.html">file_reader.c</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">   46</span>                                                                  {</div>
-<div class="line"><span class="lineno">   47</span>    <span class="keywordflow">return</span> fscanf(file, <span class="stringliteral">&quot;%lf %d %lf %d %d %d %d %lf&quot;</span>, </div>
-<div class="line"><span class="lineno">   48</span>                  &amp;sensor_data-&gt;<a class="code hl_variable" href="structsensors__input__data.html#a01371737abb4472988490f1d011be0c9">obstacle_distance</a>, </div>
-<div class="line"><span class="lineno">   49</span>                  &amp;sensor_data-&gt;<a class="code hl_variable" href="structsensors__input__data.html#a3782de9b1037f3ce0036f685de31f165">has_obstacle</a>, </div>
-<div class="line"><span class="lineno">   50</span>                  &amp;sensor_data-&gt;<a class="code hl_variable" href="structsensors__input__data.html#a446e6e46ec0541ab0b404d93a75ab6ac">relative_velocity</a>, </div>
-<div class="line"><span class="lineno">   51</span>                  &amp;sensor_data-&gt;<a class="code hl_variable" href="structsensors__input__data.html#a8cc0d9e6c44c3b22ba0ad4e2e3f7d055">brake_pedal</a>, </div>
-<div class="line"><span class="lineno">   52</span>                  &amp;sensor_data-&gt;<a class="code hl_variable" href="structsensors__input__data.html#a605d64229c3a536712761f44feb45251">accelerator_pedal</a>, </div>
-<div class="line"><span class="lineno">   53</span>                  &amp;sensor_data-&gt;<a class="code hl_variable" href="structsensors__input__data.html#a7d3eb4bf1acbb1c912830e8808f72168">on_off_aeb_system</a>,</div>
-<div class="line"><span class="lineno">   54</span>                  &amp;sensor_data-&gt;<a class="code hl_variable" href="structsensors__input__data.html#a0f676ac6033e205e2603c48fecf461ef">reverseEnabled</a>,</div>
-<div class="line"><span class="lineno">   55</span>                  &amp;sensor_data-&gt;<a class="code hl_variable" href="structsensors__input__data.html#a6d9d7c897f6485d71742ef8166991c22">relative_acceleration</a></div>
-<div class="line"><span class="lineno">   56</span>                ) == 8;</div>
-<div class="line"><span class="lineno">   57</span>}</div>
+<p class="definition">Definition at line <a class="el" href="file__reader_8c_source.html#l00048">48</a> of file <a class="el" href="file__reader_8c_source.html">file_reader.c</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">   48</span>                                                                  {</div>
+<div class="line"><span class="lineno">   49</span>    <span class="keywordflow">return</span> fscanf(file, <span class="stringliteral">&quot;%lf %d %lf %d %d %d %d %lf&quot;</span>, </div>
+<div class="line"><span class="lineno">   50</span>                  &amp;sensor_data-&gt;<a class="code hl_variable" href="structsensors__input__data.html#a01371737abb4472988490f1d011be0c9">obstacle_distance</a>, </div>
+<div class="line"><span class="lineno">   51</span>                  &amp;sensor_data-&gt;<a class="code hl_variable" href="structsensors__input__data.html#a3782de9b1037f3ce0036f685de31f165">has_obstacle</a>, </div>
+<div class="line"><span class="lineno">   52</span>                  &amp;sensor_data-&gt;<a class="code hl_variable" href="structsensors__input__data.html#a446e6e46ec0541ab0b404d93a75ab6ac">relative_velocity</a>, </div>
+<div class="line"><span class="lineno">   53</span>                  &amp;sensor_data-&gt;<a class="code hl_variable" href="structsensors__input__data.html#a8cc0d9e6c44c3b22ba0ad4e2e3f7d055">brake_pedal</a>, </div>
+<div class="line"><span class="lineno">   54</span>                  &amp;sensor_data-&gt;<a class="code hl_variable" href="structsensors__input__data.html#a605d64229c3a536712761f44feb45251">accelerator_pedal</a>, </div>
+<div class="line"><span class="lineno">   55</span>                  &amp;sensor_data-&gt;<a class="code hl_variable" href="structsensors__input__data.html#ae89dc450cae9cb5131b7c1eee277b71e">aeb_system_enabled</a>,</div>
+<div class="line"><span class="lineno">   56</span>                  &amp;sensor_data-&gt;<a class="code hl_variable" href="structsensors__input__data.html#a9ec0cda0acd16fae666aca69cb7938ac">reverse_enabled</a>,</div>
+<div class="line"><span class="lineno">   57</span>                  &amp;sensor_data-&gt;<a class="code hl_variable" href="structsensors__input__data.html#a6d9d7c897f6485d71742ef8166991c22">relative_acceleration</a></div>
+<div class="line"><span class="lineno">   58</span>                ) == 8;</div>
+<div class="line"><span class="lineno">   59</span>}</div>
 <div class="ttc" id="astructsensors__input__data_html_a01371737abb4472988490f1d011be0c9"><div class="ttname"><a href="structsensors__input__data.html#a01371737abb4472988490f1d011be0c9">sensors_input_data::obstacle_distance</a></div><div class="ttdeci">double obstacle_distance</div><div class="ttdef"><b>Definition</b> <a href="sensors__input_8h_source.html#l00024">sensors_input.h:24</a></div></div>
-<div class="ttc" id="astructsensors__input__data_html_a0f676ac6033e205e2603c48fecf461ef"><div class="ttname"><a href="structsensors__input__data.html#a0f676ac6033e205e2603c48fecf461ef">sensors_input_data::reverseEnabled</a></div><div class="ttdeci">int reverseEnabled</div><div class="ttdef"><b>Definition</b> <a href="sensors__input_8h_source.html#l00028">sensors_input.h:28</a></div></div>
 <div class="ttc" id="astructsensors__input__data_html_a3782de9b1037f3ce0036f685de31f165"><div class="ttname"><a href="structsensors__input__data.html#a3782de9b1037f3ce0036f685de31f165">sensors_input_data::has_obstacle</a></div><div class="ttdeci">int has_obstacle</div><div class="ttdef"><b>Definition</b> <a href="sensors__input_8h_source.html#l00023">sensors_input.h:23</a></div></div>
 <div class="ttc" id="astructsensors__input__data_html_a446e6e46ec0541ab0b404d93a75ab6ac"><div class="ttname"><a href="structsensors__input__data.html#a446e6e46ec0541ab0b404d93a75ab6ac">sensors_input_data::relative_velocity</a></div><div class="ttdeci">double relative_velocity</div><div class="ttdef"><b>Definition</b> <a href="sensors__input_8h_source.html#l00022">sensors_input.h:22</a></div></div>
 <div class="ttc" id="astructsensors__input__data_html_a605d64229c3a536712761f44feb45251"><div class="ttname"><a href="structsensors__input__data.html#a605d64229c3a536712761f44feb45251">sensors_input_data::accelerator_pedal</a></div><div class="ttdeci">int accelerator_pedal</div><div class="ttdef"><b>Definition</b> <a href="sensors__input_8h_source.html#l00026">sensors_input.h:26</a></div></div>
 <div class="ttc" id="astructsensors__input__data_html_a6d9d7c897f6485d71742ef8166991c22"><div class="ttname"><a href="structsensors__input__data.html#a6d9d7c897f6485d71742ef8166991c22">sensors_input_data::relative_acceleration</a></div><div class="ttdeci">double relative_acceleration</div><div class="ttdef"><b>Definition</b> <a href="sensors__input_8h_source.html#l00029">sensors_input.h:29</a></div></div>
-<div class="ttc" id="astructsensors__input__data_html_a7d3eb4bf1acbb1c912830e8808f72168"><div class="ttname"><a href="structsensors__input__data.html#a7d3eb4bf1acbb1c912830e8808f72168">sensors_input_data::on_off_aeb_system</a></div><div class="ttdeci">int on_off_aeb_system</div><div class="ttdef"><b>Definition</b> <a href="sensors__input_8h_source.html#l00027">sensors_input.h:27</a></div></div>
 <div class="ttc" id="astructsensors__input__data_html_a8cc0d9e6c44c3b22ba0ad4e2e3f7d055"><div class="ttname"><a href="structsensors__input__data.html#a8cc0d9e6c44c3b22ba0ad4e2e3f7d055">sensors_input_data::brake_pedal</a></div><div class="ttdeci">int brake_pedal</div><div class="ttdef"><b>Definition</b> <a href="sensors__input_8h_source.html#l00025">sensors_input.h:25</a></div></div>
+<div class="ttc" id="astructsensors__input__data_html_a9ec0cda0acd16fae666aca69cb7938ac"><div class="ttname"><a href="structsensors__input__data.html#a9ec0cda0acd16fae666aca69cb7938ac">sensors_input_data::reverse_enabled</a></div><div class="ttdeci">int reverse_enabled</div><div class="ttdef"><b>Definition</b> <a href="sensors__input_8h_source.html#l00028">sensors_input.h:28</a></div></div>
+<div class="ttc" id="astructsensors__input__data_html_ae89dc450cae9cb5131b7c1eee277b71e"><div class="ttname"><a href="structsensors__input__data.html#ae89dc450cae9cb5131b7c1eee277b71e">sensors_input_data::aeb_system_enabled</a></div><div class="ttdeci">int aeb_system_enabled</div><div class="ttdef"><b>Definition</b> <a href="sensors__input_8h_source.html#l00027">sensors_input.h:27</a></div></div>
 </div><!-- fragment -->
 </div>
 </div>

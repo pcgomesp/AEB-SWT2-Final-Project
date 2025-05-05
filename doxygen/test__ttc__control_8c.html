@@ -352,7 +352,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Verify if the test-version of the AEB controller is is reacting correctly, according to the calculated TTC, considering the case where the TTC is low enought that the alarm must enter the active state, while the ABS remains deactivated. </p>
-<dl class="test"><dt><b><a class="el" href="test.html#_test000041">Test:</a></b></dt><dd></dd></dl>
+<dl class="test"><dt><b><a class="el" href="test.html#_test000045">Test:</a></b></dt><dd></dd></dl>
 <p><a class="anchor" id="test_aeb_alarm_situation"></a>test ID <a class="el" href="traceability.html#TC_TTC_CTRL_008">TC_TTC_CTRL_008</a></p>
 <dl class="section note"><dt>Note</dt><dd></dd></dl>
 
@@ -413,7 +413,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Verify if the test-version of the AEB controller is is reacting correctly, according to the calculated TTC, considering the case where the TTC is low enought that the alarm and ABS abstraction must enter the active state. </p>
-<dl class="test"><dt><b><a class="el" href="test.html#_test000040">Test:</a></b></dt><dd></dd></dl>
+<dl class="test"><dt><b><a class="el" href="test.html#_test000044">Test:</a></b></dt><dd></dd></dl>
 <p><a class="anchor" id="test_aeb_generic_break_situations"></a>test ID <a class="el" href="traceability.html#TC_TTC_CTRL_007">TC_TTC_CTRL_007</a></p>
 <dl class="section note"><dt>Note</dt><dd></dd></dl>
 
@@ -457,7 +457,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Verify if the test-version of the AEB controller is is reacting correctly, according to the calculated TTC, considering the case where the TTC is low enought that every actuator must enter the active state. </p>
-<dl class="test"><dt><b><a class="el" href="test.html#_test000039">Test:</a></b></dt><dd></dd></dl>
+<dl class="test"><dt><b><a class="el" href="test.html#_test000043">Test:</a></b></dt><dd></dd></dl>
 <p><a class="anchor" id="test_aeb_worst_situation"></a>test ID <a class="el" href="traceability.html#TC_TTC_CTRL_006">TC_TTC_CTRL_006</a></p>
 <dl class="section note"><dt>Note</dt><dd></dd></dl>
 
@@ -498,7 +498,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Verify if the test-version of the AEB controller is is reacting correctly, according to the calculated TTC, considering the case where the TTC is high enought that no actuator enters the active state. </p>
-<dl class="test"><dt><b><a class="el" href="test.html#_test000038">Test:</a></b></dt><dd></dd></dl>
+<dl class="test"><dt><b><a class="el" href="test.html#_test000042">Test:</a></b></dt><dd></dd></dl>
 <p><a class="anchor" id="test_aebcontrol_no_actuators_trigger"></a>test ID <a class="el" href="traceability.html#TC_TTC_CTRL_005">TC_TTC_CTRL_005</a></p>
 <dl class="section note"><dt>Note</dt><dd></dd></dl>
 
@@ -546,7 +546,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Verify if the TTC calculation is in line with the expected papers and patents, considering the case where the acceleration is zero. </p>
-<dl class="test"><dt><b><a class="el" href="test.html#_test000034">Test:</a></b></dt><dd></dd></dl>
+<dl class="test"><dt><b><a class="el" href="test.html#_test000038">Test:</a></b></dt><dd></dd></dl>
 <p><a class="anchor" id="test_ttc_when_acel_zero"></a>test ID <a class="el" href="traceability.html#TC_TTC_CTRL_001">TC_TTC_CTRL_001</a></p>
 <dl class="section note"><dt>Note</dt><dd>The calculation must be withing 0.0001 of the correct value in order for the test to be sucessfull. </dd></dl>
 
@@ -565,7 +565,7 @@ Variables</h2></td></tr>
 <div class="line"><span class="lineno">   52</span> </div>
 <div class="line"><span class="lineno">   53</span>    <a class="code hl_define" href="unity_8h.html#a778eea8bde4adf059d65f7cc820aae17">TEST_ASSERT_FLOAT_WITHIN</a>(<a class="code hl_define" href="test__ttc__control_8c.html#a9c93339149b1cebe866fe7fb45d33404">delta</a>, 10.0, ttc[0]);</div>
 <div class="line"><span class="lineno">   54</span>    <a class="code hl_define" href="unity_8h.html#a778eea8bde4adf059d65f7cc820aae17">TEST_ASSERT_FLOAT_WITHIN</a>(<a class="code hl_define" href="test__ttc__control_8c.html#a9c93339149b1cebe866fe7fb45d33404">delta</a>, 5.8909, ttc[1]);</div>
-<div class="line"><span class="lineno">   55</span>    <a class="code hl_define" href="unity_8h.html#a778eea8bde4adf059d65f7cc820aae17">TEST_ASSERT_FLOAT_WITHIN</a>(<a class="code hl_define" href="test__ttc__control_8c.html#a9c93339149b1cebe866fe7fb45d33404">delta</a>, 2.46, ttc[2]);</div>
+<div class="line"><span class="lineno">   55</span>    <a class="code hl_define" href="unity_8h.html#a778eea8bde4adf059d65f7cc820aae17">TEST_ASSERT_FLOAT_WITHIN</a>(<a class="code hl_define" href="test__ttc__control_8c.html#a9c93339149b1cebe866fe7fb45d33404">delta</a>, 1.9478, ttc[2]);</div>
 <div class="line"><span class="lineno">   56</span>}</div>
 <div class="ttc" id="atest__ttc__control_8c_html_a9c93339149b1cebe866fe7fb45d33404"><div class="ttname"><a href="test__ttc__control_8c.html#a9c93339149b1cebe866fe7fb45d33404">delta</a></div><div class="ttdeci">#define delta</div><div class="ttdef"><b>Definition</b> <a href="test__ttc__control_8c_source.html#l00014">test_ttc_control.c:14</a></div></div>
 <div class="ttc" id="attc__control_8c_html_a1f46561688e874bc9354c6bceea9fed2"><div class="ttname"><a href="ttc__control_8c.html#a1f46561688e874bc9354c6bceea9fed2">ttc_calc</a></div><div class="ttdeci">double ttc_calc(double dis_rel, double spd_rel, double rel_acel)</div><div class="ttdoc">Calculate the time to collision (TTC) based on relative distance and speed.</div><div class="ttdef"><b>Definition</b> <a href="ttc__control_8c_source.html#l00039">ttc_control.c:39</a></div></div>
@@ -589,7 +589,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Verify if the TTC calculation is in line with the expected papers and patents, considering the case where the acceleration is not zero and the delta from the formula is negative. </p>
-<dl class="test"><dt><b><a class="el" href="test.html#_test000035">Test:</a></b></dt><dd></dd></dl>
+<dl class="test"><dt><b><a class="el" href="test.html#_test000039">Test:</a></b></dt><dd></dd></dl>
 <p><a class="anchor" id="test_ttc_when_delta_negative"></a>test ID <a class="el" href="traceability.html#TC_TTC_CTRL_002">TC_TTC_CTRL_002</a></p>
 <dl class="section note"><dt>Note</dt><dd>The calculation must be withing 0.0001 of the correct value in order for the test to be sucessfull. </dd></dl>
 
@@ -632,7 +632,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Verify if the TTC calculation is in line with the expected papers and patents, considering the case where the acceleration is not zero and the delta from the formula is positive. </p>
-<dl class="test"><dt><b><a class="el" href="test.html#_test000037">Test:</a></b></dt><dd></dd></dl>
+<dl class="test"><dt><b><a class="el" href="test.html#_test000041">Test:</a></b></dt><dd></dd></dl>
 <p><a class="anchor" id="test_ttc_when_delta_positive"></a>test ID <a class="el" href="traceability.html#TC_TTC_CTRL_004">TC_TTC_CTRL_004</a></p>
 <dl class="section note"><dt>Note</dt><dd>The calculation must be withing 0.0001 of the correct value in order for the test to be sucessfull. </dd></dl>
 
@@ -671,7 +671,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Verify if the TTC calculation is in line with the expected papers and patents, considering the case where the acceleration is not zero and the delta from the formula is zero. </p>
-<dl class="test"><dt><b><a class="el" href="test.html#_test000036">Test:</a></b></dt><dd></dd></dl>
+<dl class="test"><dt><b><a class="el" href="test.html#_test000040">Test:</a></b></dt><dd></dd></dl>
 <p><a class="anchor" id="test_ttc_when_delta_zero"></a>test ID <a class="el" href="traceability.html#TC_TTC_CTRL_003">TC_TTC_CTRL_003</a></p>
 <dl class="section note"><dt>Note</dt><dd>The calculation must be withing 0.0001 of the correct value in order for the test to be sucessfull. </dd></dl>
 

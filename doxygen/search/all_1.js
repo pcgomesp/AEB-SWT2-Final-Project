@@ -19,12 +19,14 @@ var searchData=
   ['aeb_5fcontroller_5fid_16',['aeb_controller_id',['../aeb__controller_8c.html#a31be80dc3d658ca7ba3be24962aed6d4',1,'aeb_controller.c']]],
   ['aeb_5fcontroller_5fstate_17',['aeb_controller_state',['../aeb__controller_8c.html#a60d56dbca0466eb23ba7c109132a5928',1,'aeb_controller_state:&#160;aeb_controller.c'],['../test__aeb__controller_8c.html#a60d56dbca0466eb23ba7c109132a5928',1,'aeb_controller_state:&#160;test_aeb_controller.c']]],
   ['aeb_5finternal_5fstate_18',['aeb_internal_state',['../aeb__controller_8c.html#a15b2dc1261c867c309a53e7342596884',1,'aeb_internal_state:&#160;aeb_controller.c'],['../test__aeb__controller_8c.html#a15b2dc1261c867c309a53e7342596884',1,'aeb_internal_state:&#160;aeb_controller.c']]],
-  ['aeb_5fstate_5factive_19',['aeb_state_active',['../aeb__controller_8c.html#a60d56dbca0466eb23ba7c109132a5928ae454b2a27eae83a0c57bd2ffde66e09a',1,'AEB_STATE_ACTIVE:&#160;aeb_controller.c'],['../test__aeb__controller_8c.html#a60d56dbca0466eb23ba7c109132a5928ae454b2a27eae83a0c57bd2ffde66e09a',1,'AEB_STATE_ACTIVE:&#160;test_aeb_controller.c']]],
+  ['aeb_5fstate_5factive_19',['aeb_state_active',['../test__aeb__controller_8c.html#a60d56dbca0466eb23ba7c109132a5928ae454b2a27eae83a0c57bd2ffde66e09a',1,'AEB_STATE_ACTIVE:&#160;test_aeb_controller.c'],['../aeb__controller_8c.html#a60d56dbca0466eb23ba7c109132a5928ae454b2a27eae83a0c57bd2ffde66e09a',1,'AEB_STATE_ACTIVE:&#160;aeb_controller.c']]],
   ['aeb_5fstate_5falarm_20',['aeb_state_alarm',['../test__aeb__controller_8c.html#a60d56dbca0466eb23ba7c109132a5928a06edf6bb0f2816cbb0074c27d62e81d4',1,'AEB_STATE_ALARM:&#160;test_aeb_controller.c'],['../aeb__controller_8c.html#a60d56dbca0466eb23ba7c109132a5928a06edf6bb0f2816cbb0074c27d62e81d4',1,'AEB_STATE_ALARM:&#160;aeb_controller.c']]],
   ['aeb_5fstate_5fbrake_21',['aeb_state_brake',['../aeb__controller_8c.html#a60d56dbca0466eb23ba7c109132a5928a9f92c5be6a496ec11dcc37a5740b8bfa',1,'AEB_STATE_BRAKE:&#160;aeb_controller.c'],['../test__aeb__controller_8c.html#a60d56dbca0466eb23ba7c109132a5928a9f92c5be6a496ec11dcc37a5740b8bfa',1,'AEB_STATE_BRAKE:&#160;test_aeb_controller.c']]],
   ['aeb_5fstate_5fstandby_22',['aeb_state_standby',['../aeb__controller_8c.html#a60d56dbca0466eb23ba7c109132a5928a6d038f8cafa588e741d3b930b758b775',1,'AEB_STATE_STANDBY:&#160;aeb_controller.c'],['../test__aeb__controller_8c.html#a60d56dbca0466eb23ba7c109132a5928a6d038f8cafa588e741d3b930b758b775',1,'AEB_STATE_STANDBY:&#160;test_aeb_controller.c']]],
-  ['alarm_5fbuzzer_23',['alarm_buzzer',['../structactuators__abstraction.html#afd5b1185a961b17a79fe4fb45a65baa9',1,'actuators_abstraction']]],
-  ['alarm_5fled_24',['alarm_led',['../structactuators__abstraction.html#ab6e6f15280e566ecf86f06a780cb94a7',1,'actuators_abstraction']]],
-  ['and_20execution_25',['Setup and Execution',['../index.html#autotoc_md7',1,'']]],
-  ['auto_20emergency_20braking_20swt2_26',['AUTO EMERGENCY BRAKING - SWT2',['../index.html',1,'']]]
+  ['aeb_5fsystem_5fenabled_23',['aeb_system_enabled',['../structsensors__input__data.html#ae89dc450cae9cb5131b7c1eee277b71e',1,'sensors_input_data']]],
+  ['alarm_5fbuzzer_24',['alarm_buzzer',['../structactuators__abstraction.html#afd5b1185a961b17a79fe4fb45a65baa9',1,'actuators_abstraction']]],
+  ['alarm_5fled_25',['alarm_led',['../structactuators__abstraction.html#ab6e6f15280e566ecf86f06a780cb94a7',1,'actuators_abstraction']]],
+  ['and_20doxygen_20documentation_26',['Coverage Report and Doxygen Documentation',['../index.html#autotoc_md1',1,'']]],
+  ['and_20execution_27',['Setup and Execution',['../index.html#autotoc_md8',1,'']]],
+  ['auto_20emergency_20braking_20swt2_28',['AUTO EMERGENCY BRAKING - SWT2',['../index.html',1,'']]]
 ];

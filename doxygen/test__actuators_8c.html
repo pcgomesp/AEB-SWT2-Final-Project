@@ -284,7 +284,7 @@ Variables</h2></td></tr>
 <div class="ttc" id="aactuators_8c_html_ab0b4f8f98c3eb2f7041948c148ceadf8"><div class="ttname"><a href="actuators_8c.html#ab0b4f8f98c3eb2f7041948c148ceadf8">LOOP_EMPTY_ITERATIONS_MAX</a></div><div class="ttdeci">#define LOOP_EMPTY_ITERATIONS_MAX</div><div class="ttdef"><b>Definition</b> <a href="actuators_8c_source.html#l00022">actuators.c:22</a></div></div>
 <div class="ttc" id="aactuators_8c_html_ab919c9cf0d6de1c30bb90ee5636f09b8"><div class="ttname"><a href="actuators_8c.html#ab919c9cf0d6de1c30bb90ee5636f09b8">actuators_state</a></div><div class="ttdeci">actuators_abstraction actuators_state</div><div class="ttdef"><b>Definition</b> <a href="actuators_8c_source.html#l00031">actuators.c:31</a></div></div>
 <div class="ttc" id="alog__utils_8c_html_acf303e3f3f7d320a1113be573509bb63"><div class="ttname"><a href="log__utils_8c.html#acf303e3f3f7d320a1113be573509bb63">log_event</a></div><div class="ttdeci">void log_event(const char *id_aeb, uint32_t event_id, actuators_abstraction actuators)</div><div class="ttdoc">Logs an event to a file with a timestamp and actuator data.</div><div class="ttdef"><b>Definition</b> <a href="log__utils_8c_source.html#l00030">log_utils.c:30</a></div></div>
-<div class="ttc" id="amq__utils_8c_html_abee084f2648925ba92404d2d06f98581"><div class="ttname"><a href="mq__utils_8c.html#abee084f2648925ba92404d2d06f98581">read_mq</a></div><div class="ttdeci">int read_mq(mqd_t mq_receiver, can_msg *msg_read)</div><div class="ttdoc">Reads a message from a POSIX message queue.</div><div class="ttdef"><b>Definition</b> <a href="mq__utils_8c_source.html#l00099">mq_utils.c:99</a></div></div>
+<div class="ttc" id="amq__utils_8c_html_abee084f2648925ba92404d2d06f98581"><div class="ttname"><a href="mq__utils_8c.html#abee084f2648925ba92404d2d06f98581">read_mq</a></div><div class="ttdeci">int read_mq(mqd_t mq_receiver, can_msg *msg_read)</div><div class="ttdoc">Reads a message from a POSIX message queue.</div><div class="ttdef"><b>Definition</b> <a href="mq__utils_8c_source.html#l00105">mq_utils.c:105</a></div></div>
 <div class="ttc" id="astructcan__msg_html_ac4e36d6ad06dd50743b62e7414f78184"><div class="ttname"><a href="structcan__msg.html#ac4e36d6ad06dd50743b62e7414f78184">can_msg::identifier</a></div><div class="ttdeci">uint32_t identifier</div><div class="ttdef"><b>Definition</b> <a href="dbc_8h_source.html#l00048">dbc.h:48</a></div></div>
 </div><!-- fragment -->
 </div>
@@ -449,7 +449,7 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Message queue identifier (mqd_t). </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Message queue identifier (mqd_t). <a class="anchor" id="open_mq"></a></dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="test__actuators_8c_source.html#l00016">16</a> of file <a class="el" href="test__actuators_8c_source.html">test_actuators.c</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   16</span>                             {</div>
@@ -494,7 +494,7 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on failure. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on failure. <a class="anchor" id="read_mq"></a></dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="test__actuators_8c_source.html#l00022">22</a> of file <a class="el" href="test__actuators_8c_source.html">test_actuators.c</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">   22</span>                                    {</div>
@@ -1007,7 +1007,7 @@ Variables</h2></td></tr>
 <div class="line"><span class="lineno">   33</span>    .door_lock = <span class="keyword">true</span>,</div>
 <div class="line"><span class="lineno">   34</span>    .should_activate_abs = <span class="keyword">false</span>,</div>
 <div class="line"><span class="lineno">   35</span>    .alarm_led = <span class="keyword">false</span>,</div>
-<div class="line"><span class="lineno">   36</span>    .alarm_buzzer = <span class="keyword">true</span>};</div>
+<div class="line"><span class="lineno">   36</span>    .alarm_buzzer = <span class="keyword">false</span>};</div>
 </div><!-- fragment -->
 </div>
 </div>
