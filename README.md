@@ -1,5 +1,9 @@
 # AUTO EMERGENCY BRAKING - SWT2
 
+## Coverage Report and Doxygen Documentation
+- https://pcgomesp.github.io/AEB-SWT2-Final-Project/lcov/src/index.html
+- https://pcgomesp.github.io/AEB-SWT2-Final-Project/doxygen/
+
 ## Project Description
 
 **AEB** is an advanced active safety system that assists drivers in avoiding or mitigating collisions with other vehicles or obstacles. It detects potential frontal collisions and automatically engages the vehicle's braking system to reduce speed or come to a complete stop, aiming to prevent or minimize impact.
