@@ -1,4 +1,8 @@
-### AUTO EMERGENCY BREAKING - SWT2
+# AUTO EMERGENCY BRAKING - SWT2
+
+## Coverage Report and Doxygen Documentation
+- https://pcgomesp.github.io/AEB-SWT2-Final-Project/lcov/src/index.html
+- https://pcgomesp.github.io/AEB-SWT2-Final-Project/doxygen/
 
 ## Project Description
 
@@ -8,7 +12,7 @@ To implement this system, **POSIX** (Portable Operating System Interface) concep
 
 ## Project Objective
 
-This project is part of the final course in Automotive Propulsion Engineering, aka **Residência Tecnológica Stellantis 2024, SWT2**. It is dedicated to the development of an Automotive Emergency Braking (AEB) system, aligning with Stellantis’ interests. The project takes a multidisciplinary approach, demonstrating the student's understanding of various topics covered during the course. Key topics include Vehicle Modeling and Simulation, Agile Methodologies, Vehicular Networks, Vehicle Function Allocation, Automotive Embedded Software Modeling and Testing, and the Implementation of Automotive Control Systems.
+This project is part of the final step on an course in Automotive Propulsion Engineering, aka **Residência Tecnológica Stellantis 2024, SWT2**. It is dedicated to the development of an Automotive Emergency Braking (AEB) system, aligning with Stellantis’ interests. The project takes a multidisciplinary approach, demonstrating the student's understanding of various topics covered during the course. Key topics include Vehicle Modeling and Simulation, Agile Methodologies, Vehicular Networks, Vehicle Function Allocation, Automotive Embedded Software Modeling and Testing, and the Implementation of Automotive Control Systems.
 
 ## Main Features
 
@@ -94,6 +98,20 @@ Contributions are welcome! To contribute:
 3. Make the desired changes and commit: `git commit -m 'My new feature'`.
 4. Push to the remote repository: `git push origin my-feature`.
 5. Open a Pull Request for review.
+
+## Other links
+
+### Link to our Trello
+
+https://trello.com/b/Z5uOESC4/projeto-final-stellantis
+
+### Link to our test sheet
+
+https://docs.google.com/spreadsheets/d/1Zic-nqFaG2padWB_YQo9F5DQOCDm1wFUFN4cGH3adDw/edit?usp=sharing
+
+### Link to our final presentation
+
+https://docs.google.com/presentation/d/1Tp3rB9GpJoC1gO3rDbMZZjPwYu3iZt49clCk9x0fw9Y/edit?usp=sharing
 
 ## License
 

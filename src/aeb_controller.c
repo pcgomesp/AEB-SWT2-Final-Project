@@ -1,3 +1,17 @@
+/**
+ * @file aeb_controller.c
+ * @brief Implements the main logic for the Autonomous Emergency Braking (AEB) controller system.
+ *
+ * This file contains the core implementation of the AEB controller, including the main control loop,
+ * message handling, state management, and CAN message translation logic. It interfaces with sensors
+ * via message queues, processes data (e.g., velocity, obstacles, pedal inputs), and makes
+ * decisions based on TTC (Time to Collision) to control actuators accordingly.
+ *
+ * The controller supports multiple operating states such as standby, active, alarm, and brake, and
+ * ensures safe and timely actuation decisions based on vehicle and environmental data.
+ *
+ */
+
 // Necessary libraries
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,13 +31,14 @@
 /**
  * @enum aeb_controller_state
  * @brief Enum defining the possible states of the AEB system.
+ * Abstraction according to [SwR-12] (@ref SwR-12)
  */
-typedef enum // Abstraction according to [SwR-12]
+typedef enum
 {
-    AEB_STATE_ACTIVE,   /**< AEB system is active and performing actions */
-    AEB_STATE_ALARM,    /**< AEB system is in alarm state, but not yet braking */
-    AEB_STATE_BRAKE,    /**< AEB system is actively braking the vehicle */
-    AEB_STATE_STANDBY   /**< AEB system is in standby, waiting for data or conditions */
+    AEB_STATE_ACTIVE, /**< AEB system is active and performing actions */
+    AEB_STATE_ALARM,  /**< AEB system is in alarm state, but not yet braking */
+    AEB_STATE_BRAKE,  /**< AEB system is actively braking the vehicle */
+    AEB_STATE_STANDBY /**< AEB system is in standby, waiting for data or conditions */
 } aeb_controller_state;
 
 // Function prototypes
@@ -39,7 +54,7 @@ aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double t
 
 // Global variables for message queues and internal state
 mqd_t sensors_mq, actuators_mq; /**< Message queues for sensors and actuators */
-pthread_t aeb_controller_id;     /**< Thread ID for the AEB controller */
+pthread_t aeb_controller_id;    /**< Thread ID for the AEB controller */
 
 sensors_input_data aeb_internal_state = {
     .relative_velocity = 0.0,
@@ -47,8 +62,8 @@ sensors_input_data aeb_internal_state = {
     .obstacle_distance = 0.0,
     .brake_pedal = false,
     .accelerator_pedal = false,
-    .on_off_aeb_system = true,
-    .reverseEnabled = false,
+    .aeb_system_enabled = true,
+    .reverse_enabled = false,
     .relative_acceleration = 0.0};
 
 can_msg captured_can_frame = {
@@ -59,25 +74,26 @@ can_msg out_can_frame = {
     .identifier = ID_AEB_S,
     .dataFrame = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}};
 
+//! [SwR-5] (@ref SwR-5)
 can_msg empty_msg = { // [SwR-5]
     .identifier = ID_EMPTY,
     .dataFrame = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
 
 /**
  * @brief The main entry point of the AEB (Autonomous Emergency Braking) controller system.
- * 
- * This function initializes message queues for sensors and actuators, then starts the 
- * AEB controller thread to begin processing. It is designed for use in a production environment 
+ *
+ * This function initializes message queues for sensors and actuators, then starts the
+ * AEB controller thread to begin processing. It is designed for use in a production environment
  * where the AEB controller operates continuously.
- * 
+ *
  * @return 0 on successful execution. If an error occurs while creating the AEB controller thread,
  *         the function will terminate with an error code.
- * 
- * @note This function is only included in production builds, as it is enclosed in 
+ *
+ * @note This function is only included in production builds, as it is enclosed in
  *       a preprocessor check (`#ifndef TEST_MODE_CONTROLLER`).
  */
 #ifndef TEST_MODE // Main for the AEB controller process in production
- int main()
+int main()
 {
     // Open message queues for communication with sensors and actuators
     sensors_mq = open_mq(SENSORS_MQ);
@@ -100,10 +116,12 @@ can_msg empty_msg = { // [SwR-5]
 
 /**
  * @brief Main loop for the AEB controller that processes sensor data and makes decisions.
- * 
- * This function continuously checks the message queue for new sensor data, processes it, 
+ *
+ * This function continuously checks the message queue for new sensor data, processes it,
  * and sends commands to the actuators based on the calculated AEB state.
- * 
+ *
+ * Requirements [SwR-5] (@ref SwR-5), [SwR-6] (@ref SwR-6) and [SwR-9] (@ref SwR-9)
+ *
  * @param arg Arguments passed to the thread (not used here).
  * @return NULL.
  */
@@ -120,23 +138,22 @@ void *mainWorkingLoop(void *arg)
 
             translateAndCallCanMsg(captured_can_frame); // Process the received CAN message
 
-            double ttc = ttc_calc(aeb_internal_state.obstacle_distance, aeb_internal_state.relative_velocity, 
-                aeb_internal_state.relative_acceleration);
+            double ttc = ttc_calc(aeb_internal_state.obstacle_distance, aeb_internal_state.relative_velocity,
+                                  aeb_internal_state.relative_acceleration);
 
             state = getAEBState(aeb_internal_state, ttc);
 
             out_can_frame = updateCanMsgOutput(state);
 
-            if (state == AEB_STATE_STANDBY) // [SwR-5]
-                write_mq(actuators_mq, &empty_msg);  // Send empty message when in standby state
+            if (state == AEB_STATE_STANDBY)         // [SwR-5]
+                write_mq(actuators_mq, &empty_msg); // Send empty message when in standby state
             else
-                write_mq(actuators_mq, &out_can_frame);  // Send the appropriate message based on the current state
-
+                write_mq(actuators_mq, &out_can_frame); // Send the appropriate message based on the current state
         }
         else
-            empty_mq_counter++;  // Increment counter if no message is received
+            empty_mq_counter++; // Increment counter if no message is received
 
-        usleep(200000);  // Wait for a short period before the next iteration (to be replaced later)
+        usleep(200000); // Wait for a short period before the next iteration (to be replaced later)
     }
 
     printf("AEB Controller: empty_mq_counter reached the limit, exiting\n");
@@ -145,8 +162,8 @@ void *mainWorkingLoop(void *arg)
 
 /**
  * @brief Prints debug information about the AEB system's internal state.
- * 
- * This function displays the current values of key variables such as relative velocity, 
+ *
+ * This function displays the current values of key variables such as relative velocity,
  * obstacle distance, pedal states, and more.
  */
 void print_info()
@@ -156,18 +173,18 @@ void print_info()
     printf("obstacle_distance: %lf\n", aeb_internal_state.obstacle_distance);
     printf("brake_pedal: %s\n", aeb_internal_state.brake_pedal ? "true" : "false");
     printf("accelerator_pedal: %s\n", aeb_internal_state.accelerator_pedal ? "true" : "false");
-    printf("on_off_aeb_system: %s\n", aeb_internal_state.on_off_aeb_system ? "true" : "false");
-    printf("Is vehicle in reverse: %s\n", aeb_internal_state.reverseEnabled ? "true" : "false");
+    printf("aeb_system_enabled: %s\n", aeb_internal_state.aeb_system_enabled ? "true" : "false");
+    printf("Is vehicle in reverse: %s\n", aeb_internal_state.reverse_enabled ? "true" : "false");
 }
 #endif
 
 /**
- * @brief Translates the received CAN message and calls the appropriate handler 
+ * @brief Translates the received CAN message and calls the appropriate handler
  * function based on the message identifier.
- * 
- * This function checks the message identifier and calls the appropriate function 
+ *
+ * This function checks the message identifier and calls the appropriate function
  * to handle the CAN message data.
- * 
+ *
  * @param captured_frame The received CAN message to be processed.
  */
 void translateAndCallCanMsg(can_msg captured_frame)
@@ -194,9 +211,9 @@ void translateAndCallCanMsg(can_msg captured_frame)
 
 /**
  * @brief Updates the internal state for the brake and accelerator pedals from the received CAN message.
- * 
+ *
  * This function updates the brake and accelerator pedals' states based on the received CAN message.
- * 
+ *
  * @param captured_frame The captured CAN message containing pedal data.
  */
 void updateInternalPedalsState(can_msg captured_frame)
@@ -222,9 +239,10 @@ void updateInternalPedalsState(can_msg captured_frame)
 
 /**
  * @brief Updates the internal speed state based on the received CAN message.
- * 
+ *
  * This function updates the internal speed (relative velocity) from the received CAN message.
- * 
+ * [SwR-10] (@req SwR-10)
+ *
  * @param captured_frame The captured CAN message containing speed data.
  */
 void updateInternalSpeedState(can_msg captured_frame)
@@ -259,13 +277,13 @@ void updateInternalSpeedState(can_msg captured_frame)
     aeb_internal_state.relative_velocity = new_internal_speed;
 
     // update internal data according to the movement direction reported by the sensor
-    if (captured_frame.dataFrame[2] == 0x00)
+    if (captured_frame.dataFrame[2] == 0x01)
     {
-        aeb_internal_state.reverseEnabled = false;
+        aeb_internal_state.reverse_enabled = true;
     }
-    else if (captured_frame.dataFrame[2] == 0x01)
+    else
     {
-        aeb_internal_state.reverseEnabled = true;
+        aeb_internal_state.reverse_enabled = false;
     }
 
     // update internal data according to the relative acceleration detected by the sensor
@@ -279,36 +297,41 @@ void updateInternalSpeedState(can_msg captured_frame)
     }
     else
     {
-        // Conversion from CAN data frame, according to dbc in the requirement file 
+        // Conversion from CAN data frame, according to dbc in the requirement file
         // [SwR-10]
         data_acel = captured_frame.dataFrame[3] + (captured_frame.dataFrame[4] << 8);
         new_internal_acel = (data_acel + OFFSET_ACCELERATION_S) * RES_ACCELERATION_S;
     }
 
-    if(captured_frame.dataFrame[5] == 0x01){
+    if (captured_frame.dataFrame[5] == 0x01)
+    {
         new_internal_acel *= -1;
-    } else {
+    }
+    else
+    {
         ;
     }
 
     if (new_internal_acel > MAX_ACCELERATION_S)
     { // DBC: Max value constraint
         new_internal_acel = MAX_ACCELERATION_S;
-    } else if(new_internal_acel < MIN_ACCELERATION_S){
+    }
+    else if (new_internal_acel < MIN_ACCELERATION_S)
+    {
         // DBC: Min value constraint
         new_internal_acel = MIN_ACCELERATION_S;
     }
 
     aeb_internal_state.relative_acceleration = new_internal_acel;
 
-    //printf("acel is: %.3lf\n", aeb_internal_state.relative_acceleration);
+    // printf("acel is: %.3lf\n", aeb_internal_state.relative_acceleration);
 }
 
 /**
  * @brief Updates the internal obstacle state based on the received CAN message.
- * 
+ *
  * This function updates whether an obstacle is detected and the distance to it based on the received CAN message.
- * 
+ *
  * @param captured_frame The captured CAN message containing obstacle data.
  */
 void updateInternalObstacleState(can_msg captured_frame)
@@ -316,19 +339,22 @@ void updateInternalObstacleState(can_msg captured_frame)
     unsigned int data_distance; // used for can frame conversion
     double new_internal_distance = 0.0;
 
+    // Check if there is an obstacle
     if (captured_frame.dataFrame[2] == 0x00)
     {
         aeb_internal_state.has_obstacle = false;
+        aeb_internal_state.obstacle_distance = 300.0; // Set max distance when no obstacle is detected
+        return;
     }
     else if (captured_frame.dataFrame[2] == 0x01)
     {
         aeb_internal_state.has_obstacle = true;
     }
 
+    // Handle special cases for clearing data or doing nothing
     if (captured_frame.dataFrame[1] == 0xFF && captured_frame.dataFrame[0] == 0xFE)
-    { // DBC: Clear Data
-        // Defined to max distance, to avoid problems with TTC calculation
-        new_internal_distance = 300.0;
+    {                                  // DBC: Clear Data
+        new_internal_distance = 300.0; // Set to max distance
     }
     else if (captured_frame.dataFrame[1] == 0xFF && captured_frame.dataFrame[0] == 0xFF)
     { // DBC: Do nothing
@@ -341,39 +367,43 @@ void updateInternalObstacleState(can_msg captured_frame)
         new_internal_distance = data_distance * RES_OBSTACLE_S;
     }
 
+    // Apply the max distance constraint
     if (new_internal_distance > 300.0)
     { // DBC: Max value constraint
         new_internal_distance = 300.0;
     }
 
+    // Update internal state with calculated or reset distance
     aeb_internal_state.obstacle_distance = new_internal_distance;
 }
 
 /**
  * @brief Updates the internal car state based on the received CAN message.
- * 
+ *
  * This function updates the status of the AEB system (on/off) based on the data in the CAN message.
- * 
+ *
  * @param captured_frame The captured CAN message containing car state data.
  */
 void updateInternalCarCState(can_msg captured_frame)
 {
-    if (captured_frame.dataFrame[0] == 0x00)
+    if (captured_frame.dataFrame[0] == 0x01)
     {
-        aeb_internal_state.on_off_aeb_system = false;
+        aeb_internal_state.aeb_system_enabled = true;
     }
-    else if (captured_frame.dataFrame[0] == 0x01)
+    else
     {
-        aeb_internal_state.on_off_aeb_system = true;
+        aeb_internal_state.aeb_system_enabled = false; // off state or invalid state
     }
 }
 
 /**
  * @brief Generates the appropriate CAN message for the AEB system state.
- * 
- * This function creates a CAN message to be sent to the actuators based on the current 
+ *
+ * This function creates a CAN message to be sent to the actuators based on the current
  * state of the AEB system (e.g., brake, alarm, etc.).
- * 
+ *
+ * Requirements [SwR-2] (@ref SwR-2), [SwR-14] (@ref SwR-14) and [SwR-15] (@ref SwR-15)
+ *
  * @param state The current state of the AEB system.
  * @return The generated CAN message.
  */
@@ -408,29 +438,34 @@ can_msg updateCanMsgOutput(aeb_controller_state state)
 
 /**
  * @brief Determines the current state of the AEB system based on sensor input and TTC.
- * 
- * This function evaluates the current AEB state based on multiple sensor 
+ *
+ * This function evaluates the current AEB state based on multiple sensor
  * parameters, such as relative velocity, obstacle presence, and TTC (Time to Collision).
- * 
+ *
+ * Requirements [SwR-7] (@ref SwR-7), [SwR-8] (@ref SwR-8), [SwR-12] (@ref SwR-12) and [SwR-16] (@ref SwR-16)
+ *
  * @param aeb_internal_state The current sensor data for the AEB system.
  * @param ttc The time-to-collision value, calculated based on obstacle distance and vehicle speed.
  * @return The current AEB state.
  */
-aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double ttc) 
-{// Abstraction according to [SwR-12]
-    if (aeb_internal_state.on_off_aeb_system == false)
+aeb_controller_state getAEBState(sensors_input_data aeb_internal_state, double ttc)
+{
+    aeb_controller_state my_new_state = AEB_STATE_ACTIVE;
+
+    if (aeb_internal_state.aeb_system_enabled == false)
         return AEB_STATE_STANDBY;
-    if (aeb_internal_state.relative_velocity < MIN_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) // Required by [SwR-7][SwR-16]
-        return AEB_STATE_STANDBY;
-    // Required by [SwR-7][SwR-16]
-    if (aeb_internal_state.relative_velocity > MAX_SPD_ENABLED && aeb_internal_state.reverseEnabled == false) 
-        return AEB_STATE_STANDBY;
-    if (aeb_internal_state.brake_pedal == false && aeb_internal_state.accelerator_pedal == false)
+
+    if (aeb_internal_state.brake_pedal == false && aeb_internal_state.accelerator_pedal == false &&
+        aeb_internal_state.relative_velocity >= MIN_SPD_ENABLED && aeb_internal_state.relative_velocity <= MAX_SPD_ENABLED)
     {
         if (ttc < THRESHOLD_BRAKING)
             return AEB_STATE_BRAKE;
         if (ttc < THRESHOLD_ALARM)
             return AEB_STATE_ALARM;
     }
-    return AEB_STATE_ACTIVE; // [SwR-8]
+
+    if (ttc < THRESHOLD_ALARM)
+        my_new_state = AEB_STATE_ALARM;
+
+    return my_new_state;
 }

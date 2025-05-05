@@ -64,6 +64,9 @@ void tearDown(void) {
 /**
  * @test
  * @brief Verifies if actuatorsTranslateCanMsg correctly processes a message with ID_AEB_S
+ * 
+ * \anchor test_actuatorsTranslateCanMsg_AEB_S_Identifier
+ * test ID [TC_AEB_A__001](@ref TC_AEB_A__001)
  */
 void test_actuatorsTranslateCanMsg_AEB_S_Identifier(void) {
     can_msg test_msg = {
@@ -85,6 +88,8 @@ void test_actuatorsTranslateCanMsg_AEB_S_Identifier(void) {
 /**
  * @test
  * @brief Verifies if actuatorsTranslateCanMsg handles a message with ID_EMPTY correctly
+ * \anchor test_actuatorsTranslateCanMsg_Empty_Identifier
+ * test ID [TC_AEB_A__002](@ref TC_AEB_A__002)
  */
 void test_actuatorsTranslateCanMsg_Empty_Identifier(void) {
     can_msg test_msg = {
@@ -106,6 +111,8 @@ void test_actuatorsTranslateCanMsg_Empty_Identifier(void) {
 /**
  * @test
  * @brief Verifies if actuatorsTranslateCanMsg handles a message with ID_EMPTY correctly
+ * \anchor test_updateInternalActuatorsState_Correct_State
+ * test ID [TC_AEB_A__003](@ref TC_AEB_A__003)
  */
 void test_updateInternalActuatorsState_Correct_State(void) {
     // Verifies if updateInternalActuatorsState correctly updates the actuators' state
@@ -128,6 +135,8 @@ void test_updateInternalActuatorsState_Correct_State(void) {
 /**
  * @test
  * @brief Verifies if actuatorsTranslateCanMsg correctly processes a valid message.
+* \anchor test_actuatorsTranslateCanMsg
+ * test ID [TC_AEB_A__004](@ref TC_AEB_A__004)
  */
 void test_actuatorsTranslateCanMsg(void) {
     can_msg test_msg = {
@@ -149,6 +158,8 @@ void test_actuatorsTranslateCanMsg(void) {
 /**
  * @test
  * @brief Verifies if actuatorsTranslateCanMsg correctly processes a valid message.
+ * \anchor test_actuatorsTranslateCanMsg_Unknown_Identifier
+ * test ID [TC_AEB_A__005](@ref TC_AEB_A__005)
  */
 void test_actuatorsTranslateCanMsg_Unknown_Identifier(void) {
     // Verifies if actuatorsTranslateCanMsg handles an unknown identifier correctly
@@ -168,6 +179,11 @@ void test_actuatorsTranslateCanMsg_Unknown_Identifier(void) {
     TEST_ASSERT_FALSE(actuators_state.alarm_buzzer);
 }
 
+/** @test 
+ * @brief Verifies if updateInternalActuatorsState processes correctly when dataFrame[0] == 0x01
+ * \anchor test_updateInternalActuatorsState_DataFrame0_Active
+ * test ID [TC_AEB_A__006](@ref TC_AEB_A__006)
+*/
 void test_updateInternalActuatorsState_DataFrame0_Active(void) {
     // Verifies if updateInternalActuatorsState processes correctly when dataFrame[0] == 0x01
     can_msg test_msg = {
@@ -190,7 +206,11 @@ void test_updateInternalActuatorsState_DataFrame0_Active(void) {
 
 
 
-
+/** @test
+ * @brief Verifies the initial state of the actuators
+ * \anchor test_InitialActuatorsState
+ * test ID [TC_AEB_A__007](@ref TC_AEB_A__007)
+ */
 void test_InitialActuatorsState(void) {
     // Verifies that the initial state of the actuators is zero
     //// Test case ID: TC_AEB_A__007
@@ -201,6 +221,11 @@ void test_InitialActuatorsState(void) {
     TEST_ASSERT_FALSE(actuators_state.alarm_buzzer);
 }
 
+/** @test 
+ * @brief Verifies if actuatorsTranslateCanMsg handles an unexpected dataFrame correctly
+ * \anchor test_actuatorsTranslateCanMsg_Unexpected_DataFrame
+ * test ID [TC_AEB_A__008](@ref TC_AEB_A__008)
+*/
 void test_actuatorsTranslateCanMsg_Unexpected_DataFrame(void) {
     // Verifies if actuatorsTranslateCanMsg handles an unexpected dataFrame correctly
     can_msg test_msg = {
@@ -222,7 +247,8 @@ void test_actuatorsTranslateCanMsg_Unexpected_DataFrame(void) {
 /**
  * @test
  * @brief Verifies if the actuators response loop handles an empty queue correctly
- */
+ * \anchor test_actuatorsResponseLoop_EmptyQueue
+ * test ID [TC_AEB_A__009](@ref TC_AEB_A__009) */
 void test_actuatorsResponseLoop_EmptyQueue(void) {
     //// Test case ID: TC_AEB_A__009
 
@@ -253,6 +279,8 @@ int mock_mq_send(mqd_t mq, const can_msg *msg) {
 /**
  * @test
  * @brief Verifies if the actuators response loop handles unknown messages correctly
+ * \anchor test_actuatorsResponseLoop_UnknownMessages
+ * test ID [TC_AEB_A__010](@ref TC_AEB_A__010)
  */
 void test_actuatorsResponseLoop_UnknownMessages(void) {
     //// Test case ID: TC_AEB_A__010

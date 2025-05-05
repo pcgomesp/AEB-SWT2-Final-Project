@@ -1,3 +1,13 @@
+/**
+ * @file sensors.c
+ * @brief Sensor module responsible for reading scenario data and converting it into CAN messages.
+ * 
+ * This module reads sensor data from a predefined scenario text file and encodes the information
+ * into CAN frames. The resulting frames are sent via a POSIX message queue to other modules. 
+ * The data includes vehicle velocity, direction, AEB system  status, obstacle presence, and 
+ * pedal activation.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -10,7 +20,7 @@
 #include "file_reader.h"
 
 void *getSensorsData(void *arg);
-can_msg conv2CANCarClusterData(bool on_off_aeb_system);
+can_msg conv2CANCarClusterData(bool aeb_system_enabled);
 can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity, double relative_acceleration);
 can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance);
 can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal);
@@ -60,8 +70,8 @@ void* getSensorsData(void *arg)
         // Read a new line from the file [SwR-9]
         if (read_sensor_data(file, &sensorsData))
         {
-            can_car_cluster = conv2CANCarClusterData(sensorsData.on_off_aeb_system);
-            can_velocity_sensor = conv2CANVelocityData(sensorsData.reverseEnabled, sensorsData.relative_velocity, sensorsData.relative_acceleration); // [SwR-10]
+            can_car_cluster = conv2CANCarClusterData(sensorsData.aeb_system_enabled);
+            can_velocity_sensor = conv2CANVelocityData(sensorsData.reverse_enabled, sensorsData.relative_velocity, sensorsData.relative_acceleration); // [SwR-10]
             can_obstacle_sensor = conv2CANObstacleData(sensorsData.has_obstacle, sensorsData.obstacle_distance);
             can_pedals_sensor = conv2CANPedalsData(sensorsData.brake_pedal, sensorsData.accelerator_pedal);
 
@@ -93,17 +103,19 @@ void* getSensorsData(void *arg)
 /**
  * @brief Function that encapsulates data into the Car Cluster CAN frame.
  * 
- * @param on_off_aeb_system Argument that refers the power state of the AEB System (ON or OFF).
+ * @param aeb_system_enabled Argument that refers the power state of the AEB System (ON or OFF).
  * 
  * @return structure that contains the CAN message ID and Frame.
  * 
+ * \anchor conv2CANCarClusterData
+ * 
 */
-can_msg conv2CANCarClusterData(bool on_off_aeb_system)
+can_msg conv2CANCarClusterData(bool aeb_system_enabled)
 {
     can_msg aux = {.identifier = ID_CAR_C, .dataFrame = BASE_DATA_FRAME};
 
     // Enable or disable AEB data encapsulation
-    if (on_off_aeb_system)
+    if (aeb_system_enabled)
     {
         aux.dataFrame[0] = 0x01;
     }
@@ -127,6 +139,8 @@ can_msg conv2CANCarClusterData(bool on_off_aeb_system)
  * @param relative_acceleration Relative acceleration of the vehicle.
  * 
  * @return structure that contains the CAN message ID and Frame.
+ * 
+ * \anchor conv2CANVelocityData
  * 
 */
 can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity, double relative_acceleration)
@@ -187,6 +201,8 @@ can_msg conv2CANVelocityData(bool vehicle_direction, double relative_velocity, d
  * 
  * @return structure that contains the CAN message ID and Frame.
  * 
+ * \anchor conv2CANObstacleData
+ * 
 */
 can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance)
 {
@@ -226,6 +242,8 @@ can_msg conv2CANObstacleData(bool has_obstacle, double obstacle_distance)
  * @param accelerator_pedal Argument that refers if the accelerator is pressed or not.
  * 
  * @return structure that contains the CAN message ID and Frame.
+ * 
+ * \anchor conv2CANPedalsData
  * 
 */
 can_msg conv2CANPedalsData(bool brake_pedal, bool accelerator_pedal)

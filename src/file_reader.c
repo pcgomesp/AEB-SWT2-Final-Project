@@ -1,4 +1,13 @@
-#include "../inc/file_reader.h"
+/**
+ * @file file_reader.c
+ * @brief Module responsible for handling input file operations related to sensor data.
+ * 
+ * This module provides functions to open a file containing sensor input values and read its 
+ * contents into a structured format. It skips the header line and parses sensor data values 
+ * for later use in simulation or testing environments.
+ */
+
+#include "file_reader.h"
 #include <stdlib.h>
 
 /**
@@ -7,6 +16,7 @@
  * @param filename Name of the file to be opened.
  * @return FILE* Pointer to the opened file.
  * @note If the file cannot be opened, the program exits with an error.
+ * \anchor open_file
  */
 
 FILE* open_file(const char* filename) {
@@ -33,6 +43,7 @@ FILE* open_file(const char* filename) {
  * 
  * @note The expected file format will follow this label formact:
             Distance(m) Obstacle Speed(m/s) Brake Accelerator AEB_on_off Reverse
+    \anchor read_sensor_data
  */
 int read_sensor_data(FILE *file, sensors_input_data *sensor_data) {
     return fscanf(file, "%lf %d %lf %d %d %d %d %lf", 
@@ -41,8 +52,8 @@ int read_sensor_data(FILE *file, sensors_input_data *sensor_data) {
                   &sensor_data->relative_velocity, 
                   &sensor_data->brake_pedal, 
                   &sensor_data->accelerator_pedal, 
-                  &sensor_data->on_off_aeb_system,
-                  &sensor_data->reverseEnabled,
+                  &sensor_data->aeb_system_enabled,
+                  &sensor_data->reverse_enabled,
                   &sensor_data->relative_acceleration
                 ) == 8;
 }

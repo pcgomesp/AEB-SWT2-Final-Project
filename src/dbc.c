@@ -1,5 +1,5 @@
 /**
- * @file can_utils.c
+ * @file dbc.c
  * @brief Utilities for handling CAN messages, according to the DBC specification.
  *
  * This file contains a function for displaying CAN messages,

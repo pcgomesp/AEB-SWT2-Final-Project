@@ -1,0 +1,94 @@
+name: Generate Docs and Coverage Report
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Install make
+        run: sudo apt-get update && sudo apt-get install -y make
+
+      - name: Install gcc 14
+        run: |
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+          sudo apt-get update
+          sudo apt-get install -y gcc-14 g++-14
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 60
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 60
+          sudo ln -s /usr/bin/gcov-14 /usr/local/bin/gcov-14
+
+      - name: Install required Perl modules
+        run: |
+          sudo apt-get install -y cpanminus
+          sudo cpanm Capture::Tiny
+          sudo cpanm Capture::Tiny DateTime
+
+      - name: Install lcov 2.3.1
+        run: |
+          git clone https://github.com/linux-test-project/lcov.git
+          cd lcov
+          git checkout v2.3.1
+          sudo make install
+          cd ..
+          rm -rf lcov
+      
+      - name: Check gcc and gcov versions
+        run: |
+          gcc-14 --version
+          gcov-14 --version
+          lcov --version
+
+      - name: Set symbolic links to use gcc-14 and gcov-14
+        run: |
+          sudo rm -f /usr/bin/gcc
+          sudo rm -f /usr/bin/g++
+          sudo ln -s /usr/bin/gcc-14 /usr/bin/gcc
+          sudo ln -s /usr/bin/g++-14 /usr/bin/g++
+          sudo rm -f /usr/local/bin/gcov
+          sudo ln -s /usr/bin/gcov-14 /usr/local/bin/gcov
+
+      - name: Run lcov
+        run: |
+          make full-cov CC=gcc-14 GCOV=gcov-14
+
+      - name: Lcov_act
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: cov/full_report
+
+  generate-docs-and-deploy:
+    needs: coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+
+      - name: Generate Doxygen
+        run: |
+          doxygen Doxyfile
+          mkdir -p docs/doxygen
+          mv docs/html/* docs/doxygen/
+
+      - name: Download LCOV artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+          path: docs/lcov
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.DEPLOY_TOKEN }}
+          publish_dir: ./docs

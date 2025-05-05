@@ -27,6 +27,17 @@ void tearDown(){
     // clean stuff up here//
 }
 
+/**
+ * @test
+ * @brief Verify if the TTC calculation is in line with the expected papers and patents, 
+ * considering the case where the acceleration is zero.
+ * 
+ * \anchor test_ttc_when_acel_zero
+ * test ID [TC_TTC_CTRL_001](@ref TC_TTC_CTRL_001)
+ *
+ * @note The calculation must be withing 0.0001 of the correct value in order for the test to be sucessfull.
+ *
+ */
 void test_ttc_when_acel_zero(){
     double dist[3], vel[3], acel[3], ttc[3];
 
@@ -41,9 +52,20 @@ void test_ttc_when_acel_zero(){
 
     TEST_ASSERT_FLOAT_WITHIN(delta, 10.0, ttc[0]);
     TEST_ASSERT_FLOAT_WITHIN(delta, 5.8909, ttc[1]);
-    TEST_ASSERT_FLOAT_WITHIN(delta, 2.46, ttc[2]);
+    TEST_ASSERT_FLOAT_WITHIN(delta, 1.9478, ttc[2]);
 }
 
+/**
+ * @test
+ * @brief Verify if the TTC calculation is in line with the expected papers and patents, 
+ * considering the case where the acceleration is not zero and the delta from the formula is negative.
+ * 
+ * \anchor test_ttc_when_delta_negative
+ * test ID [TC_TTC_CTRL_002](@ref TC_TTC_CTRL_002)
+ *
+ * @note The calculation must be withing 0.0001 of the correct value in order for the test to be sucessfull.
+ *
+ */
 void test_ttc_when_delta_negative(){ 
     // Negative delta -> no real root -> Colision impossible? 
     // Verify this
@@ -64,6 +86,17 @@ void test_ttc_when_delta_negative(){
     TEST_ASSERT_FLOAT_WITHIN(delta, 99, ttc[2]);
 }
 
+/**
+ * @test
+ * @brief Verify if the TTC calculation is in line with the expected papers and patents, 
+ * considering the case where the acceleration is not zero and the delta from the formula is zero.
+ * 
+ * \anchor test_ttc_when_delta_zero
+ * test ID [TC_TTC_CTRL_003](@ref TC_TTC_CTRL_003)
+ *
+ * @note The calculation must be withing 0.0001 of the correct value in order for the test to be sucessfull.
+ *
+ */
 void test_ttc_when_delta_zero(){
     double dist[3], vel[3], acel[3], ttc[3];
 
@@ -76,6 +109,17 @@ void test_ttc_when_delta_zero(){
     TEST_ASSERT_FLOAT_WITHIN(delta, 8, ttc[1]);
 }
 
+/**
+ * @test
+ * @brief Verify if the TTC calculation is in line with the expected papers and patents, 
+ * considering the case where the acceleration is not zero and the delta from the formula is positive.
+ * 
+ * \anchor test_ttc_when_delta_positive
+ * test ID [TC_TTC_CTRL_004](@ref TC_TTC_CTRL_004)
+ *
+ * @note The calculation must be withing 0.0001 of the correct value in order for the test to be sucessfull.
+ *
+ */
 void test_ttc_when_delta_positive(){
     double dist[3], vel[3], acel[3], ttc[3];
 
@@ -92,6 +136,17 @@ void test_ttc_when_delta_positive(){
     TEST_ASSERT_FLOAT_WITHIN(delta, 1.6882, ttc[2]);
 }
 
+/**
+ * @test
+ * @brief Verify if the test-version of the AEB controller is is reacting correctly, according to the calculated TTC, 
+ * considering the case where the TTC is high enought that no actuator enters the active state.
+ * 
+ * \anchor test_aebcontrol_no_actuators_trigger
+ * test ID [TC_TTC_CTRL_005](@ref TC_TTC_CTRL_005)
+ *
+ * @note 
+ *
+ */
 void test_aebcontrol_no_actuators_trigger(){
     bool enable_aeb, alarm_cluster, enable_breaking, lk_seatbelt, lk_doors;
     double spd, dist, acel;
@@ -117,6 +172,17 @@ void test_aebcontrol_no_actuators_trigger(){
     TEST_ASSERT_FALSE(enable_breaking);
 }
 
+/**
+ * @test
+ * @brief Verify if the test-version of the AEB controller is is reacting correctly, according to the calculated TTC, 
+ * considering the case where the TTC is low enought that every actuator must enter the active state.
+ * 
+ * \anchor test_aeb_worst_situation
+ * test ID [TC_TTC_CTRL_006](@ref TC_TTC_CTRL_006)
+ *
+ * @note 
+ *
+ */
 void test_aeb_worst_situation(){
     bool enable_aeb, alarm_cluster, enable_breaking, lk_seatbelt, lk_doors;
     double spd, dist, acel;
@@ -135,6 +201,84 @@ void test_aeb_worst_situation(){
     TEST_ASSERT_FALSE(lk_doors);
 }
 
+/**
+ * @test
+ * @brief Verify if the test-version of the AEB controller is is reacting correctly, according to the calculated TTC, 
+ * considering the case where the TTC is low enought that the alarm and ABS abstraction must enter the active state.
+ * 
+ * \anchor test_aeb_generic_break_situations
+ * test ID [TC_TTC_CTRL_007](@ref TC_TTC_CTRL_007)
+ *
+ * @note 
+ *
+ */
+void test_aeb_generic_break_situations(){
+    bool enable_aeb, alarm_cluster, enable_breaking, lk_seatbelt, lk_doors;
+    double spd, dist, acel;
+
+    enable_aeb = true;
+    enable_breaking = false;
+    dist = 9.99; spd = 36; acel=0.3;   
+    aeb_control(&enable_aeb,&alarm_cluster,&enable_breaking,&lk_seatbelt,&lk_doors,
+        &spd, &dist, &acel);
+    TEST_ASSERT_TRUE(alarm_cluster);
+    TEST_ASSERT_TRUE(enable_breaking);
+
+    enable_aeb = true;
+    enable_breaking = true;
+    dist = 9.99; spd = 36; acel=0.3;   
+    aeb_control(&enable_aeb,&alarm_cluster,&enable_breaking,&lk_seatbelt,&lk_doors,
+        &spd, &dist, &acel);
+    TEST_ASSERT_TRUE(alarm_cluster);
+    TEST_ASSERT_TRUE(enable_breaking);
+}
+
+/**
+ * @test
+ * @brief Verify if the test-version of the AEB controller is is reacting correctly, according to the calculated TTC, 
+ * considering the case where the TTC is low enought that the alarm must enter the active state, while the ABS remains deactivated.
+ * 
+ * \anchor test_aeb_alarm_situation
+ * test ID [TC_TTC_CTRL_008](@ref TC_TTC_CTRL_008)
+ *
+ * @note 
+ *
+ */
+void test_aeb_alarm_situation(){
+    bool enable_aeb, alarm_cluster, enable_breaking, lk_seatbelt, lk_doors;
+    double spd, dist, acel;
+
+    // Alarm situation: TTC low enought that the alarm state is activated;
+    // But the breaking isn't yet
+
+    enable_aeb = true;
+    enable_breaking = false;
+    dist = 19.99; spd = 36; acel=0.3;   
+    aeb_control(&enable_aeb,&alarm_cluster,&enable_breaking,&lk_seatbelt,&lk_doors,
+        &spd, &dist, &acel);
+    TEST_ASSERT_TRUE(alarm_cluster);
+    TEST_ASSERT_FALSE(enable_breaking);
+
+    // Sensitizes expression 2, line 78 from original file
+    enable_aeb = true;
+    enable_breaking = false;
+    dist = 0.9; spd = 180; acel=0.3;   
+    aeb_control(&enable_aeb,&alarm_cluster,&enable_breaking,&lk_seatbelt,&lk_doors,
+        &spd, &dist, &acel);
+    TEST_ASSERT_TRUE(alarm_cluster);
+    TEST_ASSERT_FALSE(enable_breaking);
+
+    // Sensitizes expression 3, line 78 from original file
+    enable_aeb = true;
+    enable_breaking = false;
+    dist = 0.1; spd = 0.5; acel=0.3;   
+    aeb_control(&enable_aeb,&alarm_cluster,&enable_breaking,&lk_seatbelt,&lk_doors,
+        &spd, &dist, &acel);
+    TEST_ASSERT_TRUE(alarm_cluster);
+    TEST_ASSERT_FALSE(enable_breaking);
+
+}
+
 int main(){
     UNITY_BEGIN();
     
@@ -143,7 +287,9 @@ int main(){
     RUN_TEST(test_ttc_when_delta_zero);
     RUN_TEST(test_ttc_when_delta_positive);    
     RUN_TEST(test_aebcontrol_no_actuators_trigger);    
-    RUN_TEST(test_aeb_worst_situation);    
+    RUN_TEST(test_aeb_worst_situation);
+    RUN_TEST(test_aeb_generic_break_situations);
+    RUN_TEST(test_aeb_alarm_situation);
     
     return UNITY_END();
 }

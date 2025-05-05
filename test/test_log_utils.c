@@ -61,7 +61,13 @@ void tearDown(){
     remove("test/test_log.txt");
 }
 
-// first test: verify if the fopen is catchable by a test (using mock functions)
+/**
+ * @test
+ * @brief Verifies if a fopen error is catchable by a test (using mock functions)
+ * 
+ * \anchor test_log_event_fopen_fail
+ * test ID [TC_LOG_UTILS_001](@ref TC_LOG_UTILS_001)
+ */
 void test_log_event_fopen_fail(){
     // Try to write:
     // Verify if write
@@ -76,6 +82,13 @@ void test_log_event_fopen_fail(){
     TEST_ASSERT_TRUE(wrap_perror_called);
 }
 
+/**
+ * 
+ * @brief Helper function, used to capture the last file of the file
+ * @return Type 'actuators_abstraction', according to the data in the file's last line.
+ * @note The test may fail if, for any reason, the file cannot be opened.
+ *
+ */
 actuators_abstraction read_line_test(){
     FILE *file = fopen("test/test_log.txt", "r"); // Abrir o arquivo para leitura
 
@@ -97,6 +110,17 @@ actuators_abstraction read_line_test(){
     return actuators_test;
 }
 
+/**
+ * @test
+ * @brief Verifies if the line written is as expected.
+ * 
+ * \anchor test_log_event_check_writing_no1
+ * test ID [TC_LOG_UTILS_002](@ref TC_LOG_UTILS_002)
+ *
+ * @note This test depends on the correct operation of file reading and writing functions. 
+ * If one of the two fails, this test will also fail.
+ *
+ */
 void test_log_event_check_writing_no1(){
     // Try to write: done
     // Verify if write: done
@@ -114,9 +138,26 @@ void test_log_event_check_writing_no1(){
     TEST_ASSERT_EQUAL(actuators_test.alarm_buzzer, actuators_try.alarm_buzzer);
 }
 
+void test_log_event_file_already_exists(){
+    wrap_fopen_fail = false;
+    // First call, file created
+    log_event("Check_Writing", can_frame_test.identifier, actuators_test);
+    // Second call, file created before
+    log_event("Check_Writing", can_frame_test.identifier, actuators_test);
+
+    // The same as the previous test 
+    actuators_try = read_line_test();
+    TEST_ASSERT_EQUAL(actuators_test.belt_tightness, actuators_try.belt_tightness);
+    TEST_ASSERT_EQUAL(actuators_test.door_lock, actuators_try.door_lock);
+    TEST_ASSERT_EQUAL(actuators_test.should_activate_abs, actuators_try.should_activate_abs);
+    TEST_ASSERT_EQUAL(actuators_test.alarm_led, actuators_try.alarm_led);
+    TEST_ASSERT_EQUAL(actuators_test.alarm_buzzer, actuators_try.alarm_buzzer);
+}
+
 int main(){
     UNITY_BEGIN();
     RUN_TEST(test_log_event_fopen_fail);
     RUN_TEST(test_log_event_check_writing_no1);
+    RUN_TEST(test_log_event_file_already_exists);
     return UNITY_END();
 }
