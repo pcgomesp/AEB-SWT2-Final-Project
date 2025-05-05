@@ -95,6 +95,23 @@ Contributions are welcome! To contribute:
 4. Push to the remote repository: `git push origin my-feature`.
 5. Open a Pull Request for review.
 
+## Other links
+
+### Link to our Trello
+
+https://trello.com/b/Z5uOESC4/projeto-final-stellantis
+
+### Link to our test sheet (to be inserted)
+
+
+### Link to our final presentation
+
+https://docs.google.com/presentation/d/1Tp3rB9GpJoC1gO3rDbMZZjPwYu3iZt49clCk9x0fw9Y/edit?usp=sharing
+
+### Other updates may come when the project is finished
+
+
+
 ## License
 
 This project is licensed under the MIT License. For more details, refer to the `LICENSE` file in the repository.
